@@ -1,0 +1,44 @@
+name: Deploy to Cloudflare Pages
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+  deployments: write
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    name: Build and deploy
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: oven-sh/setup-bun@v2
+
+      - name: Install
+        run: bun install --frozen-lockfile
+
+      - name: Build
+        run: bun run build
+
+      # Pushes to main deploy to production; PRs get a preview URL on the same project.
+      # Branch name goes through an env var — head_ref is attacker-controlled on PRs.
+      - name: Resolve deploy branch
+        env:
+          HEAD_REF: ${{ github.head_ref }}
+        run: |
+          if [ "${{ github.ref }}" = "refs/heads/main" ]; then
+            echo "DEPLOY_BRANCH=main" >> "$GITHUB_ENV"
+          else
+            printf 'DEPLOY_BRANCH=%s\n' "$(printf '%s' "$HEAD_REF" | tr -c 'a-zA-Z0-9-' '-')" >> "$GITHUB_ENV"
+          fi
+
+      - name: Deploy
+        uses: cloudflare/wrangler-action@v3
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: 010c4c6b0df9ff6b8de54f1788a3905b
+          command: pages deploy dist --project-name descanto-www --branch "$DEPLOY_BRANCH"
