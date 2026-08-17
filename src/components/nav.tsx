@@ -1,5 +1,5 @@
-import { useState } from "react";
-import { Link, NavLink } from "react-router-dom";
+import { useEffect, useState } from "react";
+import { Link, NavLink, useLocation } from "react-router-dom";
 import { AnimatePresence, motion } from "framer-motion";
 import { Mascot } from "./mascot";
 import { cn } from "@/lib/utils";
@@ -134,6 +134,8 @@ function MobileMenu({ onClose }: { onClose: () => void }) {
 
 export function Nav() {
   const [mobileOpen, setMobileOpen] = useState(false);
+  const location = useLocation();
+  useEffect(() => setMobileOpen(false), [location.pathname]);
   return (
     <header className="sticky top-0 z-40 bg-ground/90 backdrop-blur">
       <nav className="mx-auto flex h-18 max-w-[1440px] items-center gap-10 px-8 max-md:gap-4 max-md:px-5">
@@ -164,10 +166,15 @@ export function Nav() {
             </span>
           </a>
           <button
+            type="button"
             aria-label={mobileOpen ? "Close menu" : "Open menu"}
             aria-expanded={mobileOpen}
             className="hidden size-10 cursor-pointer flex-col items-center justify-center gap-1.5 max-md:flex"
-            onClick={() => setMobileOpen((v) => !v)}
+            onClick={(e) => {
+              e.preventDefault();
+              e.stopPropagation();
+              setMobileOpen((v) => !v);
+            }}
           >
             <motion.span className="h-0.5 w-5.5 rounded-full bg-white" animate={mobileOpen ? { rotate: 45, y: 4 } : { rotate: 0, y: 0 }} />
             <motion.span className="h-0.5 w-5.5 rounded-full bg-white" animate={mobileOpen ? { rotate: -45, y: -4 } : { rotate: 0, y: 0 }} />
