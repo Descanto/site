@@ -1,6 +1,6 @@
-# descanto-www
+# Descanto/site
 
-Marketing site for Descanto (Botto + Canto). Vite + React 19 + Tailwind v4, dark-only, deployed to Cloudflare Pages at descanto.com.
+descanto.com — marketing site for Descanto (Botto + Canto). Vite + React 19 + Tailwind v4, dark-only, deployed to Cloudflare Pages.
 
 ## Develop
 
@@ -29,11 +29,9 @@ The filename becomes the URL slug (`my-post.md` → `/news/my-post`). Posts sort
 
 ## Deploy
 
-```sh
-bun run deploy   # builds and pushes to Cloudflare Pages (project: descanto-www)
-```
+Pushing to `main` deploys to production automatically (GitHub Actions → Cloudflare Pages project `descanto-www`, custom domain descanto.com). PRs get preview deployments on the same project. The workflow needs the `CLOUDFLARE_API_TOKEN` repo secret (Cloudflare token with the "Cloudflare Pages: Edit" permission).
 
-Custom domain: descanto.com. Note the zone-wide `*.descanto.com/*` Worker route (`workspace-subdomains`) — the apex needs a carve-out or proxy hop like botto-app (see bot/DEPLOYMENT.md "Moving domains").
+Manual escape hatch: `bun run deploy` (uses your local wrangler auth).
 
 ## Structure
 
