@@ -89,10 +89,54 @@ function NavDropdown({ label, primary, secondary = [] }: { label: string; primar
   );
 }
 
+const mobileLinks: { label: string; to: string }[] = [
+  { label: "Botto", to: "/botto" },
+  { label: "Canto", to: "/canto" },
+  { label: "Pricing", to: "/canto/pricing" },
+  { label: "News", to: "/news" },
+  { label: "About", to: "/about" },
+  { label: "Open source", to: "https://github.com/descanto" },
+];
+
+function MobileMenu({ onClose }: { onClose: () => void }) {
+  return (
+    <motion.div
+      className="absolute inset-x-0 top-full z-50 flex h-[calc(100dvh-4.5rem)] flex-col overflow-y-auto bg-ground px-8 pb-10 md:hidden"
+      initial={{ opacity: 0, y: -10 }}
+      animate={{ opacity: 1, y: 0 }}
+      exit={{ opacity: 0, y: -10 }}
+      transition={{ duration: 0.18, ease: "easeOut" }}
+    >
+      <div className="flex flex-col">
+        {mobileLinks.map((l) =>
+          l.to.startsWith("http") ? (
+            <a key={l.label} href={l.to} className="border-b border-white/8 py-4.5 font-display text-2xl font-medium" onClick={onClose}>
+              {l.label}
+            </a>
+          ) : (
+            <Link key={l.label} to={l.to} className="border-b border-white/8 py-4.5 font-display text-2xl font-medium" onClick={onClose}>
+              {l.label}
+            </Link>
+          ),
+        )}
+      </div>
+      <div className="mt-auto flex flex-col gap-3 pt-10">
+        <a href="https://botto.descanto.com" className="rounded-full bg-white py-3.5 text-center text-[15px] font-medium text-ground" onClick={onClose}>
+          Download Botto
+        </a>
+        <a href="mailto:hello@descanto.com" className="rounded-full border border-white/28 py-3.5 text-center text-[15px] font-medium" onClick={onClose}>
+          Contact sales
+        </a>
+      </div>
+    </motion.div>
+  );
+}
+
 export function Nav() {
+  const [mobileOpen, setMobileOpen] = useState(false);
   return (
     <header className="sticky top-0 z-40 bg-ground/90 backdrop-blur">
-      <nav className="mx-auto flex h-18 max-w-[1440px] items-center gap-10 px-8">
+      <nav className="mx-auto flex h-18 max-w-[1440px] items-center gap-10 px-8 max-md:gap-4 max-md:px-5">
         <Link to="/" className="flex shrink-0 items-center gap-2.5">
           <Mascot size={24} />
           <span className="font-display text-lg font-semibold tracking-tight">descanto</span>
@@ -108,19 +152,29 @@ export function Nav() {
             News
           </NavLink>
         </div>
-        <div className="flex shrink-0 items-center gap-3">
-          <a href="mailto:hello@descanto.com" className="rounded-full border border-white/28 px-5 py-2.5 text-[15px] font-medium max-sm:hidden">
+        <div className="ml-auto flex shrink-0 items-center gap-3">
+          <a href="mailto:hello@descanto.com" className="rounded-full border border-white/28 px-5 py-2.5 text-[15px] font-medium max-md:hidden">
             Contact sales
           </a>
           <a href="https://botto.descanto.com" className="flex items-stretch overflow-hidden rounded-full bg-white text-ground">
-            <span className="py-2.5 pl-5 pr-2 text-[15px] font-medium">Download Botto</span>
-            <span className="my-2 w-px bg-ground/15" />
-            <span className="flex items-center py-2.5 pl-2.5 pr-3.5">
+            <span className="py-2.5 pl-5 pr-2 text-[15px] font-medium max-md:px-4.5 max-md:text-sm">Download Botto</span>
+            <span className="my-2 w-px bg-ground/15 max-md:hidden" />
+            <span className="flex items-center py-2.5 pl-2.5 pr-3.5 max-md:hidden">
               <Chevron />
             </span>
           </a>
+          <button
+            aria-label={mobileOpen ? "Close menu" : "Open menu"}
+            aria-expanded={mobileOpen}
+            className="hidden size-10 cursor-pointer flex-col items-center justify-center gap-1.5 max-md:flex"
+            onClick={() => setMobileOpen((v) => !v)}
+          >
+            <motion.span className="h-0.5 w-5.5 rounded-full bg-white" animate={mobileOpen ? { rotate: 45, y: 4 } : { rotate: 0, y: 0 }} />
+            <motion.span className="h-0.5 w-5.5 rounded-full bg-white" animate={mobileOpen ? { rotate: -45, y: -4 } : { rotate: 0, y: 0 }} />
+          </button>
         </div>
       </nav>
+      <AnimatePresence>{mobileOpen && <MobileMenu onClose={() => setMobileOpen(false)} />}</AnimatePresence>
     </header>
   );
 }
