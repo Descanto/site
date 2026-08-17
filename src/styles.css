@@ -1,0 +1,27 @@
+@import "tailwindcss";
+
+@theme {
+  --color-ground: #0a0a0b;
+  --color-surface: #131418;
+  --color-elevated: #1b1d23;
+  --color-ink: #ffffff;
+  --color-accent: #3d5afe;
+  --color-accent-light: #5b7cfe;
+  --color-ok: #34c77b;
+
+  --font-display: "Space Grotesk Variable", sans-serif;
+  --font-sans: "Inter Variable", sans-serif;
+  --font-mono: "JetBrains Mono Variable", monospace;
+}
+
+body {
+  background-color: var(--color-ground);
+  color: var(--color-ink);
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+}
+
+/* hairline utility used across all sections */
+@utility hairline-t {
+  border-top: 1px solid rgb(255 255 255 / 8%);
+}
