@@ -1,16 +1,15 @@
 import { useState } from "react";
-import { BotoBot } from "@/avatar/BotoBot";
-import { Bot3D, ANIMATION_NAMES, type AnimationName } from "@/avatar/lab3d/Bot3D";
-import type { StateId } from "@/avatar/core/states";
-import { SHAPES, COLORS } from "@/avatar/core/skins";
+import {
+  BottoAvatar,
+  BOTTO_MORPHS,
+  BOTTO_SHAPES,
+  type BottoMood,
+  type BottoMorph,
+  type BottoShape,
+} from "@/avatar/BottoAvatar";
+import { ANIMATION_NAMES } from "@/avatar/lab3d/Bot3D";
+import { COLORS } from "@/avatar/core/skins";
 import { cn } from "@/lib/utils";
-
-/**
- * Avatar lab — mirrors the app's hybrid renderer: the 3D Avatar Lab engine
- * owns every resting mood, and the 2D morph engine takes over when the body
- * stops being a body. Selecting a mood shows 3D; selecting a morph cross-fades
- * to the 2D layer, exactly like BotAvatarMorph in the app.
- */
 
 const MOOD_LABELS: Record<string, string> = {
   idle: "Idle",
@@ -25,24 +24,21 @@ const MOOD_LABELS: Record<string, string> = {
   wink: "Wink",
 };
 
-const MORPHS: { id: StateId; label: string }[] = [
-  { id: "hibernate" as StateId, label: "Hibernate" },
-  { id: "fork" as StateId, label: "Fork" },
-  { id: "thinking" as StateId, label: "Dots" },
-  { id: "orbit" as StateId, label: "Orbit" },
-  { id: "burst" as StateId, label: "Burst" },
-  { id: "comet" as StateId, label: "Comet" },
-];
+const MORPH_LABELS: Record<BottoMorph, string> = {
+  hibernate: "Hibernate",
+  fork: "Fork",
+  thinking: "Dots",
+  orbit: "Orbit",
+  burst: "Burst",
+  comet: "Comet",
+};
 
-const SHAPE_LABELS: Record<string, string> = {
+const SHAPE_LABELS: Record<BottoShape, string> = {
+  squircle: "Squircle",
   cercle: "Circle",
   galet: "Pebble",
-  squircle: "Squircle",
   capsule: "Capsule",
   triangle: "Triangle",
-  hexagone: "Hexagon",
-  nuage: "Cloud",
-  goutte: "Droplet",
 };
 
 const COLOR_LABELS: Record<string, string> = {
@@ -84,60 +80,38 @@ function Section({ title, children }: { title: string; children: React.ReactNode
   );
 }
 
-const FADE_MS = 180;
-
 export function AvatarPage() {
-  const [mood, setMood] = useState<AnimationName>("idle");
-  const [morph, setMorph] = useState<StateId | null>(null);
-  const [shape, setShape] = useState("squircle");
+  const [mood, setMood] = useState<BottoMood>("idle");
+  const [morph, setMorph] = useState<BottoMorph | null>(null);
+  const [shape, setShape] = useState<BottoShape>("squircle");
   const [colorId, setColorId] = useState("creme");
 
   const hex = COLORS.find((c) => c.id === colorId)?.hex ?? "#f1efe9";
-  const morphing = morph !== null;
-
-  const layer = (visible: boolean): React.CSSProperties => ({
-    gridArea: "1 / 1",
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "center",
-    opacity: visible ? 1 : 0,
-    transition: `opacity ${FADE_MS}ms ease`,
-    pointerEvents: "none",
-  });
 
   return (
     <div className="mx-auto flex max-w-240 flex-col gap-8 px-6 pt-10 pb-24">
       <header className="flex flex-col gap-1.5">
         <h1 className="font-display text-4xl font-medium tracking-tight">Avatar lab</h1>
         <p className="text-[15px] text-white/55">
-          The app's hybrid renderer: moods play in the 3D Avatar Lab engine — quaternion head turns, perspective body —
-          and body morphs cross-fade to the 2D engine (adapted from{" "}
+          One renderer, Botto's full range: moods play in 3D — head turning in perspective — and body morphs take over
+          when the body stops being a body. Morph engine adapted from{" "}
           <a href="https://github.com/jeremy-prt/bloub" className="text-accent-light underline">
             bloub
-          </a>
-          , MIT).
+          </a>{" "}
+          (MIT).
         </p>
       </header>
 
-      {/* Stage: both engines stacked, swapping under the same fade as the app. */}
+      {/* Stage: sticky on mobile so the bot stays visible while scrolling the pickers */}
       <div className="sticky top-18 z-10 -mx-6 grid place-items-center bg-ground/92 py-4 backdrop-blur">
-        <span style={{ display: "inline-grid", width: 280, height: 280 }}>
-          <span style={layer(!morphing)}>
-            <Bot3D animation={mood} size={280} colors={{ body: hex, eyes: "#0A0A0B" }} />
-          </span>
-          <span style={layer(morphing)}>
-            {morphing && (
-              <BotoBot state={morph} motion={null} shape={shape} color={hex} paper="#0A0A0B" follow size={280} />
-            )}
-          </span>
-        </span>
+        <BottoAvatar mood={mood} morph={morph} shape={shape} ink={hex} paper="#0A0A0B" follow size={280} />
       </div>
 
-      <Section title="Mood — 3D engine, Botto's presence animations">
+      <Section title="Mood — presence animations">
         {ANIMATION_NAMES.map((name) => (
           <Chip
             key={name}
-            active={!morphing && mood === name}
+            active={!morph && mood === name}
             onClick={() => {
               setMorph(null);
               setMood(name);
@@ -148,18 +122,18 @@ export function AvatarPage() {
         ))}
       </Section>
 
-      <Section title="Morph — 2D engine, body states">
-        {MORPHS.map((s) => (
-          <Chip key={s.id} active={morph === s.id} onClick={() => setMorph(morph === s.id ? null : s.id)}>
-            {s.label}
+      <Section title="Morph — body states">
+        {BOTTO_MORPHS.map((m) => (
+          <Chip key={m} active={morph === m} onClick={() => setMorph(morph === m ? null : m)}>
+            {MORPH_LABELS[m]}
           </Chip>
         ))}
       </Section>
 
-      <Section title="Shape (morph layer)">
-        {SHAPES.map((s) => (
-          <Chip key={s.id} active={shape === s.id} onClick={() => setShape(s.id)}>
-            {SHAPE_LABELS[s.id] ?? s.id}
+      <Section title="Shape">
+        {BOTTO_SHAPES.map((s) => (
+          <Chip key={s} active={shape === s} onClick={() => setShape(s)}>
+            {SHAPE_LABELS[s]}
           </Chip>
         ))}
       </Section>
@@ -181,9 +155,9 @@ export function AvatarPage() {
       </Section>
 
       <p className="text-[13px] leading-relaxed text-white/40">
-        Tap a mood to watch the 3D engine (head turns in perspective, ambient drift, blinks). Tap a morph to cross-fade
-        into the 2D body-morph layer — tap it again to release back to 3D, the same 180ms swap the app uses for
-        hibernating Bots. Everything here is the exact code running in the desktop app.
+        Shape and colour apply everywhere — pick Triangle and the 3D head still turns in perspective, then tap Hibernate
+        and the same triangle settles into a breathing dot. Tap an active morph again to release back to 3D. This
+        `BottoAvatar` component is the single entry point the app ports.
       </p>
     </div>
   );
