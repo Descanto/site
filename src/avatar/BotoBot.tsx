@@ -81,7 +81,7 @@ export function BotoBot({
   const maskId = `bot-mask-${uid}`;
   const svgRef = useRef<SVGSVGElement | null>(null);
 
-  const ink = COLOR_BY_ID.get(color)?.hex ?? "#0a0a0c";
+  const ink = color.startsWith("#") ? color : (COLOR_BY_ID.get(color)?.hex ?? "#0a0a0c");
 
   const engineRef = useRef<BotEngine | null>(null);
   if (!engineRef.current) {
@@ -136,7 +136,6 @@ export function BotoBot({
     s.motionStep = -1;
     s.motionNextAt = s.clock;
     if (!motion) engineRef.current!.setExpression(EXPRESSION_BY_ID.get(expression) ?? null, s.clock);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [motion]);
 
   useEffect(() => {
@@ -219,7 +218,6 @@ export function BotoBot({
       const fill = dot.color ? tint(dot.color) : dot.depth === undefined ? ink : mixHex(paper, ink, dot.depth);
       return { fill, opacity: dot.opacity };
     },
-    // eslint-disable-next-line react-hooks/exhaustive-deps
     [ink, paper, decor],
   );
 
