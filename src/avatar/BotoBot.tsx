@@ -6,6 +6,7 @@ import { lookTarget, TURN_TIME } from "./core/gaze";
 import { EXPRESSION_BY_ID, DEFAULT_EXPRESSION } from "./core/expressions";
 import { COLOR_BY_ID, DEFAULT_COLOR, DEFAULT_SHAPE, SHAPE_BY_ID, mixHex } from "./core/skins";
 import { STATE_BY_ID, type StateId } from "./core/states";
+import { MOTION_BY_ID, type Motion } from "./botto";
 
 /**
  * React renderer for the vendored bloub engine (see core/README.md).
@@ -18,11 +19,46 @@ export interface BotoBotProps {
   shape?: string;
   color?: string;
   expression?: string;
+  /**
+   * Botto motion (our original animation vocabulary, see botto.ts): a looping
+   * expression sequence layered on the resting state. Takes precedence over
+   * `expression` while set; only plays on states with a resting face.
+   */
+  motion?: string | Motion | null;
   /** Page background, used for depth-fog on burst particles and the eye backfill. */
   paper?: string;
   /** Eyes follow the pointer (desktop only; touch has no hover). */
   follow?: boolean;
+  /**
+   * Décor palette for orbit ribbons / comet trails / burst particles.
+   * "accent" (default) recolors everything into Descanto's blue range —
+   * our identity. "spectrum" keeps the upstream rainbow.
+   */
+  decor?: "accent" | "spectrum";
   className?: string;
+}
+
+/**
+ * Map any decor color into the Descanto accent range, preserving lightness.
+ * Décor colors arrive as hex from the engine's hue wheel; we recover the hue
+ * and fold it into a narrow band around the accent (#3D5AFE ≈ 228°) so ribbons
+ * keep depth variation without reading as the reference rainbow.
+ */
+function accentize(color: string): string {
+  const m = /^#([0-9a-f]{6})$/i.exec(color);
+  if (!m) return color;
+  const n = parseInt(m[1]!, 16);
+  const r = (n >> 16) / 255, g = ((n >> 8) & 0xff) / 255, b = (n & 0xff) / 255;
+  const max = Math.max(r, g, b), min = Math.min(r, g, b);
+  const l = (max + min) / 2;
+  let h = 0;
+  if (max !== min) {
+    const d = max - min;
+    h = max === r ? ((g - b) / d + (g < b ? 6 : 0)) : max === g ? (b - r) / d + 2 : (r - g) / d + 4;
+    h *= 60;
+  }
+  const spread = (h / 360 - 0.5) * 44; // ±22°
+  return `hsl(${228 + spread} 82% ${Math.round(l * 100)}%)`;
 }
 
 const R = 100;
@@ -34,10 +70,13 @@ export function BotoBot({
   shape = DEFAULT_SHAPE,
   color = DEFAULT_COLOR,
   expression = DEFAULT_EXPRESSION,
+  motion = null,
   paper = "#0A0A0B",
   follow = false,
+  decor = "accent",
   className,
 }: BotoBotProps) {
+  const tint = (c: string) => (decor === "accent" ? accentize(c) : c);
   const uid = useId().replace(/[^a-zA-Z0-9]/g, "");
   const maskId = `bot-mask-${uid}`;
   const svgRef = useRef<SVGSVGElement | null>(null);
@@ -65,9 +104,13 @@ export function BotoBot({
     follow,
     stateId: state,
     stateSetAt: 0,
+    motion: null as Motion | null,
+    motionStep: -1,
+    motionNextAt: 0,
   });
   loop.current.follow = follow;
   loop.current.stateId = state;
+  loop.current.motion = typeof motion === "string" ? (MOTION_BY_ID.get(motion) ?? null) : motion;
 
   useEffect(() => {
     const engine = engineRef.current!;
@@ -82,8 +125,19 @@ export function BotoBot({
   }, [shape]);
 
   useEffect(() => {
+    // A running motion owns the expression channel; restore the picked one when it ends.
+    if (loop.current.motion) return;
     engineRef.current!.setExpression(EXPRESSION_BY_ID.get(expression) ?? null, loop.current.clock);
-  }, [expression]);
+  }, [expression, motion]);
+
+  useEffect(() => {
+    // (Re)arm the motion sequencer whenever the motion changes.
+    const s = loop.current;
+    s.motionStep = -1;
+    s.motionNextAt = s.clock;
+    if (!motion) engineRef.current!.setExpression(EXPRESSION_BY_ID.get(expression) ?? null, s.clock);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [motion]);
 
   useEffect(() => {
     const engine = engineRef.current!;
@@ -139,6 +193,14 @@ export function BotoBot({
         s.stateSetAt = s.clock;
       }
 
+      // Motion sequencer: step through our expression table on resting-face states.
+      if (s.motion && STATE_BY_ID.get(s.stateId)?.baseFace && s.clock >= s.motionNextAt) {
+        s.motionStep = (s.motionStep + 1) % s.motion.steps.length;
+        const step = s.motion.steps[s.motionStep]!;
+        engine.setExpression(step.expr, s.clock);
+        s.motionNextAt = s.clock + step.ms / 1000;
+      }
+
       if (s.follow) aim();
       else release();
       setFrame(engine.sample(s.clock));
@@ -154,10 +216,11 @@ export function BotoBot({
 
   const dotAttrs = useMemo(
     () => (dot: BotFrame["dots"][number]) => {
-      const fill = dot.color ?? (dot.depth === undefined ? ink : mixHex(paper, ink, dot.depth));
+      const fill = dot.color ? tint(dot.color) : dot.depth === undefined ? ink : mixHex(paper, ink, dot.depth);
       return { fill, opacity: dot.opacity };
     },
-    [ink, paper],
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [ink, paper, decor],
   );
 
   const dots = (behind: boolean) =>
@@ -208,7 +271,7 @@ export function BotoBot({
             y2={arc.grad.y2}
           >
             {arc.grad.stops.map((c, i) => (
-              <stop key={i} offset={i / (arc.grad.stops.length - 1)} stopColor={c} />
+              <stop key={i} offset={i / (arc.grad.stops.length - 1)} stopColor={tint(c)} />
             ))}
           </linearGradient>
         ))}
@@ -224,7 +287,9 @@ export function BotoBot({
         </g>
       </g>
       <g>{dots(false)}</g>
-      {frame.notif && <circle cx={frame.notif.x} cy={frame.notif.y} r={frame.notif.r} fill={NOTIF_BLUE} />}
+      {frame.notif && (
+        <circle cx={frame.notif.x} cy={frame.notif.y} r={frame.notif.r} fill={decor === "accent" ? "#3D5AFE" : NOTIF_BLUE} />
+      )}
       {arcs("front")}
     </svg>
   );

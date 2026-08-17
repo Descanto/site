@@ -1,27 +1,21 @@
 import { useState } from "react";
 import { BotoBot } from "@/avatar/BotoBot";
-import { STATES, type StateId } from "@/avatar/core/states";
+import { MOTIONS } from "@/avatar/botto";
+import type { StateId } from "@/avatar/core/states";
 import { SHAPES } from "@/avatar/core/skins";
 import { COLORS } from "@/avatar/core/skins";
-import { EXPRESSIONS } from "@/avatar/core/expressions";
 import { cn } from "@/lib/utils";
 
-const STATE_LABELS: Record<string, string> = {
-  idle: "Idle",
-  thinking: "Thinking",
-  wink: "Wink",
-  wide: "Wide eyes",
-  alert: "Alert",
-  notification: "Notification",
-  exclamation: "Exclamation",
-  sleep: "Sleep",
-  egg: "Egg",
-  hexagon: "Hexagon",
-  play: "Play",
-  orbit: "Orbit",
-  burst: "Burst",
-  comet: "Comet",
-};
+/** Botto's own morph states (botto.ts) + the generic engine capabilities we keep. */
+const MORPHS: { id: StateId; label: string }[] = [
+  { id: "idle" as StateId, label: "Rest" },
+  { id: "hibernate" as StateId, label: "Hibernate" },
+  { id: "fork" as StateId, label: "Fork" },
+  { id: "thinking" as StateId, label: "Dots" },
+  { id: "orbit" as StateId, label: "Orbit" },
+  { id: "burst" as StateId, label: "Burst" },
+  { id: "comet" as StateId, label: "Comet" },
+];
 
 const SHAPE_LABELS: Record<string, string> = {
   cercle: "Circle",
@@ -32,25 +26,6 @@ const SHAPE_LABELS: Record<string, string> = {
   hexagone: "Hexagon",
   nuage: "Cloud",
   goutte: "Droplet",
-};
-
-const EXPRESSION_LABELS: Record<string, string> = {
-  neutre: "Neutral",
-  attentif: "Attentive",
-  surpris: "Surprised",
-  excite: "Excited",
-  heureux: "Happy",
-  hilare: "Laughing",
-  colere: "Angry",
-  triste: "Sad",
-  effraye: "Scared",
-  mefiant: "Suspicious",
-  confus: "Confused",
-  curieux: "Curious",
-  fier: "Proud",
-  timide: "Shy",
-  blase: "Unimpressed",
-  somnolent: "Sleepy",
 };
 
 const COLOR_LABELS: Record<string, string> = {
@@ -94,8 +69,8 @@ function Section({ title, children }: { title: string; children: React.ReactNode
 
 export function AvatarPage() {
   const [state, setState] = useState<StateId>("idle");
-  const [shape, setShape] = useState("cercle");
-  const [expression, setExpression] = useState("neutre");
+  const [motionId, setMotionId] = useState("idle");
+  const [shape, setShape] = useState("squircle");
   const [color, setColor] = useState("creme");
 
   return (
@@ -103,23 +78,32 @@ export function AvatarPage() {
       <header className="flex flex-col gap-1.5">
         <h1 className="font-display text-4xl font-medium tracking-tight">Avatar lab</h1>
         <p className="text-[15px] text-white/55">
-          The extended Botto avatar — morphing body, décor, and gaze. Engine ported from{" "}
+          Botto's animation set — presence moods from the app, plus body morphs for Canto states. Runs on a morphing
+          engine adapted from{" "}
           <a href="https://github.com/jeremy-prt/bloub" className="text-accent-light underline">
             bloub
           </a>{" "}
-          (MIT), measured off the x.ai reference frame by frame.
+          (MIT).
         </p>
       </header>
 
       {/* Stage: sticky on mobile so the bot stays visible while scrolling the pickers */}
       <div className="sticky top-18 z-10 -mx-6 flex items-center justify-center bg-ground/92 py-4 backdrop-blur">
-        <BotoBot state={state} shape={shape} expression={expression} color={color} paper="#0A0A0B" follow size={280} />
+        <BotoBot state={state} motion={motionId} shape={shape} color={color} paper="#0A0A0B" follow size={280} />
       </div>
 
-      <Section title="Animation">
-        {STATES.map((s) => (
+      <Section title="Mood — Botto's presence animations">
+        {MOTIONS.map((m) => (
+          <Chip key={m.id} active={motionId === m.id} onClick={() => { setMotionId(m.id); setState("idle" as StateId); }}>
+            {m.label}
+          </Chip>
+        ))}
+      </Section>
+
+      <Section title="Morph — body states">
+        {MORPHS.map((s) => (
           <Chip key={s.id} active={state === s.id} onClick={() => setState(s.id)}>
-            {STATE_LABELS[s.id] ?? s.id}
+            {s.label}
           </Chip>
         ))}
       </Section>
@@ -128,14 +112,6 @@ export function AvatarPage() {
         {SHAPES.map((s) => (
           <Chip key={s.id} active={shape === s.id} onClick={() => setShape(s.id)}>
             {SHAPE_LABELS[s.id] ?? s.id}
-          </Chip>
-        ))}
-      </Section>
-
-      <Section title="Expression">
-        {EXPRESSIONS.map((e) => (
-          <Chip key={e.id} active={expression === e.id} onClick={() => setExpression(e.id)}>
-            {EXPRESSION_LABELS[e.id] ?? e.id}
           </Chip>
         ))}
       </Section>
@@ -157,8 +133,10 @@ export function AvatarPage() {
       </Section>
 
       <p className="text-[13px] leading-relaxed text-white/40">
-        Move your cursor to steer the gaze on desktop. On touch, gaze rests. The engine is pure TypeScript
-        (`src/avatar/core`) — a function of time with no framework dependency, ready to port into the Botto app.
+        Moods are Botto's original presence vocabulary (idle, thinking, working, error…) ported from the app. Morphs map
+        to Canto: hibernate rests the body as a breathing dot, fork slides a clone out and merges it back. Move your
+        cursor to steer the gaze on desktop; on touch, gaze rests. Pure TypeScript, no framework dependency — ready to
+        port back into the app.
       </p>
     </div>
   );
