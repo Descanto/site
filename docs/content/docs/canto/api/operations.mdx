@@ -1,0 +1,49 @@
+---
+title: Operations
+description: Read-only lookup of a control-plane operation handle.
+---
+
+## Get an operation
+
+`GET /v1/operations/{id}`
+
+| Param | In | Required | Description |
+|---|---|---|---|
+| `id` | path | yes | Operation id (a UUID v4 string) |
+
+```bash
+curl -sS "$BASE/operations/$OPERATION_ID" -H "$AUTH"
+```
+
+Response (`OperationJson`):
+
+```json
+{
+  "id": "5b1e...",
+  "desktop_id": "d_...",
+  "kind": "wake",
+  "state": "succeeded",
+  "result": null,
+  "error": null
+}
+```
+
+| Field | Type | Description |
+|---|---|---|
+| `id` | string | Operation id |
+| `desktop_id` | string | The desktop this operation acts on |
+| `kind` | string | e.g. `wake`, `hibernate`, `destroy` |
+| `state` | string | e.g. `pending`, `running`, `succeeded`, `failed` |
+| `result` | any | Present on some settled operations |
+| `error` | string \| null | Set when `state` is `failed` |
+
+| Status | Meaning |
+|---|---|
+| `200` | The operation |
+| `400` | Malformed id (not a UUID) |
+| `401` | Missing/invalid credentials |
+| `404` | Operation not found, or its desktop belongs to another org |
+
+See [Concepts: Operations](/docs/canto/concepts/operations) for how operations
+are created (via `wake`/`hibernate`/`destroy`) and the `?wait=true`
+long-poll model.

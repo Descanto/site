@@ -1,0 +1,52 @@
+---
+title: Orgs and auth
+description: API keys vs sessions, org scoping, and /v1/me.
+---
+
+Every route under `/v1` (except the public `GET /v1/openapi.json`) requires
+an `Authorization: Bearer <credential>` header. The credential is one of two
+forms, both verified by the same middleware:
+
+| Form | Looks like | Typical caller |
+|---|---|---|
+| API key | `canto_sk_...` | SDK, MCP server, scripts, CI |
+| AuthKit session | a WorkOS AuthKit JWT access token | The dashboard, browser sessions |
+
+Both resolve to the same thing internally: an **org**. Every route is
+scoped to the caller's org -- there is no cross-org visibility, ever.
+
+## `GET /v1/me`
+
+Ask the API who you are and how you authenticated:
+
+```bash
+curl -sS "$BASE/me" -H "$AUTH"
+```
+
+```json
+{ "org_id": "org_...", "auth_kind": "api_key" }
+```
+
+`auth_kind` is `"api_key"` or `"session"` -- useful for a dashboard session
+to confirm it authenticated via AuthKit rather than a raw key, or for any
+client to sanity-check which org a given credential resolves to. See
+[API reference: /v1/me](/docs/canto/api/me).
+
+## Org scoping: 404, never 403
+
+A desktop or operation that exists but belongs to a **different** org is
+indistinguishable from one that doesn't exist at all: both return
+`404 Not Found`, never `403 Forbidden`. This is deliberate -- it means a
+credential can never be used to probe for the *existence* of another org's
+resources, only to fail identically either way. Every by-id route
+(`GET /v1/desktops/{id}`, guest ops, `GET /v1/operations/{id}`, etc.) is
+covered by this rule; treat a `404` on an id you expect to be yours as "not
+found or not yours," not as "definitely doesn't exist anywhere."
+
+<Callout title="Missing/invalid credentials" type="warn">
+  A missing `Authorization` header, a non-`Bearer` scheme, or a
+  key/JWT that fails verification is `401 Unauthorized` -- distinct from
+  the `404` org-scoping case above. See
+  [API overview: error format](/docs/canto/api/overview#error-format) for the
+  full status table.
+</Callout>

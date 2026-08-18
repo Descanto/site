@@ -1,0 +1,95 @@
+---
+title: Billing
+description: Locked prices, billing_mode, awake-seconds metering, and projected cost.
+---
+
+<Callout title="No charging yet" type="info">
+  This milestone has no Stripe integration or self-serve signup -- prices
+  and usage are computed and surfaced everywhere (API, SDK, usage query),
+  but nothing is actually invoiced. The numbers below are the real, locked
+  prices the ledger already uses.
+</Callout>
+
+## Locked prices
+
+| Tier | Specs | Monthly commit | On-demand hourly |
+|---|---|---|---|
+| `small` | 2 vCPU / 4 GB | **$4.50/mo** | **$0.00675/h** |
+| `default` | 4 vCPU / 8 GB | **$9.00/mo** | **$0.0135/h** |
+| `large` | 8 vCPU / 16 GB | **$18.00/mo** | **$0.027/h** |
+
+These come from one constant table (never computed at runtime from anything
+configurable): hourly = monthly ÷ 667, i.e. paying hourly costs about 9.5%
+more than committing to monthly for the same full-time usage --
+committing saves.
+
+## `billing_mode`: chosen per desktop
+
+`billing_mode` (`"monthly"` or `"hourly"`) is chosen **once, at
+`POST /v1/desktops`** and stored on the desktop row -- it isn't a global
+account setting. It defaults to `hourly` when omitted:
+
+```bash
+curl -sS -X POST "$BASE/desktops" \
+  -H "$AUTH" -H 'Content-Type: application/json' \
+  -d '{"tier": "default", "billing_mode": "monthly"}'
+```
+
+It's returned on every `DesktopJson` and factored into that desktop's
+projected cost in `GET /v1/usage`.
+
+## Hibernated desktops cost nothing
+
+Only **awake** time is billed. A `hibernated` desktop keeps its full disk
+state but stops accumulating awake-seconds entirely -- hibernate whenever
+you're not actively using a desktop and its compute cost drops to $0 until
+the next wake.
+
+## Awake-seconds metering
+
+Awake time is tracked as a sequence of open/close events -- a desktop
+becomes "guest responsive" (opens the meter) and later hibernates, is
+force-recovered after a host failure, or is destroyed (closes it). Each
+desktop's raw awake-seconds are then weighted by its tier (`small` = 0.5x,
+`default` = 1.0x, `large` = 2.0x) into `weighted_awake_seconds`, and its
+existence over the queried range is separately expressed as
+`desktop_months` (a 30-day-month convention: overlap of the desktop's
+lifetime with the query range, divided by 30 days in seconds).
+
+## Projected cost: `GET /v1/usage`
+
+Query a time range (Unix milliseconds) to get per-desktop and org-total
+usage and projected cost at the locked prices above:
+
+```bash
+END=$(($(date +%s) * 1000))
+START=$((END - 86400000)) # last 24h
+curl -sS "$BASE/usage?start=$START&end=$END" -H "$AUTH"
+```
+
+```json
+{
+  "per_desktop": [
+    {
+      "desktop_id": "d_...",
+      "awake_seconds": 36000.0,
+      "weighted_awake_seconds": 36000.0,
+      "desktop_months": 0.0139,
+      "billing_mode": "hourly",
+      "projected_cost_cents": 14
+    }
+  ],
+  "org_awake_seconds_weighted": 36000.0,
+  "org_desktop_months": 0.0139,
+  "org_projected_cost_cents": 14
+}
+```
+
+`projected_cost_cents` is computed per desktop from its `billing_mode`:
+`hourly` desktops are `awake_seconds / 3600 * hourly rate`; `monthly`
+desktops are `desktop_months * monthly rate` -- both rounded half-up to the
+nearest whole cent. This is **display/projection math**, meant for showing
+an estimated running cost -- not the exact-cent precision a future Stripe
+metered-billing integration will need for real invoices.
+
+See [API reference: usage](/docs/canto/api/usage) for the full route contract.

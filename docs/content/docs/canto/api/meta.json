@@ -1,0 +1,12 @@
+{
+  "title": "API Reference",
+  "pages": [
+    "overview",
+    "desktops",
+    "operations",
+    "exec-and-files",
+    "streaming",
+    "usage",
+    "me"
+  ]
+}

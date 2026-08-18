@@ -1,0 +1,139 @@
+---
+title: Desktops
+description: Create, list, read, wake, hibernate, destroy.
+---
+
+## List desktops
+
+`GET /v1/desktops`
+
+| Param | In | Required | Description |
+|---|---|---|---|
+| `state` | query | no | Optional lifecycle-state filter, e.g. `awake` |
+
+```bash
+curl -sS "$BASE/desktops?state=awake" -H "$AUTH"
+```
+
+```json
+{ "desktops": [ /* DesktopJson[] */ ] }
+```
+
+| Status | Meaning |
+|---|---|
+| `200` | Desktops belonging to the caller's org |
+| `400` | Invalid state filter |
+| `401` | Missing/invalid credentials |
+
+## Create a desktop
+
+`POST /v1/desktops`
+
+| Param | In | Required | Description |
+|---|---|---|---|
+| `Idempotency-Key` | header | no | Client-supplied dedup key, scoped per-org. A repeat request with the same key (and org) returns the existing desktop (`200`) instead of creating a new one (`201`). |
+
+Request body (`CreateDesktopBody`):
+
+```json
+{
+  "tier": "small",
+  "billing_mode": "hourly",
+  "image_version": null,
+  "idle_timeout_secs": null
+}
+```
+
+| Field | Type | Required | Description |
+|---|---|---|---|
+| `tier` | string | yes | One of `small`/`default`/`large`. |
+| `billing_mode` | string \| null | no | `monthly` or `hourly`; defaults to `hourly` when omitted/empty. |
+| `image_version` | string \| null | no | |
+| `idle_timeout_secs` | integer \| null | no | |
+
+```bash
+curl -sS -X POST "$BASE/desktops" \
+  -H "$AUTH" -H 'Content-Type: application/json' \
+  -d '{"tier": "small", "billing_mode": "hourly"}'
+```
+
+| Status | Meaning |
+|---|---|
+| `200` | `Idempotency-Key` already used by this org -- returns the existing desktop, not a new one |
+| `201` | Desktop created |
+| `400` | Invalid tier/billing_mode, malformed body, or a non-ASCII `Idempotency-Key` |
+| `401` | Missing/invalid credentials |
+
+Both `200` and `201` return a full `DesktopJson`.
+
+## Get a desktop
+
+`GET /v1/desktops/{id}`
+
+```bash
+curl -sS "$BASE/desktops/$DESKTOP_ID" -H "$AUTH"
+```
+
+| Status | Meaning |
+|---|---|
+| `200` | The desktop (`DesktopJson`) |
+| `400` | Malformed id |
+| `401` | Missing/invalid credentials |
+| `404` | Desktop not found or belongs to another org |
+
+## Wake / hibernate / destroy
+
+`POST /v1/desktops/{id}/wake`
+`POST /v1/desktops/{id}/hibernate`
+`POST /v1/desktops/{id}/destroy`
+
+These three share an identical request/response shape.
+
+| Param | In | Required | Description |
+|---|---|---|---|
+| `id` | path | yes | Desktop id |
+| `wait` | query | no | Long-poll until the operation settles (2s cadence, 120s cap) |
+| `Idempotency-Key` | header | no | Client-supplied dedup key, scoped per-desktop |
+
+Request body (`MutationBody`, optional -- an empty body is equivalent to
+`{}`):
+
+```json
+{ "expected_generation": null }
+```
+
+`expected_generation` is an optional fencing generation the caller expects
+the desktop to currently be on -- see
+[Concepts: generation fencing](/docs/canto/concepts/desktops-and-lifecycle#generation-fencing).
+
+```bash
+curl -sS -X POST "$BASE/desktops/$DESKTOP_ID/wake?wait=true" -H "$AUTH"
+curl -sS -X POST "$BASE/desktops/$DESKTOP_ID/hibernate?wait=true" -H "$AUTH"
+curl -sS -X POST "$BASE/desktops/$DESKTOP_ID/destroy?wait=true" -H "$AUTH"
+```
+
+| Status | Meaning |
+|---|---|
+| `200` | Operation settled, or the `?wait=true` cap was reached while still pending/running |
+| `202` | Operation enqueued (no `?wait=true`) |
+| `400` | Malformed id or body |
+| `401` | Missing/invalid credentials |
+| `404` | Desktop not found or belongs to another org |
+| `409` | Stale `expected_generation` or wrong desktop state |
+| `503` | This node is not the leader |
+
+Both `200` and `202` return an `OperationJson` -- see
+[API reference: Operations](/docs/canto/api/operations) for its shape and
+[Concepts: Operations](/docs/canto/concepts/operations) for the polling model.
+
+## Fork (not yet implemented)
+
+`POST /v1/desktops/{id}/fork`
+
+| Status | Meaning |
+|---|---|
+| `401` | Missing/invalid credentials |
+| `501` | Not implemented yet |
+
+This route exists in the contract but always returns `501`. It is not a
+working feature -- see [Concepts: Fork](/docs/canto/concepts/desktops-and-lifecycle#generation-fencing).

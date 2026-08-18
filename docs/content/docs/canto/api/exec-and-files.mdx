@@ -1,0 +1,101 @@
+---
+title: Exec and files
+description: Run commands and read/write files on an awake desktop's guest.
+---
+
+All three routes below only work while the desktop is `awake` -- a `409`
+means the desktop isn't awake, or its control claim is already held by
+another client (see [Streaming](/docs/canto/api/streaming) for claims).
+
+## Run a command
+
+`POST /v1/desktops/{id}/exec`
+
+| Param | In | Required | Description |
+|---|---|---|---|
+| `id` | path | yes | Desktop id |
+
+Request body (`ExecBody`):
+
+```json
+{ "command": "echo hello", "timeout_secs": 10 }
+```
+
+| Field | Type | Required | Description |
+|---|---|---|---|
+| `command` | string | yes | |
+| `timeout_secs` | integer \| null | no | Defaults to 60s when omitted; clamped (never rejected) to 300s. |
+
+```bash
+curl -sS -X POST "$BASE/desktops/$DESKTOP_ID/exec" \
+  -H "$AUTH" -H 'Content-Type: application/json' \
+  -d '{"command": "echo hello", "timeout_secs": 10}'
+```
+
+Response (`ExecResponse`):
+
+```json
+{ "exit_code": 0, "stdout": "hello\n", "stderr": "" }
+```
+
+| Status | Meaning |
+|---|---|
+| `200` | Command ran to completion in the guest |
+| `400` | Malformed id/body, or empty command |
+| `401` | Missing/invalid credentials |
+| `404` | Desktop not found or belongs to another org |
+| `409` | Desktop is not awake, or its control claim is already held |
+| `503` | The desktop's host is currently unreachable -- retry |
+| `504` | The command timed out inside the guest -- retry |
+
+## Read a file
+
+`GET /v1/desktops/{id}/files/{path}`
+
+| Param | In | Required | Description |
+|---|---|---|---|
+| `id` | path | yes | Desktop id |
+| `path` | path | yes | Absolute guest path, without its leading `/` (e.g. `home/user/notes.txt` for `/home/user/notes.txt`) |
+
+```bash
+curl -sS "$BASE/desktops/$DESKTOP_ID/files/home/user/notes.txt" -H "$AUTH"
+```
+
+Response is `200` with `application/octet-stream` (raw file bytes).
+
+| Status | Meaning |
+|---|---|
+| `200` | Raw file content |
+| `400` | Malformed id, or a path that's empty/contains a NUL byte/contains a `..` segment |
+| `401` | Missing/invalid credentials |
+| `404` | Desktop not found (or belongs to another org), or the file itself does not exist |
+| `409` | Desktop is not awake, or its control claim is already held |
+| `503` | The desktop's host is currently unreachable -- retry |
+| `504` | The read timed out inside the guest -- retry |
+
+## Write a file
+
+`PUT /v1/desktops/{id}/files/{path}`
+
+| Param | In | Required | Description |
+|---|---|---|---|
+| `id` | path | yes | Desktop id |
+| `path` | path | yes | Absolute guest path, without its leading `/` |
+
+Request body: raw `application/octet-stream` file content.
+
+```bash
+curl -sS -X PUT "$BASE/desktops/$DESKTOP_ID/files/home/user/notes.txt" \
+  -H "$AUTH" --data-binary "hello from canto"
+```
+
+| Status | Meaning |
+|---|---|
+| `204` | File written |
+| `400` | Malformed id, or a path that's empty/contains a NUL byte/contains a `..` segment |
+| `401` | Missing/invalid credentials |
+| `404` | Desktop not found or belongs to another org |
+| `409` | Desktop is not awake, or its control claim is already held |
+| `413` | File exceeds the **8 MiB** size limit |
+| `503` | The desktop's host is currently unreachable -- retry |
+| `504` | The write timed out inside the guest -- retry |

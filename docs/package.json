@@ -1,0 +1,33 @@
+{
+  "name": "descanto-docs",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "serve out",
+    "typecheck": "next typegen && tsc --noEmit",
+    "deploy": "bun run build && wrangler pages deploy out --project-name descanto-docs"
+  },
+  "dependencies": {
+    "fumadocs-core": "^16.14.5",
+    "fumadocs-mdx": "^15.2.3",
+    "fumadocs-ui": "^16.14.5",
+    "next": "^16.3.1",
+    "react": "^19.2.8",
+    "react-dom": "^19.2.8"
+  },
+  "devDependencies": {
+    "@tailwindcss/postcss": "^4.3.3",
+    "@types/mdx": "^2.0.14",
+    "@types/node": "^26.2.0",
+    "@types/react": "^19.2.18",
+    "@types/react-dom": "^19.2.4",
+    "postcss": "^8.5.26",
+    "serve": "^14.2.6",
+    "tailwindcss": "^4.3.3",
+    "typescript": "^5.9.3",
+    "wrangler": "^4.48.1"
+  }
+}
