@@ -117,7 +117,7 @@ const mcpConfig = `{
 }`;
 
 const positioning = [
-  ["Fork-ready snapshots", "Every desktop is a memory snapshot. Branch a working session instead of rebuilding one."],
+  ["Snapshot-native", "Every desktop hibernates as a full memory snapshot — state intact, compute at zero while it sleeps."],
   ["Org-scoped API", "Every by-id route is org-scoped end to end — a key only ever sees its own org's desktops."],
   ["Honest operation handles", "Waking, hibernating, and destroying return an operation you can poll — no guessing at state."],
 ];

@@ -10,7 +10,7 @@ import { Footer } from "./components/footer";
 import { HomePage } from "./pages/home";
 import { BottoPage } from "./pages/botto";
 import { CantoPage } from "./pages/canto";
-import { PricingPage } from "./pages/pricing";
+import { Navigate } from "react-router-dom";
 import { NewsIndexPage, NewsPostPage } from "./pages/news";
 import { AboutPage } from "./pages/about";
 import { AvatarPage } from "./pages/avatar";
@@ -36,7 +36,7 @@ const router = createBrowserRouter([
       { path: "/", element: <HomePage /> },
       { path: "/botto", element: <BottoPage /> },
       { path: "/canto", element: <CantoPage /> },
-      { path: "/canto/pricing", element: <PricingPage /> },
+      { path: "/canto/pricing", element: <Navigate to="/canto#pricing" replace /> },
       { path: "/news", element: <NewsIndexPage /> },
       { path: "/news/:slug", element: <NewsPostPage /> },
       { path: "/about", element: <AboutPage /> },
