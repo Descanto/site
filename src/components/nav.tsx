@@ -55,7 +55,7 @@ const products: MenuEntry[] = [
 ];
 const productsSecondary: MenuEntry[] = [
   { to: "https://botto.descanto.com", title: "Botto on the web", description: "" },
-  { to: "/canto#api", title: "Canto API docs", description: "" },
+  { to: "/canto#quickstart", title: "Canto API docs", description: "" },
 ];
 const developer: MenuEntry[] = [
   { to: "https://github.com/descanto", title: "Documentation", description: "Set up Botto, self-host, and build on the Canto API." },
@@ -91,7 +91,7 @@ function NavDropdown({ label, primary, secondary = [] }: { label: string; primar
 const mobileLinks: { label: string; to: string }[] = [
   { label: "Botto", to: "/botto" },
   { label: "Canto", to: "/canto" },
-  { label: "Pricing", to: "/canto/pricing" },
+  { label: "Pricing", to: "/canto#pricing" },
   { label: "News", to: "/news" },
   { label: "About", to: "/about" },
   { label: "Open source", to: "https://github.com/descanto" },

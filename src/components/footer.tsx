@@ -16,7 +16,7 @@ const columns: { heading: string; links: { label: string; to: string }[] }[] = [
     links: [
       { label: "Early access", to: "/canto" },
       { label: "API docs", to: "https://github.com/descanto" },
-      { label: "Pricing", to: "/canto/pricing" },
+      { label: "Pricing", to: "/canto#pricing" },
       { label: "Status", to: "https://github.com/descanto" },
     ],
   },
