@@ -14,6 +14,7 @@ import { PricingPage } from "./pages/pricing";
 import { NewsIndexPage, NewsPostPage } from "./pages/news";
 import { AboutPage } from "./pages/about";
 import { AvatarPage } from "./pages/avatar";
+import { PluginsPage } from "./pages/plugins";
 
 function Layout() {
   return (
@@ -40,6 +41,7 @@ const router = createBrowserRouter([
       { path: "/news/:slug", element: <NewsPostPage /> },
       { path: "/about", element: <AboutPage /> },
       { path: "/avatar", element: <AvatarPage /> },
+      { path: "/plugins", element: <PluginsPage /> },
       { path: "*", element: <HomePage /> },
     ],
   },
