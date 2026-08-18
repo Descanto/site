@@ -2,7 +2,8 @@ import { useEffect, useMemo, useState } from "react";
 import { Button } from "@/components/ui/button";
 import fallbackCatalog from "@/content/plugin-catalog.json";
 
-const CATALOG_URL = "https://catalog.botto.descanto.com/catalog.json";
+const CATALOG_ORIGIN = "https://catalog.botto.descanto.com";
+const CATALOG_URL = `${CATALOG_ORIGIN}/catalog.json`;
 
 interface CatalogMcp {
   transport: "stdio" | "http";
@@ -14,6 +15,7 @@ interface CatalogPlugin {
   id: string;
   name: string;
   description: string;
+  icon?: string;
   categories: string[];
   featured?: boolean;
   source: string;
@@ -33,8 +35,24 @@ function PluginCard({ plugin }: { plugin: CatalogPlugin }) {
   return (
     <div className="flex flex-col gap-3 rounded-2xl border border-white/10 bg-surface p-5 transition-colors hover:border-white/22">
       <div className="flex items-start justify-between gap-3">
-        <div className="flex size-10 items-center justify-center rounded-xl bg-white/8 font-display text-lg font-semibold text-white/80">
-          {plugin.name.charAt(0)}
+        <div className="flex size-10 items-center justify-center overflow-hidden rounded-xl bg-white/90 p-1.5">
+          {plugin.icon ? (
+            <img
+              src={`${CATALOG_ORIGIN}${plugin.icon}`}
+              alt=""
+              className="size-full object-contain"
+              loading="lazy"
+              onError={(e) => {
+                const el = e.currentTarget;
+                el.replaceWith(Object.assign(document.createElement("span"), {
+                  textContent: plugin.name.charAt(0),
+                  className: "font-display text-lg font-semibold text-black/70",
+                }));
+              }}
+            />
+          ) : (
+            <span className="font-display text-lg font-semibold text-black/70">{plugin.name.charAt(0)}</span>
+          )}
         </div>
         <span className="rounded-full border border-white/10 px-2.5 py-1 text-[11px] text-white/45">{authLabel(plugin)}</span>
       </div>

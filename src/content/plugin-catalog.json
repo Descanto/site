@@ -6,6 +6,7 @@
       "name": "1inch",
       "description": "Get crypto prices, portfolios, swaps, and limit orders on 1inch.",
       "version": "1.0.0",
+      "icon": "/icons/1inch.png",
       "categories": [
         "Payments & Fintech"
       ],
@@ -26,6 +27,7 @@
       "name": "1Password",
       "description": "Manage secrets and environment credentials via the 1Password desktop app — requires the app with Labs MCP Server enabled (macOS/Linux).",
       "version": "1.0.0",
+      "icon": "/icons/1password.svg",
       "categories": [
         "Security",
         "Developer Tools"
@@ -44,6 +46,7 @@
       "name": "Adobe App Builder",
       "description": "Initialize, develop, test, and deploy Adobe Developer App Builder extensions.",
       "version": "1.0.0",
+      "icon": "/icons/adobe-app-builder.svg",
       "categories": [
         "Developer Tools"
       ],
@@ -58,6 +61,7 @@
       "name": "AgentMail",
       "description": "Give your Bot its own email inboxes to send, receive, and manage mail.",
       "version": "1.0.0",
+      "icon": "/icons/agentmail.png",
       "categories": [
         "Communication"
       ],
@@ -78,6 +82,7 @@
       "name": "Aikido",
       "description": "Run SAST and secrets scanning on your code with Aikido.",
       "version": "1.0.0",
+      "icon": "/icons/aikido.png",
       "categories": [
         "Security"
       ],
@@ -98,6 +103,7 @@
       "name": "Airtable",
       "description": "Read and update your Airtable bases, tables, and records.",
       "version": "1.0.0",
+      "icon": "/icons/airtable.svg",
       "categories": [
         "Project Management",
         "Data & Search"
@@ -117,6 +123,7 @@
       "name": "Airwallex Developer",
       "description": "Generate integration code for Airwallex payments, billing, and KYC APIs.",
       "version": "1.0.0",
+      "icon": "/icons/airwallex-developer.png",
       "categories": [
         "Payments & Fintech",
         "Developer Tools"
@@ -132,6 +139,7 @@
       "name": "Aleph",
       "description": "Query your FP&A and financial data source of truth in Aleph.",
       "version": "1.0.0",
+      "icon": "/icons/aleph.png",
       "categories": [
         "Finance"
       ],
@@ -149,6 +157,7 @@
       "name": "Amazon Location Service",
       "description": "Use maps, geocoding, and routing from Amazon Location Service.",
       "version": "1.0.0",
+      "icon": "/icons/amazon-location-service.svg",
       "categories": [
         "Infrastructure"
       ],
@@ -169,6 +178,7 @@
       "name": "AMD",
       "description": "Guidance for local AI on AMD Ryzen AI and Instinct GPUs, from vLLM serving to kernel performance analysis.",
       "version": "1.0.0",
+      "icon": "/icons/amd-skills.svg",
       "categories": [
         "Developer Tools"
       ],
@@ -183,6 +193,7 @@
       "name": "Amplitude",
       "description": "Analyze charts, build dashboards, and run experiments on your product analytics.",
       "version": "1.0.0",
+      "icon": "/icons/amplitude.png",
       "categories": [
         "Analytics"
       ],
@@ -200,6 +211,7 @@
       "name": "Antimetal",
       "description": "Investigate infrastructure incidents across 50+ connected integrations.",
       "version": "1.0.0",
+      "icon": "/icons/antimetal.png",
       "categories": [
         "Infrastructure"
       ],
@@ -217,6 +229,7 @@
       "name": "Apify",
       "description": "Run thousands of ready-made scrapers and crawlers for web data gathering and research.",
       "version": "1.0.0",
+      "icon": "/icons/apify.png",
       "categories": [
         "Data & Search"
       ],
@@ -237,6 +250,7 @@
       "name": "Apollo.io",
       "description": "Prospect, enrich leads, load sequences, and pull outreach analytics.",
       "version": "1.0.0",
+      "icon": "/icons/apollo.svg",
       "categories": [
         "Sales & CRM"
       ],
@@ -254,6 +268,7 @@
       "name": "Appwrite",
       "description": "Manage Appwrite backends with built-in docs search and deploy workflows.",
       "version": "1.0.0",
+      "icon": "/icons/appwrite.svg",
       "categories": [
         "Infrastructure",
         "Developer Tools"
@@ -272,6 +287,7 @@
       "name": "Arize",
       "description": "LLM observability workflows with Arize: instrumentation, traces, datasets, experiments, and prompt optimization.",
       "version": "1.0.0",
+      "icon": "/icons/arize.png",
       "categories": [
         "Developer Tools",
         "Analytics"
@@ -287,6 +303,7 @@
       "name": "Asana",
       "description": "Manage tasks and projects in your Asana workspace.",
       "version": "1.0.0",
+      "icon": "/icons/asana.svg",
       "categories": [
         "Project Management"
       ],
@@ -304,6 +321,7 @@
       "name": "Ashby",
       "description": "Search candidates, prep interviews, and manage your recruiting pipeline.",
       "version": "1.0.0",
+      "icon": "/icons/ashby.png",
       "categories": [
         "Recruiting"
       ],
@@ -321,6 +339,7 @@
       "name": "Astronomer",
       "description": "Manage Airflow DAGs, data lineage, and dbt workflows.",
       "version": "1.0.0",
+      "icon": "/icons/astronomer.png",
       "categories": [
         "Infrastructure",
         "Data & Search"
@@ -343,6 +362,7 @@
       "name": "Atlan",
       "description": "Explore your enterprise data catalog and lineage in Atlan.",
       "version": "1.0.0",
+      "icon": "/icons/atlan.png",
       "categories": [
         "Data & Search"
       ],
@@ -360,6 +380,7 @@
       "name": "Atlassian",
       "description": "Work with Jira issues and Confluence pages in your Atlassian Cloud account.",
       "version": "1.0.0",
+      "icon": "/icons/atlassian.svg",
       "categories": [
         "Project Management",
         "Knowledge"
@@ -378,6 +399,7 @@
       "name": "AtScale",
       "description": "Query governed metrics from your company's AtScale semantic layer.",
       "version": "1.0.0",
+      "icon": "/icons/atscale.png",
       "categories": [
         "Data & Search",
         "Analytics"
@@ -400,6 +422,7 @@
       "name": "Auth0",
       "description": "Manage Auth0 applications, deploy Actions, and query tenant logs.",
       "version": "1.0.0",
+      "icon": "/icons/auth0.svg",
       "categories": [
         "Security",
         "Developer Tools"
@@ -421,6 +444,7 @@
       "name": "AWS Amplify",
       "description": "Build and manage fullstack Amplify Gen 2 apps on AWS.",
       "version": "1.0.0",
+      "icon": "/icons/aws-amplify.svg",
       "categories": [
         "Infrastructure",
         "Developer Tools"
@@ -442,6 +466,7 @@
       "name": "AWS Core",
       "description": "Plan and operate AWS workloads: service selection, IaC, serverless, and billing.",
       "version": "1.0.0",
+      "icon": "/icons/aws-core.svg",
       "categories": [
         "Infrastructure"
       ],
@@ -462,6 +487,7 @@
       "name": "AWS Data Analytics",
       "description": "Data-lake and ETL workflows on AWS with S3 Tables, Glue, and Athena.",
       "version": "1.0.0",
+      "icon": "/icons/aws-data-analytics.svg",
       "categories": [
         "Infrastructure",
         "Analytics"
@@ -477,6 +503,7 @@
       "name": "AWS Databases",
       "description": "Design, query, and migrate databases on AWS including Aurora DSQL.",
       "version": "1.0.0",
+      "icon": "/icons/aws-databases.svg",
       "categories": [
         "Infrastructure"
       ],
@@ -497,6 +524,7 @@
       "name": "AWS Deployments",
       "description": "Get architecture recommendations, cost estimates, and guided deployments on AWS.",
       "version": "1.0.0",
+      "icon": "/icons/aws-deployments.svg",
       "categories": [
         "Infrastructure"
       ],
@@ -517,6 +545,7 @@
       "name": "AWS Serverless",
       "description": "Build and deploy Lambda serverless workflows with SAM and CDK.",
       "version": "1.0.0",
+      "icon": "/icons/aws-serverless.svg",
       "categories": [
         "Infrastructure"
       ],
@@ -537,6 +566,7 @@
       "name": "Azure",
       "description": "Operate Azure resources and services from natural language.",
       "version": "1.0.0",
+      "icon": "/icons/azure.svg",
       "categories": [
         "Infrastructure"
       ],
@@ -557,6 +587,7 @@
       "name": "Box",
       "description": "Search, read, and manage Box files with built-in Box AI Q&A.",
       "version": "1.0.0",
+      "icon": "/icons/box.svg",
       "categories": [
         "Documents"
       ],
@@ -574,6 +605,7 @@
       "name": "Braintrust",
       "description": "Query AI experiments, production logs, and docs on the Braintrust evals platform.",
       "version": "1.0.0",
+      "icon": "/icons/braintrust.png",
       "categories": [
         "Developer Tools",
         "Analytics"
@@ -595,6 +627,7 @@
       "name": "Bright Data",
       "description": "Access and unblock web pages for scraping and search tasks.",
       "version": "1.0.0",
+      "icon": "/icons/bright-data.png",
       "categories": [
         "Data & Search"
       ],
@@ -615,6 +648,7 @@
       "name": "Browser Use",
       "description": "Browse websites, fill forms, and scrape pages with an automated local browser.",
       "version": "1.0.0",
+      "icon": "/icons/browser-use.png",
       "categories": [
         "Data & Search"
       ],
@@ -632,6 +666,7 @@
       "name": "Browserbase Browse",
       "description": "Browse websites, fill forms, scrape data, and take screenshots with an automated browser.",
       "version": "1.0.0",
+      "icon": "/icons/browserbase-browse.svg",
       "categories": [
         "Data & Search"
       ],
@@ -652,6 +687,7 @@
       "name": "Browserstack",
       "description": "Test on 3,500+ real devices, run accessibility scans, and generate test cases.",
       "version": "1.0.0",
+      "icon": "/icons/browserstack.png",
       "categories": [
         "Developer Tools"
       ],
@@ -673,6 +709,7 @@
       "name": "Buildkite",
       "description": "Design pipelines and troubleshoot CI/CD builds on Buildkite.",
       "version": "1.0.0",
+      "icon": "/icons/buildkite.svg",
       "categories": [
         "Developer Tools"
       ],
@@ -690,6 +727,7 @@
       "name": "Canva",
       "description": "Create designs, resize for social, bulk-create, and check brand compliance in Canva.",
       "version": "1.0.0",
+      "icon": "/icons/canva.svg",
       "categories": [
         "Design & Content"
       ],
@@ -708,6 +746,7 @@
       "name": "Chainguard",
       "description": "Work with container images, CVEs, and SBOMs from Chainguard.",
       "version": "1.0.0",
+      "icon": "/icons/chainguard.png",
       "categories": [
         "Security"
       ],
@@ -728,6 +767,7 @@
       "name": "Chargebee",
       "description": "Search Chargebee documentation and generate billing integration code.",
       "version": "1.0.0",
+      "icon": "/icons/chargebee.png",
       "categories": [
         "Payments & Fintech",
         "Developer Tools"
@@ -746,6 +786,7 @@
       "name": "ChatPRD",
       "description": "Write and align PRDs and product docs with your ChatPRD workspace.",
       "version": "1.0.0",
+      "icon": "/icons/chatprd.png",
       "categories": [
         "Project Management",
         "Documents"
@@ -767,6 +808,7 @@
       "name": "Checkmarx",
       "description": "Find and remediate code security issues from your Checkmarx One tenant.",
       "version": "1.0.0",
+      "icon": "/icons/checkmarx.png",
       "categories": [
         "Security"
       ],
@@ -788,6 +830,7 @@
       "name": "Circle",
       "description": "Build with USDC: stablecoin payments, CCTP cross-chain transfers, and wallets.",
       "version": "1.0.0",
+      "icon": "/icons/circle.png",
       "categories": [
         "Payments & Fintech",
         "Developer Tools"
@@ -803,6 +846,7 @@
       "name": "Circleback",
       "description": "Search and read your meetings, transcripts, action items, calendar, and email notes.",
       "version": "1.0.0",
+      "icon": "/icons/circleback.png",
       "categories": [
         "Meetings"
       ],
@@ -820,6 +864,7 @@
       "name": "Clay",
       "description": "Run enrichment, research agents, and workflows on your Clay account.",
       "version": "1.0.0",
+      "icon": "/icons/clay.png",
       "categories": [
         "Sales & CRM"
       ],
@@ -837,6 +882,7 @@
       "name": "Clerk",
       "description": "Look up Clerk auth docs and code snippets and manage your workspace.",
       "version": "1.0.0",
+      "icon": "/icons/clerk.svg",
       "categories": [
         "Developer Tools",
         "Security"
@@ -855,6 +901,7 @@
       "name": "ClickHouse",
       "description": "Run SQL queries and manage data in your ClickHouse database.",
       "version": "1.0.0",
+      "icon": "/icons/clickhouse.svg",
       "categories": [
         "Infrastructure",
         "Analytics"
@@ -878,6 +925,7 @@
       "name": "ClickUp",
       "description": "Manage tasks and projects in your ClickUp workspace.",
       "version": "1.0.0",
+      "icon": "/icons/clickup.svg",
       "categories": [
         "Project Management"
       ],
@@ -895,6 +943,7 @@
       "name": "Cloudflare",
       "description": "Search Cloudflare documentation for Workers, DNS, and platform features.",
       "version": "1.0.0",
+      "icon": "/icons/cloudflare.svg",
       "categories": [
         "Infrastructure",
         "Developer Tools"
@@ -913,6 +962,7 @@
       "name": "Cloudinary",
       "description": "Manage, analyze, and transform media assets in your Cloudinary account.",
       "version": "1.0.0",
+      "icon": "/icons/cloudinary.svg",
       "categories": [
         "AI & Media",
         "Design & Content"
@@ -934,6 +984,7 @@
       "name": "CockroachDB",
       "description": "SQL patterns, app patterns, audit logging, and operations for CockroachDB.",
       "version": "1.0.0",
+      "icon": "/icons/cockroachdb.svg",
       "categories": [
         "Infrastructure",
         "Developer Tools"
@@ -949,6 +1000,7 @@
       "name": "Composio",
       "description": "Connect to 1000+ downstream apps like email, CRM, and docs through one managed connector.",
       "version": "1.0.0",
+      "icon": "/icons/composio.png",
       "categories": [
         "Infrastructure"
       ],
@@ -966,6 +1018,7 @@
       "name": "Confidence by Spotify",
       "description": "Manage feature flags and experiments, with migration help from other flag platforms.",
       "version": "1.0.0",
+      "icon": "/icons/confidence.png",
       "categories": [
         "Developer Tools",
         "Analytics"
@@ -984,6 +1037,7 @@
       "name": "Context7",
       "description": "Look up up-to-date documentation for any library or framework while writing code.",
       "version": "1.0.0",
+      "icon": "/icons/context7.png",
       "categories": [
         "Developer Tools",
         "Knowledge"
@@ -1005,6 +1059,7 @@
       "name": "Convex",
       "description": "Inspect and manage your Convex backend deployments.",
       "version": "1.0.0",
+      "icon": "/icons/convex.svg",
       "categories": [
         "Infrastructure",
         "Developer Tools"
@@ -1026,6 +1081,7 @@
       "name": "Coralogix",
       "description": "Query observability data in your Coralogix account.",
       "version": "1.0.0",
+      "icon": "/icons/coralogix.png",
       "categories": [
         "Infrastructure"
       ],
@@ -1047,6 +1103,7 @@
       "name": "Dagster",
       "description": "Build and maintain Dagster data-orchestration projects.",
       "version": "1.0.0",
+      "icon": "/icons/dagster.png",
       "categories": [
         "Infrastructure",
         "Developer Tools"
@@ -1062,6 +1119,7 @@
       "name": "Datadog",
       "description": "Query monitoring, logs, and observability data in Datadog.",
       "version": "1.0.0",
+      "icon": "/icons/datadog.svg",
       "categories": [
         "Infrastructure"
       ],
@@ -1079,6 +1137,7 @@
       "name": "dbt Labs",
       "description": "Run dbt commands, query the Semantic Layer, and discover models.",
       "version": "1.0.0",
+      "icon": "/icons/dbt-labs.svg",
       "categories": [
         "Analytics",
         "Data & Search"
@@ -1100,6 +1159,7 @@
       "name": "D&B Commercial Graph",
       "description": "Look up company data from D&B's Commercial Graph for sales, finance, and compliance.",
       "version": "1.0.0",
+      "icon": "/icons/dnb-commercial-graph.png",
       "categories": [
         "Sales & CRM",
         "Finance"
@@ -1123,6 +1183,7 @@
       "name": "D&B Risk Analytics",
       "description": "Get company risk indicators, beneficial ownership, and portfolio insights from D&B.",
       "version": "1.0.0",
+      "icon": "/icons/dnb-risk-analytics.png",
       "categories": [
         "Finance",
         "Security"
@@ -1146,6 +1207,7 @@
       "name": "Docusign",
       "description": "Find envelopes, check agreement status, and advance signing workflows.",
       "version": "1.0.0",
+      "icon": "/icons/docusign.png",
       "categories": [
         "Documents"
       ],
@@ -1163,6 +1225,7 @@
       "name": "Dynatrace",
       "description": "Query live observability data and investigate incidents in Dynatrace.",
       "version": "1.0.0",
+      "icon": "/icons/dynatrace.svg",
       "categories": [
         "Infrastructure"
       ],
@@ -1183,6 +1246,7 @@
       "name": "Elastic",
       "description": "Search and analyze data in your Elasticsearch cluster.",
       "version": "1.0.0",
+      "icon": "/icons/elastic.svg",
       "categories": [
         "Data & Search",
         "Infrastructure"
@@ -1205,6 +1269,7 @@
       "name": "eToro",
       "description": "Look up eToro Public API docs for trading, market data, and portfolio integrations.",
       "version": "1.0.0",
+      "icon": "/icons/etoro.png",
       "categories": [
         "Finance",
         "Developer Tools"
@@ -1226,6 +1291,7 @@
       "name": "Exa",
       "description": "Search and crawl the web for research and browsing tasks.",
       "version": "1.0.0",
+      "icon": "/icons/exa.png",
       "categories": [
         "Data & Search"
       ],
@@ -1247,6 +1313,7 @@
       "name": "Falconer",
       "description": "Read and write docs and specs in your Falconer knowledge base.",
       "version": "1.0.0",
+      "icon": "/icons/falconer.png",
       "categories": [
         "Knowledge"
       ],
@@ -1264,6 +1331,7 @@
       "name": "Firebase",
       "description": "Manage Firestore, Auth, Data Connect, and messaging in your Firebase project.",
       "version": "1.0.0",
+      "icon": "/icons/firebase.svg",
       "categories": [
         "Infrastructure",
         "Developer Tools"
@@ -1285,6 +1353,7 @@
       "name": "Firecrawl",
       "description": "Scrape, crawl, search, and extract structured data from websites.",
       "version": "1.0.0",
+      "icon": "/icons/firecrawl.svg",
       "categories": [
         "Data & Search"
       ],
@@ -1305,6 +1374,7 @@
       "name": "GitBook",
       "description": "Create and edit documentation sites, pages, and change requests in GitBook.",
       "version": "1.0.0",
+      "icon": "/icons/gitbook.svg",
       "categories": [
         "Documents",
         "Knowledge"
@@ -1323,6 +1393,7 @@
       "name": "GitHits",
       "description": "Search indexed open-source package and repo source, docs, and dependency health.",
       "version": "1.0.0",
+      "icon": "/icons/githits.png",
       "categories": [
         "Developer Tools"
       ],
@@ -1343,6 +1414,7 @@
       "name": "GitHub",
       "description": "Work with repositories, issues, and pull requests on GitHub.",
       "version": "1.0.0",
+      "icon": "/icons/github.svg",
       "categories": [
         "Developer Tools"
       ],
@@ -1361,6 +1433,7 @@
       "name": "GitLab",
       "description": "Work with issues, merge requests, pipelines, and code search on GitLab.",
       "version": "1.0.0",
+      "icon": "/icons/gitlab.svg",
       "categories": [
         "Developer Tools"
       ],
@@ -1378,6 +1451,7 @@
       "name": "Glean",
       "description": "Search your company's knowledge across all connected workplace apps.",
       "version": "1.0.0",
+      "icon": "/icons/glean.png",
       "categories": [
         "Knowledge",
         "Data & Search"
@@ -1399,6 +1473,7 @@
       "name": "Gmail",
       "description": "Search, read, draft, and label your Gmail email.",
       "version": "1.0.0",
+      "icon": "/icons/gmail.svg",
       "categories": [
         "Communication"
       ],
@@ -1417,6 +1492,7 @@
       "name": "Gong",
       "description": "Pull call briefs and deal insights from Gong revenue intelligence.",
       "version": "1.0.0",
+      "icon": "/icons/gong.png",
       "categories": [
         "Sales & CRM"
       ],
@@ -1434,6 +1510,7 @@
       "name": "Google Calendar",
       "description": "List calendars and create or update events in Google Calendar.",
       "version": "1.0.0",
+      "icon": "/icons/google-calendar.svg",
       "categories": [
         "Meetings"
       ],
@@ -1452,6 +1529,7 @@
       "name": "Google Drive",
       "description": "Search, read, create, and share files in Google Drive.",
       "version": "1.0.0",
+      "icon": "/icons/google-drive.svg",
       "categories": [
         "Documents"
       ],
@@ -1470,6 +1548,7 @@
       "name": "Grafana Cloud",
       "description": "Work with dashboards, Prometheus, Loki, Tempo, alerting, and OnCall in Grafana Cloud.",
       "version": "1.0.0",
+      "icon": "/icons/grafana-cloud.svg",
       "categories": [
         "Infrastructure",
         "Analytics"
@@ -1488,6 +1567,7 @@
       "name": "Grafana Labs",
       "description": "Skills for the Grafana Assistant and CLI across dashboards and observability workflows.",
       "version": "1.0.0",
+      "icon": "/icons/grafana-skills.svg",
       "categories": [
         "Infrastructure",
         "Developer Tools"
@@ -1503,6 +1583,7 @@
       "name": "Granola",
       "description": "Search your Granola meeting notes and transcripts and extract action items.",
       "version": "1.0.0",
+      "icon": "/icons/granola.svg",
       "categories": [
         "Meetings"
       ],
@@ -1521,6 +1602,7 @@
       "name": "GSAP",
       "description": "Web animation with GSAP: core, timelines, ScrollTrigger, plugins, React, and performance.",
       "version": "1.0.0",
+      "icon": "/icons/gsap-skills.svg",
       "categories": [
         "Design & Content",
         "Developer Tools"
@@ -1536,6 +1618,7 @@
       "name": "Harness",
       "description": "Operate CI/CD and software delivery across your Harness resources.",
       "version": "1.0.0",
+      "icon": "/icons/harness.png",
       "categories": [
         "Developer Tools"
       ],
@@ -1553,6 +1636,7 @@
       "name": "Hex",
       "description": "Ask business-analytics questions over your Hex projects and notebooks.",
       "version": "1.0.0",
+      "icon": "/icons/hex.png",
       "categories": [
         "Analytics"
       ],
@@ -1573,6 +1657,7 @@
       "name": "HeyGen",
       "description": "Create avatar videos, translations, and video content with your HeyGen account.",
       "version": "1.0.0",
+      "icon": "/icons/heygen.png",
       "categories": [
         "AI & Media"
       ],
@@ -1590,6 +1675,7 @@
       "name": "Higgsfield",
       "description": "Generate images and video, train Soul characters, and analyze virality.",
       "version": "1.0.0",
+      "icon": "/icons/higgsfield.png",
       "categories": [
         "AI & Media",
         "Design & Content"
@@ -1608,6 +1694,7 @@
       "name": "HubSpot",
       "description": "Work with contacts, companies, deals, tickets, and marketing emails in HubSpot.",
       "version": "1.0.0",
+      "icon": "/icons/hubspot.png",
       "categories": [
         "Sales & CRM"
       ],
@@ -1625,6 +1712,7 @@
       "name": "Hugging Face",
       "description": "Work with Hugging Face models, datasets, and papers.",
       "version": "1.0.0",
+      "icon": "/icons/hugging-face.svg",
       "categories": [
         "AI & Media",
         "Developer Tools"
@@ -1646,6 +1734,7 @@
       "name": "IcePanel",
       "description": "Query and edit C4-style software architecture models in IcePanel.",
       "version": "1.0.0",
+      "icon": "/icons/icepanel.png",
       "categories": [
         "Developer Tools"
       ],
@@ -1663,6 +1752,7 @@
       "name": "Intercom",
       "description": "Search customer conversations, contacts, and Help Center content.",
       "version": "1.0.0",
+      "icon": "/icons/intercom.svg",
       "categories": [
         "Support"
       ],
@@ -1680,6 +1770,7 @@
       "name": "JFrog",
       "description": "Manage artifacts and supply-chain security on your JFrog Platform instance.",
       "version": "1.0.0",
+      "icon": "/icons/jfrog.png",
       "categories": [
         "Developer Tools",
         "Security"
@@ -1701,6 +1792,7 @@
       "name": "Juicebox",
       "description": "Source candidates and run recruiting analytics with PeopleGPT.",
       "version": "1.0.0",
+      "icon": "/icons/juicebox.png",
       "categories": [
         "Recruiting"
       ],
@@ -1718,6 +1810,7 @@
       "name": "Langfuse",
       "description": "LLM tracing, prompt management, and evaluation workflows with Langfuse.",
       "version": "1.0.0",
+      "icon": "/icons/langfuse.png",
       "categories": [
         "Developer Tools",
         "Analytics"
@@ -1733,6 +1826,7 @@
       "name": "LaunchDarkly",
       "description": "Manage feature flags and AI configs in LaunchDarkly.",
       "version": "1.0.0",
+      "icon": "/icons/launchdarkly.png",
       "categories": [
         "Developer Tools"
       ],
@@ -1750,6 +1844,7 @@
       "name": "Linear",
       "description": "Create, search, and update issues and projects in Linear.",
       "version": "1.0.0",
+      "icon": "/icons/linear.svg",
       "categories": [
         "Project Management"
       ],
@@ -1768,6 +1863,7 @@
       "name": "Lovable",
       "description": "Create Lovable projects, drive the Lovable agent, manage cloud databases, and deploy apps.",
       "version": "1.0.0",
+      "icon": "/icons/lovable.svg",
       "categories": [
         "Developer Tools",
         "Design & Content"
@@ -1786,6 +1882,7 @@
       "name": "Lucid",
       "description": "Search, summarize, create, and edit Lucidchart and Lucidspark documents.",
       "version": "1.0.0",
+      "icon": "/icons/lucid.svg",
       "categories": [
         "Design & Content",
         "Documents"
@@ -1804,6 +1901,7 @@
       "name": "Magic Patterns",
       "description": "Generate and iterate on AI design prototypes in Magic Patterns.",
       "version": "1.0.0",
+      "icon": "/icons/magic-patterns.png",
       "categories": [
         "Design & Content"
       ],
@@ -1821,6 +1919,7 @@
       "name": "Mem0",
       "description": "Give your Bot persistent memory, personalization, and semantic search.",
       "version": "1.0.0",
+      "icon": "/icons/mem0.png",
       "categories": [
         "Knowledge",
         "AI & Media"
@@ -1839,6 +1938,7 @@
       "name": "Mintlify",
       "description": "Manage and search Mintlify documentation sites, pages, and navigation.",
       "version": "1.0.0",
+      "icon": "/icons/mintlify.svg",
       "categories": [
         "Documents",
         "Developer Tools"
@@ -1857,6 +1957,7 @@
       "name": "Miro",
       "description": "Create and browse boards, diagrams, docs, and tables in Miro.",
       "version": "1.0.0",
+      "icon": "/icons/miro.svg",
       "categories": [
         "Design & Content",
         "Project Management"
@@ -1875,6 +1976,7 @@
       "name": "Mixpanel",
       "description": "Ask questions of your product analytics and build dashboards in Mixpanel.",
       "version": "1.0.0",
+      "icon": "/icons/mixpanel.svg",
       "categories": [
         "Analytics"
       ],
@@ -1892,6 +1994,7 @@
       "name": "Mobbin",
       "description": "Search 600k+ real app screens and user flows for design reference.",
       "version": "1.0.0",
+      "icon": "/icons/mobbin.png",
       "categories": [
         "Design & Content"
       ],
@@ -1909,6 +2012,7 @@
       "name": "Modern Web Guidance",
       "description": "Curated modern web-platform best practices from the Chrome team, fully offline.",
       "version": "1.0.0",
+      "icon": "/icons/modern-web-guidance.svg",
       "categories": [
         "Developer Tools"
       ],
@@ -1923,6 +2027,7 @@
       "name": "Monday.com",
       "description": "Run CRM briefings, dashboards, and project workflows on your monday.com boards.",
       "version": "1.0.0",
+      "icon": "/icons/monday.png",
       "categories": [
         "Project Management",
         "Sales & CRM"
@@ -1941,6 +2046,7 @@
       "name": "MongoDB",
       "description": "Query and manage any MongoDB deployment via its connection string.",
       "version": "1.0.0",
+      "icon": "/icons/mongodb.svg",
       "categories": [
         "Infrastructure"
       ],
@@ -1961,6 +2067,7 @@
       "name": "MongoDB Atlas",
       "description": "Manage MongoDB Atlas clusters, projects, and data.",
       "version": "1.0.0",
+      "icon": "/icons/mongodb-atlas.svg",
       "categories": [
         "Infrastructure"
       ],
@@ -1982,6 +2089,7 @@
       "name": "Navan",
       "description": "Query expenses, travel bookings, policies, approvals, and cards in Navan.",
       "version": "1.0.0",
+      "icon": "/icons/navan.png",
       "categories": [
         "Finance"
       ],
@@ -1999,6 +2107,7 @@
       "name": "Neon Postgres",
       "description": "Manage Neon Postgres databases, branches, and queries.",
       "version": "1.0.0",
+      "icon": "/icons/neon-postgres.svg",
       "categories": [
         "Infrastructure"
       ],
@@ -2016,6 +2125,7 @@
       "name": "Netlify",
       "description": "Create, manage, and deploy sites and environment variables on Netlify.",
       "version": "1.0.0",
+      "icon": "/icons/netlify.svg",
       "categories": [
         "Infrastructure"
       ],
@@ -2036,6 +2146,7 @@
       "name": "Notion",
       "description": "Read, search, and edit your Notion pages and databases.",
       "version": "1.0.0",
+      "icon": "/icons/notion.svg",
       "categories": [
         "Knowledge",
         "Documents"
@@ -2055,6 +2166,7 @@
       "name": "Nvidia Skills",
       "description": "Official NVIDIA skills for CUDA, Jetson, NIM, NeMo, Omniverse, RAPIDS, and robotics.",
       "version": "1.0.0",
+      "icon": "/icons/nvidia-skills.svg",
       "categories": [
         "Developer Tools",
         "AI & Media"
@@ -2070,6 +2182,7 @@
       "name": "Observe by Snowflake",
       "description": "Query observability data in your Observe tenant.",
       "version": "1.0.0",
+      "icon": "/icons/observe.png",
       "categories": [
         "Infrastructure"
       ],
@@ -2091,6 +2204,7 @@
       "name": "OneSignal",
       "description": "Manage and debug push, email, and SMS messaging campaigns.",
       "version": "1.0.0",
+      "icon": "/icons/onesignal.png",
       "categories": [
         "Communication"
       ],
@@ -2108,6 +2222,7 @@
       "name": "OpenSearch",
       "description": "Build search applications and log analytics against an OpenSearch cluster.",
       "version": "1.0.0",
+      "icon": "/icons/opensearch.svg",
       "categories": [
         "Data & Search",
         "Infrastructure"
@@ -2123,6 +2238,7 @@
       "name": "Paper",
       "description": "Read and edit design canvases in the Paper desktop app — requires Paper installed and signed in.",
       "version": "1.0.0",
+      "icon": "/icons/paper.svg",
       "categories": [
         "Design & Content"
       ],
@@ -2140,6 +2256,7 @@
       "name": "ParadeDB",
       "description": "Expert guidance for search with ParadeDB and pg_search on Postgres.",
       "version": "1.0.0",
+      "icon": "/icons/paradedb.png",
       "categories": [
         "Data & Search",
         "Infrastructure"
@@ -2155,6 +2272,7 @@
       "name": "Parallel",
       "description": "Run web search and async deep-research or enrichment tasks.",
       "version": "1.0.0",
+      "icon": "/icons/parallel.png",
       "categories": [
         "Data & Search"
       ],
@@ -2172,6 +2290,7 @@
       "name": "Pendo",
       "description": "Analyze account health, feature adoption, replays, and feedback in Pendo.",
       "version": "1.0.0",
+      "icon": "/icons/pendo.png",
       "categories": [
         "Analytics"
       ],
@@ -2192,6 +2311,7 @@
       "name": "Phantom",
       "description": "Scaffold wallet-connected apps with the Phantom Connect SDK for React and React Native.",
       "version": "1.0.0",
+      "icon": "/icons/phantom.png",
       "categories": [
         "Payments & Fintech",
         "Developer Tools"
@@ -2207,6 +2327,7 @@
       "name": "Pinecone",
       "description": "Manage Pinecone vector indexes, upsert and query data, and search docs.",
       "version": "1.0.0",
+      "icon": "/icons/pinecone.png",
       "categories": [
         "Infrastructure",
         "Data & Search"
@@ -2228,6 +2349,7 @@
       "name": "Plain",
       "description": "Work support queues: reply to customers, assign, label, and resolve threads.",
       "version": "1.0.0",
+      "icon": "/icons/plain.svg",
       "categories": [
         "Support"
       ],
@@ -2245,6 +2367,7 @@
       "name": "PlanetScale",
       "description": "Manage PlanetScale organizations, databases, branches, schema, and insights.",
       "version": "1.0.0",
+      "icon": "/icons/planetscale.svg",
       "categories": [
         "Infrastructure"
       ],
@@ -2262,6 +2385,7 @@
       "name": "Playwright",
       "description": "Automate a web browser to navigate, click, and test pages.",
       "version": "1.0.0",
+      "icon": "/icons/playwright.svg",
       "categories": [
         "Developer Tools"
       ],
@@ -2279,6 +2403,7 @@
       "name": "Port (getport.io)",
       "description": "Work with your internal developer portal and engineering system of record.",
       "version": "1.0.0",
+      "icon": "/icons/port.png",
       "categories": [
         "Developer Tools"
       ],
@@ -2296,6 +2421,7 @@
       "name": "PostHog",
       "description": "Query product analytics, manage feature flags, run experiments, and track errors.",
       "version": "1.0.0",
+      "icon": "/icons/posthog.svg",
       "categories": [
         "Analytics"
       ],
@@ -2316,6 +2442,7 @@
       "name": "Postman",
       "description": "Work with Postman collections and check API readiness.",
       "version": "1.0.0",
+      "icon": "/icons/postman.svg",
       "categories": [
         "Developer Tools"
       ],
@@ -2336,6 +2463,7 @@
       "name": "Profound",
       "description": "Analyze AI visibility, sentiment, and citations for your brand.",
       "version": "1.0.0",
+      "icon": "/icons/profound.png",
       "categories": [
         "Analytics"
       ],
@@ -2353,6 +2481,7 @@
       "name": "QuiverAI",
       "description": "Create, refine, and vectorize SVG assets.",
       "version": "1.0.0",
+      "icon": "/icons/quiverai.png",
       "categories": [
         "Design & Content"
       ],
@@ -2370,6 +2499,7 @@
       "name": "Railway",
       "description": "Deploy and operate services and infrastructure on Railway.",
       "version": "1.0.0",
+      "icon": "/icons/railway.svg",
       "categories": [
         "Infrastructure"
       ],
@@ -2387,6 +2517,7 @@
       "name": "Raisely",
       "description": "Query and manage fundraising campaigns, donations, and supporters.",
       "version": "1.0.0",
+      "icon": "/icons/raisely.png",
       "categories": [
         "Sales & CRM"
       ],
@@ -2404,6 +2535,7 @@
       "name": "Ramp",
       "description": "Analyze spend, handle approvals, clean up transactions, and manage vendors in Ramp.",
       "version": "1.0.0",
+      "icon": "/icons/ramp.png",
       "categories": [
         "Finance"
       ],
@@ -2421,6 +2553,7 @@
       "name": "Redis",
       "description": "Read and write Redis data using natural language operations.",
       "version": "1.0.0",
+      "icon": "/icons/redis.svg",
       "categories": [
         "Infrastructure"
       ],
@@ -2441,6 +2574,7 @@
       "name": "Remotion",
       "description": "Best practices for creating programmatic videos with Remotion.",
       "version": "1.0.0",
+      "icon": "/icons/remotion.svg",
       "categories": [
         "Design & Content",
         "Developer Tools"
@@ -2456,6 +2590,7 @@
       "name": "Render",
       "description": "Deploy, debug, and monitor apps hosted on Render.",
       "version": "1.0.0",
+      "icon": "/icons/render.svg",
       "categories": [
         "Infrastructure"
       ],
@@ -2473,6 +2608,7 @@
       "name": "Resend",
       "description": "Send and receive email, manage contacts, broadcasts, and sending domains.",
       "version": "1.0.0",
+      "icon": "/icons/resend.svg",
       "categories": [
         "Communication"
       ],
@@ -2490,6 +2626,7 @@
       "name": "resolve-ai",
       "description": "Investigate incidents and pull production context from your Resolve account.",
       "version": "1.0.0",
+      "icon": "/icons/resolve-ai.png",
       "categories": [
         "Infrastructure"
       ],
@@ -2507,6 +2644,7 @@
       "name": "Resolve AI Admin",
       "description": "Configure Resolve AI data sources like Datadog, Grafana, and Prometheus.",
       "version": "1.0.0",
+      "icon": "/icons/resolve-ai-admin.png",
       "categories": [
         "Infrastructure"
       ],
@@ -2521,6 +2659,7 @@
       "name": "RevenueCat",
       "description": "Manage subscription products, entitlements, offerings, and analytics.",
       "version": "1.0.0",
+      "icon": "/icons/revenuecat.svg",
       "categories": [
         "Payments & Fintech",
         "Analytics"
@@ -2542,6 +2681,7 @@
       "name": "RevenueCat Play Billing",
       "description": "Implement Google Play Billing with the RevenueCat Android SDK.",
       "version": "1.0.0",
+      "icon": "/icons/revenuecat-play-billing.svg",
       "categories": [
         "Payments & Fintech",
         "Developer Tools"
@@ -2557,6 +2697,7 @@
       "name": "Roboflow",
       "description": "Manage computer-vision datasets, labeling, training, and workflows.",
       "version": "1.0.0",
+      "icon": "/icons/roboflow.svg",
       "categories": [
         "AI & Media",
         "Developer Tools"
@@ -2575,6 +2716,7 @@
       "name": "Salesforce",
       "description": "Work with your Salesforce CRM through your org's hosted endpoint.",
       "version": "1.0.0",
+      "icon": "/icons/salesforce.svg",
       "categories": [
         "Sales & CRM"
       ],
@@ -2595,6 +2737,7 @@
       "name": "Sanity",
       "description": "Manage structured content in your Sanity CMS through conversation.",
       "version": "1.0.0",
+      "icon": "/icons/sanity.svg",
       "categories": [
         "Design & Content",
         "Documents"
@@ -2613,6 +2756,7 @@
       "name": "Scandit",
       "description": "Integrate Scandit's barcode, ID, and label-capture SDK into applications.",
       "version": "1.0.0",
+      "icon": "/icons/scandit.png",
       "categories": [
         "Developer Tools"
       ],
@@ -2627,6 +2771,7 @@
       "name": "ScyllaDB",
       "description": "Cloud setup, CQL data modeling, and vector search with ScyllaDB.",
       "version": "1.0.0",
+      "icon": "/icons/scylladb.svg",
       "categories": [
         "Infrastructure",
         "Developer Tools"
@@ -2642,6 +2787,7 @@
       "name": "Semgrep",
       "description": "Scan code for security issues locally with Semgrep.",
       "version": "1.0.0",
+      "icon": "/icons/semgrep.png",
       "categories": [
         "Security",
         "Developer Tools"
@@ -2660,6 +2806,7 @@
       "name": "Sentry",
       "description": "Investigate errors, crashes, and issues tracked in Sentry.",
       "version": "1.0.0",
+      "icon": "/icons/sentry.svg",
       "categories": [
         "Developer Tools",
         "Infrastructure"
@@ -2678,6 +2825,7 @@
       "name": "shadcn/ui",
       "description": "Search, install, and audit shadcn/ui registry components.",
       "version": "1.0.0",
+      "icon": "/icons/shadcn-ui.svg",
       "categories": [
         "Developer Tools"
       ],
@@ -2695,6 +2843,7 @@
       "name": "Shopify",
       "description": "Search Shopify dev docs, introspect GraphQL schemas, and validate code and themes.",
       "version": "1.0.0",
+      "icon": "/icons/shopify.svg",
       "categories": [
         "Developer Tools"
       ],
@@ -2712,6 +2861,7 @@
       "name": "Sinch",
       "description": "Send SMS, RCS, WhatsApp, voice, and email messages and run verification flows.",
       "version": "1.0.0",
+      "icon": "/icons/sinch.png",
       "categories": [
         "Communication"
       ],
@@ -2734,6 +2884,7 @@
       "name": "Slack",
       "description": "Search, read, and send Slack messages, manage canvases and users.",
       "version": "1.0.0",
+      "icon": "/icons/slack.svg",
       "categories": [
         "Communication"
       ],
@@ -2752,6 +2903,7 @@
       "name": "Snowflake",
       "description": "Query your Snowflake data warehouse with SQL and Cortex analytics.",
       "version": "1.0.0",
+      "icon": "/icons/snowflake.svg",
       "categories": [
         "Data & Search",
         "Analytics"
@@ -2774,6 +2926,7 @@
       "name": "Snyk",
       "description": "Check code and dependencies for vulnerabilities as they are written.",
       "version": "1.0.0",
+      "icon": "/icons/snyk.svg",
       "categories": [
         "Security"
       ],
@@ -2794,6 +2947,7 @@
       "name": "Sonatype",
       "description": "Check dependencies, find safer versions, and audit software supply-chain health.",
       "version": "1.0.0",
+      "icon": "/icons/sonatype.svg",
       "categories": [
         "Developer Tools",
         "Security"
@@ -2815,6 +2969,7 @@
       "name": "Sourcegraph",
       "description": "Search code across your organization's Sourcegraph instance.",
       "version": "1.0.0",
+      "icon": "/icons/sourcegraph.svg",
       "categories": [
         "Developer Tools"
       ],
@@ -2836,6 +2991,7 @@
       "name": "Stripe",
       "description": "Manage payments end to end: refunds, invoicing, reporting, and docs search.",
       "version": "1.0.0",
+      "icon": "/icons/stripe.svg",
       "categories": [
         "Payments & Fintech"
       ],
@@ -2853,6 +3009,7 @@
       "name": "Subtext",
       "description": "Review recorded production sessions to reproduce bugs and manage capture privacy.",
       "version": "1.0.0",
+      "icon": "/icons/subtext.png",
       "categories": [
         "Developer Tools",
         "Analytics"
@@ -2871,6 +3028,7 @@
       "name": "Supabase",
       "description": "Manage Supabase tables, config, and queries, and launch databases.",
       "version": "1.0.0",
+      "icon": "/icons/supabase.svg",
       "categories": [
         "Infrastructure",
         "Developer Tools"
@@ -2892,6 +3050,7 @@
       "name": "Svelte",
       "description": "Get official Svelte guidance and tooling while building Svelte apps.",
       "version": "1.0.0",
+      "icon": "/icons/svelte.svg",
       "categories": [
         "Developer Tools"
       ],
@@ -2909,6 +3068,7 @@
       "name": "Tavily",
       "description": "Search, extract, map, and crawl the web for general-purpose research.",
       "version": "1.0.0",
+      "icon": "/icons/tavily.png",
       "categories": [
         "Data & Search"
       ],
@@ -2929,6 +3089,7 @@
       "name": "Temporal",
       "description": "Develop Temporal workflows across Python, TypeScript, Go, Java, .NET, and Ruby.",
       "version": "1.0.0",
+      "icon": "/icons/temporal.svg",
       "categories": [
         "Developer Tools",
         "Infrastructure"
@@ -2944,6 +3105,7 @@
       "name": "ThoughtSpot",
       "description": "Ask natural-language analytics questions against your ThoughtSpot instance.",
       "version": "1.0.0",
+      "icon": "/icons/thoughtspot.png",
       "categories": [
         "Analytics"
       ],
@@ -2964,6 +3126,7 @@
       "name": "TierZero",
       "description": "Fetch production telemetry and investigate incidents with TierZero.",
       "version": "1.0.0",
+      "icon": "/icons/tierzero.png",
       "categories": [
         "Infrastructure"
       ],
@@ -2981,6 +3144,7 @@
       "name": "tldraw",
       "description": "Draw and edit diagrams on an interactive tldraw canvas.",
       "version": "1.0.0",
+      "icon": "/icons/tldraw.svg",
       "categories": [
         "Design & Content"
       ],
@@ -2998,6 +3162,7 @@
       "name": "turbopuffer",
       "description": "Manage vector and full-text search namespaces in turbopuffer.",
       "version": "1.0.0",
+      "icon": "/icons/turbopuffer.png",
       "categories": [
         "Infrastructure",
         "Data & Search"
@@ -3019,6 +3184,7 @@
       "name": "Twilio",
       "description": "Search Twilio's messaging, voice, and email API documentation.",
       "version": "1.0.0",
+      "icon": "/icons/twilio.svg",
       "categories": [
         "Communication",
         "Developer Tools"
@@ -3037,6 +3203,7 @@
       "name": "Vercel",
       "description": "Manage Vercel projects, deployments, and logs.",
       "version": "1.0.0",
+      "icon": "/icons/vercel.svg",
       "categories": [
         "Infrastructure"
       ],
@@ -3054,6 +3221,7 @@
       "name": "Webflow",
       "description": "Manage CMS content, audit sites, optimize assets, and publish in Webflow.",
       "version": "1.0.0",
+      "icon": "/icons/webflow.svg",
       "categories": [
         "Design & Content"
       ],
@@ -3071,6 +3239,7 @@
       "name": "Whop",
       "description": "Run your Whop business: payments, memberships, products, promos, and ads.",
       "version": "1.0.0",
+      "icon": "/icons/whop.svg",
       "categories": [
         "Payments & Fintech"
       ],
@@ -3088,6 +3257,7 @@
       "name": "Wix",
       "description": "Manage Wix sites and business features like eCommerce, bookings, and payments.",
       "version": "1.0.0",
+      "icon": "/icons/wix.svg",
       "categories": [
         "Design & Content"
       ],
@@ -3105,6 +3275,7 @@
       "name": "X (X API)",
       "description": "Post, search, and read timelines through the X API.",
       "version": "1.0.0",
+      "icon": "/icons/x.svg",
       "categories": [
         "Communication"
       ],
@@ -3122,6 +3293,7 @@
       "name": "Zapier",
       "description": "Trigger 9,000+ app actions across email, CRM, payments, and docs from one connector.",
       "version": "1.0.0",
+      "icon": "/icons/zapier.svg",
       "categories": [
         "Infrastructure"
       ],
@@ -3139,6 +3311,7 @@
       "name": "Zoom",
       "description": "Search your Zoom meetings, recordings, AI summaries, transcripts, and team chat.",
       "version": "1.0.0",
+      "icon": "/icons/zoom.svg",
       "categories": [
         "Meetings"
       ],
@@ -3156,6 +3329,7 @@
       "name": "ZoomInfo",
       "description": "Prospect, enrich, and analyze intent from ZoomInfo's go-to-market data.",
       "version": "1.0.0",
+      "icon": "/icons/zoominfo.png",
       "categories": [
         "Sales & CRM"
       ],
@@ -3173,6 +3347,7 @@
       "name": "Zscaler",
       "description": "Administer Zscaler network-security configuration across ZPA, ZIA, and ZDX.",
       "version": "1.0.0",
+      "icon": "/icons/zscaler.png",
       "categories": [
         "Security",
         "Infrastructure"
