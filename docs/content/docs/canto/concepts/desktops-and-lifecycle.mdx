@@ -1,0 +1,70 @@
+---
+title: Desktops and lifecycle
+description: Lifecycle states and generation fencing.
+---
+
+A **desktop** is a real, persistent Linux machine: an id, an org, a tier, an
+image version, and a disk that survives hibernation. Its wire shape
+(`DesktopJson`) is what every desktop-returning route responds with:
+
+```json
+{
+  "id": "...",
+  "org_id": "...",
+  "tier": "small",
+  "state": "awake",
+  "image_version": "...",
+  "generation": 3,
+  "current_generation_id": "...",
+  "idle_timeout_secs": 900,
+  "billing_mode": "hourly",
+  "host_id": "..."
+}
+```
+
+## Lifecycle states
+
+A desktop's `state` field is one of:
+
+| State | Meaning |
+|---|---|
+| `provisioning` | Just created, not yet placed on a host. |
+| `waking` | A `wake` operation is in flight. |
+| `awake` | Running -- compute is billed, guest ops (`exec`/files/stream) are available. |
+| `hibernating` | A `hibernate` operation is in flight. |
+| `hibernated` | Stopped -- disk state preserved, compute not billed. |
+| `destroyed` | Permanently gone, along with its disk. Irreversible. |
+
+`wake`, `hibernate`, and `destroy` are the three mutating transitions,
+triggered by `POST /v1/desktops/{id}/{wake,hibernate,destroy}`. Each of
+those returns an [operation handle](/docs/canto/concepts/operations) rather than
+blocking until the transition finishes -- see that page for the polling
+model.
+
+Guest operations (`exec`, `files`, `stream`) only work while a desktop is
+`awake`; calling them against a desktop in any other state is a `409
+Conflict` (see [API overview](/docs/canto/api/overview#error-format)).
+
+## Generation fencing
+
+Every desktop carries a `generation`, an integer that increments across its
+lifecycle transitions. Mutation requests can optionally include an
+`expected_generation` in the request body:
+
+```json
+{ "expected_generation": 3 }
+```
+
+If the desktop's current generation doesn't match, the operation settles
+`failed` with a "generation mismatch" error, surfaced as `409 Conflict` when
+observed through `?wait=true` (or on the settled `Operation` itself when
+polled directly). This is a compare-and-swap-style guard against
+stale-read races -- e.g. two callers racing to wake the same desktop, or a
+caller acting on a desktop it fetched a while ago and hasn't refreshed
+since. Omitting `expected_generation` skips the check entirely.
+
+<Callout title="Fork">
+  `POST /v1/desktops/{id}/fork` exists in the API surface but always
+  returns `501 Not Implemented` -- an honest stub, not a bug. It isn't
+  documented as a working feature anywhere in these docs.
+</Callout>

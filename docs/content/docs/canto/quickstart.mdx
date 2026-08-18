@@ -1,0 +1,245 @@
+---
+title: Quickstart
+description: Create a desktop, wake it, run a command, and hibernate it.
+---
+
+This walks through the full desktop lifecycle once, end to end, with every
+step shown three ways: raw `curl`, the [TypeScript SDK](/docs/canto/sdk/typescript),
+and [MCP tools](/docs/canto/mcp). Pick whichever matches how you're integrating.
+
+<Callout title="Operation handles" type="info">
+  `wake`, `hibernate`, and `destroy` are asynchronous: they return an
+  *operation handle* rather than blocking until the change is done. This
+  quickstart uses `?wait=true` (curl) or the SDK's default `wait: true`
+  behavior to keep things linear -- see
+  [Concepts: Operations](/docs/canto/concepts/operations) for the handle/polling
+  model itself.
+</Callout>
+
+## 1. Get access
+
+Canto is early access: desktops are manually provisioned, and there's no
+self-serve signup yet. Request an API key, then export it:
+
+```bash
+export CANTO_API_KEY="canto_sk_..."
+```
+
+The TypeScript SDK and the MCP server both read `CANTO_API_KEY` from the
+environment automatically. For raw `curl`, send it as a bearer credential on
+every request:
+
+```bash
+BASE=http://127.0.0.1:8081/v1
+AUTH="Authorization: Bearer $CANTO_API_KEY"
+```
+
+(`http://127.0.0.1:8081` is `controld`'s own local-dev address and the
+SDK's default `baseUrl` -- this will change once a hosted Canto API is
+live; your API key request will come with the right base URL.)
+
+## 2. Create a desktop
+
+<Tabs items={['curl', 'TypeScript SDK', 'MCP']}>
+<Tab value="curl">
+```bash
+DESKTOP=$(curl -sS -X POST "$BASE/desktops" \
+  -H "$AUTH" -H 'Content-Type: application/json' \
+  -d '{"tier": "small", "billing_mode": "hourly"}')
+
+DESKTOP_ID=$(echo "$DESKTOP" | jq -r .id)
+echo "$DESKTOP"
+```
+
+`tier` is required (`small`/`default`/`large`); `billing_mode` defaults to
+`hourly` when omitted. A `201` means a new desktop was created; a `200`
+means an `Idempotency-Key` you sent was already used and you got the
+existing desktop back instead. See
+[POST /v1/desktops](/docs/canto/api/desktops#create-a-desktop).
+</Tab>
+<Tab value="TypeScript SDK">
+```ts
+import { Canto } from "@canto/sdk";
+
+const canto = new Canto({ apiKey: process.env.CANTO_API_KEY });
+
+const desktop = await canto.desktops.create({
+  tier: "small",
+  billingMode: "hourly",
+});
+```
+</Tab>
+<Tab value="MCP">
+Ask the model to create a desktop, or call the tool directly:
+
+```json
+{
+  "tool": "create_desktop",
+  "arguments": { "tier": "small", "billing_mode": "hourly" }
+}
+```
+
+See the [full tool table](/docs/canto/mcp#tools) for every field.
+</Tab>
+</Tabs>
+
+## 3. Wake it
+
+A freshly created desktop starts `provisioning`/`hibernated`, not `awake` --
+wake it before running anything inside the guest.
+
+<Tabs items={['curl', 'TypeScript SDK', 'MCP']}>
+<Tab value="curl">
+```bash
+curl -sS -X POST "$BASE/desktops/$DESKTOP_ID/wake?wait=true" -H "$AUTH"
+```
+
+`?wait=true` long-polls server-side (2s cadence, capped at 120s) until the
+operation settles, and still returns `200`/`202` either way -- never a
+timeout error. Omit it to get the operation handle back immediately
+(`202`) and poll [`GET /v1/operations/{id}`](/docs/canto/api/operations)
+yourself.
+</Tab>
+<Tab value="TypeScript SDK">
+```ts
+await desktop.wake(); // waits by default
+```
+
+`wake`/`hibernate`/`destroy` default to `{ wait: true }`: the SDK uses the
+server's own `?wait=true`, then falls back to client-side re-polling if the
+server's 120s cap is reached while the operation is still pending. Pass
+`{ wait: false }` to get the raw `Operation` handle back immediately
+instead. See [Error handling](/docs/canto/sdk/typescript#error-handling) for what
+throws when a wake fails.
+</Tab>
+<Tab value="MCP">
+```json
+{ "tool": "wake_desktop", "arguments": { "desktop_id": "..." } }
+```
+
+`wait` defaults to `true`. Waking typically takes ~1-10s.
+</Tab>
+</Tabs>
+
+## 4. Run a command
+
+<Tabs items={['curl', 'TypeScript SDK', 'MCP']}>
+<Tab value="curl">
+```bash
+curl -sS -X POST "$BASE/desktops/$DESKTOP_ID/exec" \
+  -H "$AUTH" -H 'Content-Type: application/json' \
+  -d '{"command": "echo hello", "timeout_secs": 10}'
+```
+
+Returns `{"exit_code", "stdout", "stderr"}` once the command finishes
+inside the guest. `timeout_secs` defaults to 60s and is clamped (never
+rejected) to 300s. See
+[exec and files](/docs/canto/api/exec-and-files#run-a-command).
+</Tab>
+<Tab value="TypeScript SDK">
+```ts
+const { exitCode, stdout, stderr } = await desktop.exec("echo hello", {
+  timeoutSecs: 10,
+});
+```
+</Tab>
+<Tab value="MCP">
+```json
+{
+  "tool": "exec",
+  "arguments": { "desktop_id": "...", "command": "echo hello" }
+}
+```
+
+stdout/stderr are each truncated at 50KB in the tool result (never in the
+underlying API call) to protect the calling model's context window.
+</Tab>
+</Tabs>
+
+## 5. Work with files
+
+<Tabs items={['curl', 'TypeScript SDK']}>
+<Tab value="curl">
+```bash
+# Write (path is given without its leading slash).
+curl -sS -X PUT "$BASE/desktops/$DESKTOP_ID/files/home/user/task.txt" \
+  -H "$AUTH" --data-binary "hello from canto"
+
+# Read it back.
+curl -sS "$BASE/desktops/$DESKTOP_ID/files/home/user/task.txt" -H "$AUTH"
+```
+
+Writes are capped at 8 MiB (`413` past that). See
+[exec and files](/docs/canto/api/exec-and-files#write-a-file).
+</Tab>
+<Tab value="TypeScript SDK">
+```ts
+await desktop.writeFile("/home/user/task.txt", "hello from canto");
+const bytes = await desktop.readFile("/home/user/task.txt");
+```
+
+`writeFile`/`readFile` accept an absolute (`/home/user/...`) or already-
+relative path -- the SDK strips a single leading `/` before sending, to
+match `controld`'s own path-parameter convention.
+</Tab>
+</Tabs>
+
+## 6. Watch the screen
+
+<Tabs items={['curl', 'TypeScript SDK']}>
+<Tab value="curl">
+```bash
+curl -sS -X POST "$BASE/desktops/$DESKTOP_ID/stream" \
+  -H "$AUTH" -H 'Content-Type: application/json' \
+  -d '{"claim": "view"}'
+```
+</Tab>
+<Tab value="TypeScript SDK">
+```ts
+const { url, expiresUnix } = await desktop.stream({ claim: "view" });
+```
+</Tab>
+</Tabs>
+
+Both return a dial-able `tcp://host:port/?ticket=...` URL and its expiry --
+a raw stream ticket, not an embeddable web player. A hosted
+viewer/embed integration is coming; today, point a stream-capable client at
+the ticket URL directly. See
+[Streaming](/docs/canto/api/streaming) for the full claim/takeover model.
+
+## 7. Hibernate
+
+<Tabs items={['curl', 'TypeScript SDK', 'MCP']}>
+<Tab value="curl">
+```bash
+curl -sS -X POST "$BASE/desktops/$DESKTOP_ID/hibernate?wait=true" -H "$AUTH"
+```
+</Tab>
+<Tab value="TypeScript SDK">
+```ts
+await desktop.hibernate();
+```
+</Tab>
+<Tab value="MCP">
+```json
+{ "tool": "hibernate_desktop", "arguments": { "desktop_id": "..." } }
+```
+</Tab>
+</Tabs>
+
+Hibernating preserves the desktop's full disk state and stops billing
+compute -- see [Billing](/docs/canto/concepts/billing) for exactly how awake-time
+is metered. Wake it again any time with the same call from step 3.
+
+<Cards>
+  <Card
+    title="Concepts: Operations"
+    href="/docs/canto/concepts/operations"
+    description="Operation handles, polling, ?wait, and idempotency in depth."
+  />
+  <Card
+    title="API reference"
+    href="/docs/canto/api/overview"
+    description="Every route and status code."
+  />
+</Cards>

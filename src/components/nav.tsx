@@ -58,7 +58,7 @@ const productsSecondary: MenuEntry[] = [
   { to: "/canto#quickstart", title: "Canto API docs", description: "" },
 ];
 const developer: MenuEntry[] = [
-  { to: "https://github.com/descanto", title: "Documentation", description: "Set up Botto, self-host, and build on the Canto API." },
+  { to: "https://docs.descanto.com", title: "Docs", description: "Set up Botto, self-host, and build on the Canto API." },
   { to: "https://github.com/descanto", title: "GitHub", description: "Botto is MIT-licensed — star, fork, or contribute." },
   { to: "/plugins", title: "Plugin marketplace", description: "Browse plugins for every Bot, or build and list your own." },
 ];

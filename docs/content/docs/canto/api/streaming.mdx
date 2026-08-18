@@ -1,0 +1,53 @@
+---
+title: Streaming
+description: Issue a stream ticket for an awake desktop's display/control stream.
+---
+
+## Create a stream ticket
+
+`POST /v1/desktops/{id}/stream`
+
+| Param | In | Required | Description |
+|---|---|---|---|
+| `id` | path | yes | Desktop id |
+
+Request body (`StreamTicketBody`):
+
+```json
+{ "claim": "view", "takeover": false }
+```
+
+| Field | Type | Required | Description |
+|---|---|---|---|
+| `claim` | string | yes | `view` or `control` |
+| `takeover` | boolean | no | Forcibly take over an existing `control` claim |
+
+```bash
+curl -sS -X POST "$BASE/desktops/$DESKTOP_ID/stream" \
+  -H "$AUTH" -H 'Content-Type: application/json' \
+  -d '{"claim": "view"}'
+```
+
+Response (`StreamTicketResponse`):
+
+```json
+{ "url": "tcp://host:port/?ticket=...", "expires_unix": 1755600000 }
+```
+
+`url` is a dial-able `tcp://host:port/?ticket=...` URL for the desktop's
+display/control stream, already rewritten to the desktop's host's
+externally reachable address.
+
+<Callout title="No embeddable web viewer yet" type="warn">
+  This route returns a raw, dial-able ticket URL, not a browser-embeddable
+  player. Point a stream-capable client at it directly; a hosted
+  viewer/embed integration is coming in a later milestone.
+</Callout>
+
+| Status | Meaning |
+|---|---|
+| `200` | Stream ticket issued |
+| `400` | Malformed id/body or invalid claim |
+| `401` | Missing/invalid credentials |
+| `404` | Desktop not found or belongs to another org |
+| `409` | Desktop is not awake, or its control claim is already held |

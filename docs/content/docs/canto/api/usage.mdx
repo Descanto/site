@@ -1,0 +1,60 @@
+---
+title: Usage
+description: Per-desktop and org-total usage and projected cost for a time range.
+---
+
+## Query usage
+
+`GET /v1/usage`
+
+| Param | In | Required | Description |
+|---|---|---|---|
+| `start` | query | yes | Range start, Unix milliseconds |
+| `end` | query | yes | Range end, Unix milliseconds |
+
+```bash
+END=$(($(date +%s) * 1000))
+START=$((END - 86400000)) # last 24h
+curl -sS "$BASE/usage?start=$START&end=$END" -H "$AUTH"
+```
+
+Response (`UsageResponse`):
+
+```json
+{
+  "per_desktop": [
+    {
+      "desktop_id": "d_...",
+      "awake_seconds": 36000.0,
+      "weighted_awake_seconds": 36000.0,
+      "desktop_months": 0.0139,
+      "billing_mode": "hourly",
+      "projected_cost_cents": 14
+    }
+  ],
+  "org_awake_seconds_weighted": 36000.0,
+  "org_desktop_months": 0.0139,
+  "org_projected_cost_cents": 14
+}
+```
+
+| Field | Type | Description |
+|---|---|---|
+| `per_desktop[].desktop_id` | string | |
+| `per_desktop[].awake_seconds` | number | Raw (unweighted) awake seconds within the queried range |
+| `per_desktop[].weighted_awake_seconds` | number | Awake seconds weighted by tier |
+| `per_desktop[].desktop_months` | number | Existence overlap with the range, as 30-day months |
+| `per_desktop[].billing_mode` | string | `monthly` or `hourly` |
+| `per_desktop[].projected_cost_cents` | integer | Projected cost at the locked prices |
+| `org_awake_seconds_weighted` | number | Sum across the org |
+| `org_desktop_months` | number | Sum across the org |
+| `org_projected_cost_cents` | integer | Sum across the org |
+
+See [Concepts: Billing](/docs/canto/concepts/billing) for the metering and
+rounding rules behind these numbers, and the locked price table.
+
+| Status | Meaning |
+|---|---|
+| `200` | Per-desktop and org-total usage + projected cost |
+| `400` | Missing/non-numeric/out-of-range `start` or `end`, or `start` after `end` |
+| `401` | Missing/invalid credentials |

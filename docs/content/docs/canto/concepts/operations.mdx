@@ -1,0 +1,83 @@
+---
+title: Operations
+description: Async handles, polling, ?wait, and idempotency.
+---
+
+`wake`, `hibernate`, and `destroy` don't apply their change synchronously.
+Each returns an **operation handle** -- a small, pollable record of an
+in-flight (or already-settled) state transition:
+
+```json
+{
+  "id": "5b1e...",
+  "desktop_id": "d_...",
+  "kind": "wake",
+  "state": "pending",
+  "result": null,
+  "error": null
+}
+```
+
+Fetch the current state of any operation with
+[`GET /v1/operations/{id}`](/docs/canto/api/operations):
+
+```bash
+curl -sS "$BASE/operations/$OPERATION_ID" -H "$AUTH"
+```
+
+## `?wait=true`: server-side long-poll
+
+Every mutating route accepts an optional `?wait=true` query parameter. When
+set, the server long-polls the operation itself (2s cadence, capped at
+120s) before responding -- so the caller gets the *settled* operation back
+in the same request/response cycle, without writing their own poll loop:
+
+```bash
+curl -sS -X POST "$BASE/desktops/$ID/wake?wait=true" -H "$AUTH"
+```
+
+The response is always `200`/`202`, **never a timeout error** -- if the
+120s cap is reached while the operation is still `pending`/`running`, you
+just get that in-progress operation back and can keep polling
+`GET /v1/operations/{id}` yourself. A settled `failed` operation observed
+*within* the `?wait=true` window is surfaced as `409 Conflict` instead of a
+`200`, with `operation_id` set on the problem body.
+
+Without `?wait=true`, a mutation returns `202 Accepted` immediately with the
+freshly enqueued operation (`state: "pending"`), and it's on you to poll.
+
+The [TypeScript SDK](/docs/canto/sdk/typescript) defaults to `wait: true` and adds
+its own client-side re-poll fallback beyond the server's 120s cap -- see
+that page's "wait vs handles" section.
+
+## Idempotency
+
+`POST /v1/desktops` (create) and the three lifecycle mutations all accept an
+optional `Idempotency-Key` header:
+
+```bash
+curl -sS -X POST "$BASE/desktops" \
+  -H "$AUTH" -H 'Content-Type: application/json' \
+  -H 'Idempotency-Key: my-client-generated-key' \
+  -d '{"tier": "small"}'
+```
+
+- **Create** scopes the key to `(org, key)`: a repeat request with the same
+  key from the same org returns the **existing** desktop (`200`), never a
+  second one (`201` is only for the request that actually created it).
+- **Mutations** (`wake`/`hibernate`/`destroy`) scope the key to
+  `(desktop, key)`: a repeat request returns the existing `Operation`
+  handle instead of enqueueing a duplicate.
+
+Reusing the same key value across two different orgs (or two different
+desktops, for mutations) is safe -- the scoping is never global, so it
+creates two independent rows rather than colliding. A non-ASCII
+`Idempotency-Key` is rejected with `400 Bad Request`.
+
+<Callout title="Retry-safe by default">
+  Because create/mutation idempotency keys are scoped per-org/per-desktop,
+  it's safe to generate a fresh UUID per logical call and attach it
+  automatically to every retry of that call -- which is exactly what the
+  TypeScript SDK does (`crypto.randomUUID()`) when you don't supply one
+  yourself.
+</Callout>

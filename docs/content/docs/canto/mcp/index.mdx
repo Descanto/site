@@ -1,0 +1,108 @@
+---
+title: MCP server
+description: Drive Canto desktops from Claude Code, Claude Desktop, or Cursor.
+---
+
+`@canto/mcp` is an MCP (Model Context Protocol) stdio server exposing Canto
+cloud desktops to MCP-compatible AI clients -- Claude Code, Claude Desktop,
+Cursor, and any other MCP client. It's a thin wrapper over
+[`@canto/sdk`](/docs/canto/sdk/typescript): one process, one org's worth of
+desktops, driven entirely through the [tools](#tools) below.
+
+<Callout title="Private until launch" type="warn">
+  Not published to a registry yet -- run it via a local path (`bunx --bun
+  /path/to/canto/mcp` or a `node dist/index.js` invocation) until then.
+  `@canto/sdk` is bundled into `dist/index.js` at build time, so `npx`/`bunx
+  @canto/mcp` will work correctly once this package is published.
+</Callout>
+
+## Configuration
+
+| Env var | Required | Description |
+|---|---|---|
+| `CANTO_API_KEY` | yes | `canto_sk_...` API key (or AuthKit JWT). The server exits immediately with a clear stderr message if this is unset or blank. |
+| `CANTO_BASE_URL` | no | Override the Canto API base URL. Defaults to the SDK's own default (`controld`'s local-dev address); set this once a hosted Canto API launches. |
+
+### Claude Code
+
+```bash
+claude mcp add canto --env CANTO_API_KEY=canto_sk_... -- node /path/to/canto/mcp/dist/index.js
+```
+
+### Claude Desktop
+
+Add to `claude_desktop_config.json`:
+
+```json
+{
+  "mcpServers": {
+    "canto": {
+      "command": "node",
+      "args": ["/path/to/canto/mcp/dist/index.js"],
+      "env": {
+        "CANTO_API_KEY": "canto_sk_..."
+      }
+    }
+  }
+}
+```
+
+### Cursor
+
+Add to `.cursor/mcp.json` (project) or the global MCP settings:
+
+```json
+{
+  "mcpServers": {
+    "canto": {
+      "command": "node",
+      "args": ["/path/to/canto/mcp/dist/index.js"],
+      "env": {
+        "CANTO_API_KEY": "canto_sk_..."
+      }
+    }
+  }
+}
+```
+
+Once published, `command`/`args` become `npx`/`bunx -y @canto/mcp` instead
+of a local path.
+
+## Tools
+
+| Tool | Description |
+|---|---|
+| `list_desktops` | List desktops, optionally filtered by `state`. Returns `{id, state, tier, billingMode, hostId}` per desktop. |
+| `create_desktop` | Provision a desktop: `tier` (small/default/large), optional `billing_mode` (monthly/hourly), optional `idle_timeout_secs`. |
+| `wake_desktop` | Wake a hibernated desktop (`desktop_id`, `wait` default true). Waking typically takes ~1-10s. |
+| `hibernate_desktop` | Hibernate an awake desktop to pause billing (`desktop_id`, `wait` default true). |
+| `destroy_desktop` | Permanently destroy a desktop and its disk (`desktop_id`). Always waits; irreversible. |
+| `exec` | Run a shell command on an awake desktop (`desktop_id`, `command`, optional `timeout_secs`). stdout/stderr each truncated at 50KB in the result. |
+| `read_file` | Read a file from an awake desktop (`desktop_id`, `path`). Text if valid UTF-8 under 50KB, else base64 (capped at 64KB) or an error asking you to use `exec` with head/tail. |
+| `write_file` | Write a file (`desktop_id`, `path`, `content` or `content_base64`). `content_base64` is strictly validated (alphabet, padding, round-trip) before decoding -- malformed input returns a tool error instead of silently writing garbage/zero bytes. |
+| `get_stream_url` | Get a short-lived signed stream URL (`desktop_id`, `claim`: view/control, default view). |
+| `usage` | Awake-time usage and projected cost, per desktop and org-wide (`start_ms`/`end_ms`, default last 30 days). |
+
+## Output truncation (context protection)
+
+`exec`'s stdout/stderr are each truncated at **50KB** in the tool *result*
+(never in the underlying API call) with a trailing `[truncated by
+canto-mcp]` marker, UTF-8-boundary-safe. This exists purely to protect the
+calling model's context window -- for larger output, redirect the
+command's output to a file on the desktop and fetch it with `read_file`,
+or re-run with `head`/`tail`.
+
+`read_file` follows the same idea: content is returned as text only when
+it's valid UTF-8 and under 50KB; otherwise it's base64-encoded, but only if
+that encoding itself stays under 64KB (base64 inflates size ~4/3x, so this
+in practice means small binary files only) -- otherwise the tool returns
+`{ size, error: "too large for tool result — use exec with head/tail" }`.
+
+## Errors
+
+A failed Canto API call never crashes the server. Every tool catches
+`CantoApiError` (and any other thrown error) and returns an MCP tool-error
+(`isError: true`) whose message includes the API's HTTP status, title, and
+detail (and `operation_id` when the problem concerns a specific
+operation), so the calling model sees exactly what the API returned and
+can react to it.

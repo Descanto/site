@@ -1,0 +1,31 @@
+---
+title: Me
+description: Who-am-I resolution from the bearer credential.
+---
+
+## Get the caller's identity
+
+`GET /v1/me`
+
+```bash
+curl -sS "$BASE/me" -H "$AUTH"
+```
+
+Response (`MeResponse`):
+
+```json
+{ "org_id": "org_...", "auth_kind": "api_key" }
+```
+
+| Field | Type | Description |
+|---|---|---|
+| `org_id` | string | The caller's org |
+| `auth_kind` | string | `"api_key"` or `"session"` -- which credential form authenticated this request |
+
+| Status | Meaning |
+|---|---|
+| `200` | The caller's org and how they authenticated |
+| `401` | Missing/invalid credentials |
+
+See [Concepts: Orgs and auth](/docs/canto/concepts/orgs-and-auth) for the two
+credential forms.

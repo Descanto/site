@@ -1,0 +1,12 @@
+{
+  "title": "Canto",
+  "pages": [
+    "index",
+    "quickstart",
+    "concepts",
+    "api",
+    "sdk",
+    "mcp",
+    "self-hosting"
+  ]
+}

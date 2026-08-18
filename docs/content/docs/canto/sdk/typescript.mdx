@@ -1,0 +1,198 @@
+---
+title: TypeScript SDK
+description: "@canto/sdk: the ergonomic client for the Canto API."
+---
+
+`@canto/sdk` is a fetch-based, zero-runtime-dependency TypeScript client for
+`controld`'s public REST API (`/v1/**`). ESM + CJS, works in Node >= 18,
+Bun, and edge runtimes with a global `fetch`.
+
+<Callout title="Private until launch" type="warn">
+  Not published to a registry yet -- consume it as a workspace/path
+  dependency within the `vm-infra` monorepo (`file:../sdk-typescript`).
+</Callout>
+
+## Install
+
+```bash
+bun install
+```
+
+## Quickstart
+
+```ts
+import { Canto } from "@canto/sdk";
+
+const canto = new Canto({ apiKey }); // or CANTO_API_KEY env var
+
+const d = await canto.desktops.create({ tier: "default", billingMode: "monthly" });
+await d.wake(); // waits by default (server ?wait=true + client re-poll fallback)
+
+const { stdout } = await d.exec("whoami");
+await d.writeFile("/home/user/task.txt", "hello");
+const { url } = await d.stream({ claim: "view" });
+
+await d.hibernate({ wait: false }); // returns an Operation handle for power users
+```
+
+## Auth
+
+`new Canto({ apiKey })` takes a `canto_sk_...` API key or an AuthKit JWT
+access token, sent as `Authorization: Bearer <credential>`. When `apiKey`
+is omitted, the SDK falls back to `process.env.CANTO_API_KEY` (guarded for
+runtimes with no `process`; pass `apiKey` explicitly there instead).
+
+`baseUrl` defaults to `http://127.0.0.1:8081`, `controld`'s own local-dev
+default -- this will change once a hosted Canto API launches.
+
+## Desktops
+
+```ts
+canto.desktops.create({ tier, billingMode?, imageVersion?, idleTimeoutSecs? }) -> Promise<Desktop>
+canto.desktops.list({ state? }) -> Promise<Desktop[]>
+canto.desktops.get(id) -> Promise<Desktop>
+```
+
+A `Desktop` exposes camelCase properties mapped from the wire's snake_case
+JSON (`id`, `orgId`, `tier`, `state`, `imageVersion`, `generation`,
+`currentGenerationId`, `idleTimeoutSecs`, `billingMode`, `hostId`), plus:
+
+```ts
+desktop.wake({ wait?, expectedGeneration? }) -> Promise<Operation>
+desktop.hibernate({ wait?, expectedGeneration? }) -> Promise<Operation>
+desktop.destroy({ wait?, expectedGeneration? }) -> Promise<Operation>
+desktop.fork() -> never // always throws CantoApiError (status 501) -- honest passthrough
+desktop.exec(command, { timeoutSecs? }) -> Promise<{ exitCode, stdout, stderr }>
+desktop.readFile(path) -> Promise<Uint8Array>
+desktop.writeFile(path, data: Uint8Array | string) -> Promise<void> // string is UTF-8 encoded
+desktop.stream({ claim?, takeover? }) -> Promise<{ url, expiresUnix }>
+desktop.refresh() -> Promise<Desktop> // re-fetches current state
+```
+
+Guest file paths (`readFile`/`writeFile`) accept either an absolute
+(`/home/user/notes.txt`) or already-relative (`home/user/notes.txt`) form
+-- a single leading `/` is stripped before the request is sent, matching
+`controld`'s own path-parameter convention (sent without a leading slash;
+the server re-prepends it).
+
+## Operations and usage
+
+```ts
+canto.operations.get(id) -> Promise<Operation>
+canto.usage.query({ startMs, endMs }) -> Promise<UsageResponse>
+```
+
+## Wait vs handles
+
+`wake`/`hibernate`/`destroy` default to `{ wait: true }`: the SDK sends the
+mutation with the server's own `?wait=true` (2s cadence, capped at 120s),
+then -- if the server's cap is reached while the operation is still
+pending/running -- falls back to client-side re-polling
+`GET /v1/operations/{id}` at `pollIntervalMs` (default 2000ms) up to an
+overall `pollTimeoutSecs` budget (default 300s, configurable via
+`new Canto({ pollTimeoutSecs, pollIntervalMs })`), throwing
+`CantoTimeoutError` if that budget is exhausted.
+
+Pass `{ wait: false }` to get the `Operation` handle back immediately
+instead -- this never throws for a `failed` state, an explicit opt-in to
+the raw handle, which you then poll yourself via `canto.operations.get(id)`.
+
+## Error handling
+
+Every non-2xx response throws `CantoApiError`, parsed from the API's RFC
+9457 `application/problem+json` body:
+
+```ts
+try {
+  await canto.desktops.get("nonexistent");
+} catch (err) {
+  if (err instanceof CantoApiError) {
+    err.status; // 404
+    err.type; // "about:blank"
+    err.title; // "Not Found"
+    err.detail; // "desktop not found"
+    err.operationId; // set when the problem concerns a specific operation
+    err.isRetryable; // true for 429/503/504
+  }
+}
+```
+
+If the server responds with a non-conformant error body (not JSON, or JSON
+that isn't a `ProblemJson`), the SDK never throws a parse error out of
+error handling itself: `detail` falls back to the raw response text.
+
+### Three error types, one for each failure mode
+
+| Type | When it throws |
+|---|---|
+| `CantoApiError` | Any non-2xx HTTP response, parsed from the `ProblemJson` body. Includes a `failed` operation observed **within** the server's own 120s `?wait=true` cap (surfaced as `409`). |
+| `CantoOperationError` | A `{ wait: true }` mutation settles `failed` only **after** the server's 120s cap, observed by the SDK's own client-side re-poll fallback instead. Carries `.operation` (the settled `Operation`, `state === "failed"`), `.detail`, and `.desktopId`. |
+| `CantoTimeoutError` | A `{ wait: true }` mutation's client-side poll budget (`pollTimeoutSecs`) is exhausted while the operation is **still** pending/running -- not settled at all, distinct from both errors above. |
+
+```ts
+import { CantoApiError, CantoOperationError } from "@canto/sdk";
+
+try {
+  await d.wake({ expectedGeneration: staleGeneration });
+} catch (err) {
+  if (err instanceof CantoApiError) {
+    // Failed fast enough for the server's own ?wait=true to see it settle.
+    err.status; // 409
+  } else if (err instanceof CantoOperationError) {
+    // Failed only after the server's 120s cap, observed by the SDK's own
+    // re-poll loop instead.
+    err.operation; // the settled Operation, state === "failed"
+    err.detail; // operation.error, or a fixed fallback string
+    err.desktopId;
+  }
+}
+```
+
+A single `catch` block that only checks `instanceof CantoApiError` would
+miss the slow-path case entirely -- both are guaranteed to throw
+*something* for a `{ wait: true }` (the default) call, so a bare
+`try { await d.wake(); } catch { ... }` is safe either way. `{ wait: false }`
+never throws for a failed operation.
+
+## Retry semantics
+
+The SDK automatically retries on a network error or a `429`/`503`/`504`
+response, honoring a `Retry-After` response header (seconds or an
+HTTP-date) when present -- capped at 30s -- and otherwise falling back to
+exponential backoff (`250ms * 2^attempt`, full jitter), up to `maxRetries`
+(default 3), **only for requests that are safe to retry**:
+
+- Every `GET` (always idempotent).
+- `create`/`wake`/`hibernate`/`destroy`, because the SDK automatically
+  attaches an `Idempotency-Key` header (via `crypto.randomUUID()`) to each
+  of these calls unless the caller already supplied one -- `controld`
+  scopes that key per-org (create) or per-desktop (mutations), so a
+  retried request returns the original result instead of duplicating the
+  effect. See [Concepts: Operations](/docs/canto/concepts/operations#idempotency).
+
+`4xx` responses (other than `429`) are **never** retried -- they indicate a
+request that won't succeed by resending it unchanged.
+
+## Regenerating generated types
+
+Whenever `canto/controld/openapi/v1.json` changes, regenerate the
+committed wire types:
+
+```bash
+bun run generate
+```
+
+This runs `openapi-typescript` against the committed OpenAPI contract into
+`src/generated/api.d.ts`. The handwritten ergonomic layer in `src/types.ts`
+derives its shapes from `components["schemas"]` in that file rather than
+duplicating fields by hand, so a schema change surfaces as a type error
+there on the next build.
+
+## Development
+
+```bash
+bun install
+bun run build      # tsup -> dist/ (ESM + CJS + .d.ts)
+bun run test        # vitest run
+bun run typecheck   # tsc --noEmit
+```

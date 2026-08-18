@@ -15,7 +15,7 @@ const columns: { heading: string; links: { label: string; to: string }[] }[] = [
     heading: "Canto",
     links: [
       { label: "Early access", to: "/canto" },
-      { label: "API docs", to: "https://github.com/descanto" },
+      { label: "API docs", to: "https://docs.descanto.com/docs/canto" },
       { label: "Pricing", to: "/canto#pricing" },
       { label: "Status", to: "https://github.com/descanto" },
     ],
@@ -23,7 +23,7 @@ const columns: { heading: string; links: { label: string; to: string }[] }[] = [
   {
     heading: "Developers",
     links: [
-      { label: "Documentation", to: "https://github.com/descanto" },
+      { label: "Docs", to: "https://docs.descanto.com" },
       { label: "GitHub", to: "https://github.com/descanto" },
       { label: "Self-hosting", to: "https://github.com/descanto" },
       { label: "Security", to: "https://github.com/descanto" },

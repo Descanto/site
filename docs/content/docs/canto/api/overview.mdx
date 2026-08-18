@@ -1,0 +1,95 @@
+---
+title: Overview
+description: Base URL, auth, error format, and limits.
+---
+
+<Callout title="Hand-written reference" type="info">
+  These API pages are hand-written from the committed OpenAPI 3.1 contract
+  (`canto/controld/openapi/v1.json`), rather than generated with
+  `fumadocs-openapi`. See the note at the bottom of this page for why.
+</Callout>
+
+## Base URL
+
+```
+http://127.0.0.1:8081/v1
+```
+
+This is `controld`'s own local-dev default (and the TypeScript SDK's
+default `baseUrl`) -- there is no fixed production hostname yet. Your API
+key request will come with the right base URL for a hosted deployment. The
+OpenAPI document itself declares no fixed server (`"servers": [{"url":
+"/"}]`): it's served at the root of whatever host runs `controld`.
+
+The identical OpenAPI document is also served live, unauthenticated, at
+`GET /v1/openapi.json`.
+
+## Auth
+
+Every route under `/v1` (except `GET /v1/openapi.json`) requires:
+
+```
+Authorization: Bearer <credential>
+```
+
+`<credential>` is either a `canto_sk_...` API key or a WorkOS AuthKit JWT
+access token. See [Concepts: Orgs and auth](/docs/canto/concepts/orgs-and-auth)
+for the two forms and org-scoping semantics.
+
+## Error format
+
+Every non-2xx response is an RFC 9457 ("Problem Details for HTTP APIs")
+body, served as `application/problem+json`:
+
+```json
+{
+  "type": "about:blank",
+  "title": "Not Found",
+  "status": 404,
+  "detail": "desktop not found"
+}
+```
+
+`operation_id` is present in addition to the fields above when the problem
+concerns a specific operation -- e.g. a `?wait=true` poll that observed the
+operation settle `failed`.
+
+| Status | When |
+|---|---|
+| `200 OK` | `POST /v1/desktops` with an `Idempotency-Key` already used by this org -- returns the **existing** desktop, not a new one. |
+| `400 Bad Request` | Malformed JSON body, an invalid `tier`/`billing_mode`/desktop or operation id, a non-numeric/out-of-range `start`/`end` on `GET /v1/usage`, a non-`true`/`false` `?wait=` value, a non-ASCII `Idempotency-Key`, or a `..`-traversing `files` path. |
+| `401 Unauthorized` | Missing/non-`Bearer`/garbage `Authorization` header, or a key/JWT that fails WorkOS verification. |
+| `404 Not Found` | The desktop/operation truly doesn't exist, **or** it belongs to a different org than the caller's -- these two cases are byte-identical on purpose. See [org scoping](/docs/canto/concepts/orgs-and-auth#org-scoping-404-never-403). |
+| `409 Conflict` | Stale `expected_generation`, wrong desktop state for the requested transition, a guest op against a desktop that isn't currently `awake`, or a stream `control` claim already held by another client. |
+| `413 Payload Too Large` | A `files` `PUT` body over the 8 MiB cap, or any request body over axum's own 2 MiB default limit. |
+| `501 Not Implemented` | `POST /v1/desktops/{id}/fork` -- an honest stub until hostd's `Fork` RPC lands. |
+| `503 Service Unavailable` | A mutation (`wake`/`hibernate`/`destroy`/`fork`) sent to a non-leader replica; a guest op whose desktop's host is currently unreachable (retryable); or WorkOS itself is unreachable. |
+| `504 Gateway Timeout` | A guest op (`exec`/`files`) that ran past its own deadline inside the guest -- a normal, retryable outcome, not a server bug. |
+| `500 Internal Server Error` | Anything else (a DB error, an unmapped internal failure) -- the body never carries the real error text. |
+
+`503`/`504` mean "this exact request is safe to retry" (a transient/timing
+condition); `500` means "something is actually broken server-side." The
+[TypeScript SDK](/docs/canto/sdk/typescript#retry-semantics)'s default retry
+policy acts on the former, not the latter.
+
+## Limits
+
+- **File writes** (`PUT /v1/desktops/{id}/files/{path}`) are capped at
+  **8 MiB** -- `413` past that.
+- **`exec` timeouts** default to 60s and are clamped (never rejected) to a
+  **300s** maximum, regardless of what `timeout_secs` requests.
+- **`?wait=true`** long-polls at a 2s cadence, capped at **120s** per
+  request.
+- Every request body is additionally capped at axum's own default **2 MiB**
+  limit (independent of the 8 MiB file-write cap above).
+
+## Why hand-written, not `fumadocs-openapi`
+
+`fumadocs-openapi` can generate reference pages (and an interactive
+"try it" panel) directly from an OpenAPI document, but its request-proxy
+route for the try-it panel is a live server function -- not a fit for this
+site's static export (`output: "export"`, deployed as static files to
+Cloudflare Pages, no server runtime). The pages in this section are
+hand-written directly from `canto/controld/openapi/v1.json` instead: every
+parameter, request/response schema, and status code below is transcribed
+from that committed contract, one page per resource group.
