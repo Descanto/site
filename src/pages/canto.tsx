@@ -102,13 +102,13 @@ const { stdout } = await d.exec("whoami");
 
 await d.hibernate(); // pay nothing while asleep`;
 
-const mcpClaudeCode = `claude mcp add canto --env CANTO_API_KEY=canto_sk_... -- node /path/to/canto/mcp/dist/index.js`;
+const mcpClaudeCode = `claude mcp add canto --env CANTO_API_KEY=canto_sk_... -- npx -y @descanto/vm-mcp`;
 
 const mcpConfig = `{
   "mcpServers": {
     "canto": {
-      "command": "node",
-      "args": ["/path/to/canto/mcp/dist/index.js"],
+      "command": "npx",
+      "args": ["-y", "@descanto/vm-mcp"],
       "env": {
         "CANTO_API_KEY": "canto_sk_..."
       }

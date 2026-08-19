@@ -9,11 +9,10 @@ Cursor, and any other MCP client. It's a thin wrapper over
 [`@descanto/vm-sdk`](/docs/canto/sdk/typescript): one process, one org's worth of
 desktops, driven entirely through the [tools](#tools) below.
 
-<Callout title="Private until launch" type="warn">
-  Not published to a registry yet -- run it via a local path (`bunx --bun
-  /path/to/canto/mcp` or a `node dist/index.js` invocation) until then.
-  `@descanto/vm-sdk` is bundled into `dist/index.js` at build time, so `npx`/`bunx
-  @descanto/vm-mcp` will work correctly once this package is published.
+<Callout title="No install needed" type="info">
+  The server ships as a self-contained binary on npm (`@descanto/vm-sdk` is bundled
+  in), so point your client at `npx -y @descanto/vm-mcp` -- npm fetches and runs the
+  latest version for you.
 </Callout>
 
 ## Configuration
@@ -26,7 +25,7 @@ desktops, driven entirely through the [tools](#tools) below.
 ### Claude Code
 
 ```bash
-claude mcp add canto --env CANTO_API_KEY=canto_sk_... -- node /path/to/canto/mcp/dist/index.js
+claude mcp add canto --env CANTO_API_KEY=canto_sk_... -- npx -y @descanto/vm-mcp
 ```
 
 ### Claude Desktop
@@ -37,8 +36,8 @@ Add to `claude_desktop_config.json`:
 {
   "mcpServers": {
     "canto": {
-      "command": "node",
-      "args": ["/path/to/canto/mcp/dist/index.js"],
+      "command": "npx",
+      "args": ["-y", "@descanto/vm-mcp"],
       "env": {
         "CANTO_API_KEY": "canto_sk_..."
       }
@@ -55,8 +54,8 @@ Add to `.cursor/mcp.json` (project) or the global MCP settings:
 {
   "mcpServers": {
     "canto": {
-      "command": "node",
-      "args": ["/path/to/canto/mcp/dist/index.js"],
+      "command": "npx",
+      "args": ["-y", "@descanto/vm-mcp"],
       "env": {
         "CANTO_API_KEY": "canto_sk_..."
       }
@@ -64,9 +63,6 @@ Add to `.cursor/mcp.json` (project) or the global MCP settings:
   }
 }
 ```
-
-Once published, `command`/`args` become `npx`/`bunx -y @descanto/vm-mcp` instead
-of a local path.
 
 ## Tools
 

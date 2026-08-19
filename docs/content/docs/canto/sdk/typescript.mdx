@@ -7,15 +7,11 @@ description: "@descanto/vm-sdk: the ergonomic client for the Canto API."
 `controld`'s public REST API (`/v1/**`). ESM + CJS, works in Node >= 18,
 Bun, and edge runtimes with a global `fetch`.
 
-<Callout title="Private until launch" type="warn">
-  Not published to a registry yet -- consume it as a workspace/path
-  dependency within the `vm-infra` monorepo (`file:../sdk-typescript`).
-</Callout>
-
 ## Install
 
 ```bash
-bun install
+npm install @descanto/vm-sdk
+# or: bun add @descanto/vm-sdk / pnpm add @descanto/vm-sdk / yarn add @descanto/vm-sdk
 ```
 
 ## Quickstart
@@ -244,27 +240,3 @@ exponential backoff (`250ms * 2^attempt`, full jitter), up to `maxRetries`
 
 `4xx` responses (other than `429`) are **never** retried -- they indicate a
 request that won't succeed by resending it unchanged.
-
-## Regenerating generated types
-
-Whenever `canto/controld/openapi/v1.json` changes, regenerate the
-committed wire types:
-
-```bash
-bun run generate
-```
-
-This runs `openapi-typescript` against the committed OpenAPI contract into
-`src/generated/api.d.ts`. The handwritten ergonomic layer in `src/types.ts`
-derives its shapes from `components["schemas"]` in that file rather than
-duplicating fields by hand, so a schema change surfaces as a type error
-there on the next build.
-
-## Development
-
-```bash
-bun install
-bun run build      # tsup -> dist/ (ESM + CJS + .d.ts)
-bun run test        # vitest run
-bun run typecheck   # tsc --noEmit
-```
