@@ -1,4 +1,5 @@
 import { Button } from "@/components/ui/button";
+import { ContactForm } from "@/components/contact-form";
 
 const beliefs = [
   ["Trust is structural", "Hard isolation, org-scoped APIs, and honest operation handles aren't features on a list — they're the reason you can hand an agent a real computer. We build them into the architecture, not the marketing."],
@@ -33,14 +34,20 @@ export function AboutPage() {
       </section>
 
       <section id="contact" className="hairline-t">
-        <div className="mx-auto flex max-w-[1440px] items-center justify-between px-20 pt-12 pb-22 max-md:flex-col max-md:items-start max-md:gap-8 max-lg:px-8">
-          <div className="flex flex-col gap-2">
+        <div className="mx-auto flex max-w-[1440px] items-start justify-between gap-16 px-20 pt-14 pb-22 max-lg:flex-col max-lg:gap-10 max-lg:px-8">
+          <div className="flex w-100 shrink-0 flex-col gap-3 max-lg:w-auto">
             <h2 className="font-display text-[28px] font-bold tracking-tight">Talk to us</h2>
-            <p className="text-[14.5px] text-graphite">hello@descanto.com — or open an issue, the repo is the front door.</p>
+            <p className="text-[14.5px] leading-relaxed text-graphite">
+              Requesting early access, sizing a fleet, or just curious — drop a note and we'll get back to you. Prefer
+              email? hello@descanto.com works too, and the repo is the front door.
+            </p>
+            <div className="flex items-center gap-3 pt-1">
+              <Button size="sm" variant="outline" href="https://github.com/descanto">GitHub</Button>
+              <Button size="sm" variant="outline" href="mailto:hello@descanto.com">Email us</Button>
+            </div>
           </div>
-          <div className="flex items-center gap-3">
-            <Button variant="outline" href="https://github.com/descanto">GitHub</Button>
-            <Button href="mailto:hello@descanto.com">Contact</Button>
+          <div className="min-w-0 flex-1">
+            <ContactForm />
           </div>
         </div>
       </section>
