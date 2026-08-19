@@ -1,9 +1,9 @@
 ---
 title: TypeScript SDK
-description: "@canto/sdk: the ergonomic client for the Canto API."
+description: "@descanto/vm-sdk: the ergonomic client for the Canto API."
 ---
 
-`@canto/sdk` is a fetch-based, zero-runtime-dependency TypeScript client for
+`@descanto/vm-sdk` is a fetch-based, zero-runtime-dependency TypeScript client for
 `controld`'s public REST API (`/v1/**`). ESM + CJS, works in Node >= 18,
 Bun, and edge runtimes with a global `fetch`.
 
@@ -21,7 +21,7 @@ bun install
 ## Quickstart
 
 ```ts
-import { Canto } from "@canto/sdk";
+import { Canto } from "@descanto/vm-sdk";
 
 const canto = new Canto({ apiKey }); // or CANTO_API_KEY env var
 
@@ -202,7 +202,7 @@ error handling itself: `detail` falls back to the raw response text.
 | `CantoTimeoutError` | A `{ wait: true }` mutation's client-side poll budget (`pollTimeoutSecs`) is exhausted while the operation is **still** pending/running -- not settled at all, distinct from both errors above. |
 
 ```ts
-import { CantoApiError, CantoOperationError } from "@canto/sdk";
+import { CantoApiError, CantoOperationError } from "@descanto/vm-sdk";
 
 try {
   await d.wake({ expectedGeneration: staleGeneration });

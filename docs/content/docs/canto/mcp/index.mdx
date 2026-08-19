@@ -3,17 +3,17 @@ title: MCP server
 description: Drive Canto desktops from Claude Code, Claude Desktop, or Cursor.
 ---
 
-`@canto/mcp` is an MCP (Model Context Protocol) stdio server exposing Canto
+`@descanto/vm-mcp` is an MCP (Model Context Protocol) stdio server exposing Canto
 cloud desktops to MCP-compatible AI clients -- Claude Code, Claude Desktop,
 Cursor, and any other MCP client. It's a thin wrapper over
-[`@canto/sdk`](/docs/canto/sdk/typescript): one process, one org's worth of
+[`@descanto/vm-sdk`](/docs/canto/sdk/typescript): one process, one org's worth of
 desktops, driven entirely through the [tools](#tools) below.
 
 <Callout title="Private until launch" type="warn">
   Not published to a registry yet -- run it via a local path (`bunx --bun
   /path/to/canto/mcp` or a `node dist/index.js` invocation) until then.
-  `@canto/sdk` is bundled into `dist/index.js` at build time, so `npx`/`bunx
-  @canto/mcp` will work correctly once this package is published.
+  `@descanto/vm-sdk` is bundled into `dist/index.js` at build time, so `npx`/`bunx
+  @descanto/vm-mcp` will work correctly once this package is published.
 </Callout>
 
 ## Configuration
@@ -65,7 +65,7 @@ Add to `.cursor/mcp.json` (project) or the global MCP settings:
 }
 ```
 
-Once published, `command`/`args` become `npx`/`bunx -y @canto/mcp` instead
+Once published, `command`/`args` become `npx`/`bunx -y @descanto/vm-mcp` instead
 of a local path.
 
 ## Tools

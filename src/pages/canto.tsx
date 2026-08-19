@@ -92,7 +92,7 @@ const tiers: Tier[] = [
   { name: "Large", specs: "8 vCPU · 16 GB RAM", monthly: "$18", hourly: "$0.027", highlight: false },
 ];
 
-const sdkSnippet = `import { Canto } from "@canto/sdk";
+const sdkSnippet = `import { Canto } from "@descanto/vm-sdk";
 
 const canto = new Canto({ apiKey }); // or CANTO_API_KEY env var
 
@@ -282,7 +282,7 @@ export function CantoPage() {
           </div>
 
           {tab === "sdk" ? (
-            <CodeBlock title="typescript · @canto/sdk" code={sdkSnippet} />
+            <CodeBlock title="typescript · @descanto/vm-sdk" code={sdkSnippet} />
           ) : (
             <div className="flex flex-col gap-5">
               <CodeBlock title="bash · claude mcp add" code={mcpClaudeCode} />
