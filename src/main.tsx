@@ -10,6 +10,7 @@ import { HomePage } from "./pages/home";
 import { PricingPage } from "./pages/pricing";
 import { NewsIndexPage, NewsPostPage } from "./pages/news";
 import { AboutPage } from "./pages/about";
+import { EarlyAccessPage } from "./pages/early-access";
 
 function Layout() {
   return (
@@ -35,6 +36,7 @@ const router = createBrowserRouter([
       { path: "/news", element: <NewsIndexPage /> },
       { path: "/news/:slug", element: <NewsPostPage /> },
       { path: "/about", element: <AboutPage /> },
+      { path: "/early-access", element: <EarlyAccessPage /> },
       { path: "*", element: <HomePage /> },
     ],
   },

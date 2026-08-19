@@ -100,7 +100,7 @@ export function NewsPostPage() {
         dangerouslySetInnerHTML={{ __html: post.html }}
       />
       <div className="flex items-center gap-3 pt-2">
-        <Button size="sm" href="mailto:hello@descanto.com?subject=Canto%20early%20access">Request access</Button>
+        <Button size="sm" href="/early-access">Request access</Button>
         <Button size="sm" variant="outline" href="https://docs.descanto.com">Read the docs</Button>
       </div>
     </article>

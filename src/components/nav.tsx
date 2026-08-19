@@ -151,7 +151,7 @@ function MobileMenu({ onClose }: { onClose: () => void }) {
       </div>
       <div className="mt-auto flex flex-col gap-3 pt-10">
         <a
-          href="mailto:hello@descanto.com?subject=Canto%20early%20access"
+          href="/early-access"
           className="rounded-full bg-ink py-3.5 text-center text-[15px] font-medium text-on-ink"
           onClick={onClose}
         >
@@ -195,7 +195,7 @@ export function Nav() {
             Contact sales
           </a>
           <a
-            href="mailto:hello@descanto.com?subject=Canto%20early%20access"
+            href="/early-access"
             className="flex items-stretch overflow-hidden rounded-full bg-ink text-on-ink"
           >
             <span className="px-5 py-2.5 text-[15px] font-medium max-md:px-4.5 max-md:text-sm">Request access</span>

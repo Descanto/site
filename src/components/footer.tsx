@@ -5,7 +5,7 @@ const columns: { heading: string; links: { label: string; to: string }[] }[] = [
   {
     heading: "Product",
     links: [
-      { label: "Early access", to: "mailto:hello@descanto.com?subject=Canto%20early%20access" },
+      { label: "Early access", to: "/early-access" },
       { label: "Pricing", to: "/pricing" },
       { label: "Quickstart", to: "https://docs.descanto.com/quickstart" },
       { label: "Status", to: "https://github.com/descanto" },

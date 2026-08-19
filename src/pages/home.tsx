@@ -148,7 +148,7 @@ export function HomePage() {
         </StaggerItem>
         <StaggerItem>
           <div className="flex items-center gap-3 pt-1.5">
-            <Button href="mailto:hello@descanto.com?subject=Canto%20early%20access">Request access</Button>
+            <Button href="/early-access">Request access</Button>
             <Button variant="outline" href="https://docs.descanto.com">Read the docs</Button>
           </div>
         </StaggerItem>
@@ -294,7 +294,7 @@ $ canto fork release-bot --count 20
           <p className="text-base text-graphite">Always there. Pay only when it thinks.</p>
           <div className="flex items-center gap-3 pt-1">
             <Button variant="outline" href="https://docs.descanto.com">Read the docs</Button>
-            <Button href="mailto:hello@descanto.com?subject=Canto%20early%20access">Request access</Button>
+            <Button href="/early-access">Request access</Button>
           </div>
           <Link to="/pricing" className="pt-1 text-[13px] font-medium text-graphite hover:text-ink">
             See pricing →

@@ -106,7 +106,7 @@ export function PricingPage() {
               <Button
                 size="sm"
                 variant={tier.highlight ? "primary" : "outline"}
-                href="mailto:hello@descanto.com?subject=Canto%20early%20access"
+                href={`/early-access?tier=${tier.name.toLowerCase()}`}
               >
                 Request the {tier.name.toLowerCase()} tier
               </Button>
