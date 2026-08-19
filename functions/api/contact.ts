@@ -62,9 +62,7 @@ export const onRequestPost: PagesFunction<Env> = async ({ request, env }) => {
   }
 
   const to = env.CONTACT_TO ?? "hello@descanto.com";
-  // TODO: switch to noreply@descanto.com once that domain finishes Resend
-  // verification (it's pending; vrbty.dev is verified today).
-  const from = env.CONTACT_FROM ?? "Canto contact form <noreply@vrbty.dev>";
+  const from = env.CONTACT_FROM ?? "Canto contact form <noreply@descanto.com>";
 
   const res = await fetch("https://api.resend.com/emails", {
     method: "POST",
