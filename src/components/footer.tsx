@@ -1,32 +1,23 @@
 import { Link } from "react-router-dom";
-import { Mascot } from "./mascot";
+import { Mark } from "./mark";
 
 const columns: { heading: string; links: { label: string; to: string }[] }[] = [
   {
-    heading: "Botto",
+    heading: "Product",
     links: [
-      { label: "Download", to: "https://botto.descanto.com" },
-      { label: "Web app", to: "https://botto.descanto.com" },
-      { label: "Plugins", to: "/botto#plugins" },
-      { label: "Changelog", to: "https://github.com/descanto" },
-    ],
-  },
-  {
-    heading: "Canto",
-    links: [
-      { label: "Early access", to: "/canto" },
-      { label: "API docs", to: "https://docs.descanto.com/docs/canto" },
-      { label: "Pricing", to: "/canto#pricing" },
+      { label: "Early access", to: "mailto:hello@descanto.com?subject=Canto%20early%20access" },
+      { label: "Pricing", to: "/pricing" },
+      { label: "Quickstart", to: "https://docs.descanto.com/docs/canto/quickstart" },
       { label: "Status", to: "https://github.com/descanto" },
     ],
   },
   {
     heading: "Developers",
     links: [
-      { label: "Docs", to: "https://docs.descanto.com" },
-      { label: "GitHub", to: "https://github.com/descanto" },
-      { label: "Self-hosting", to: "https://github.com/descanto" },
-      { label: "Security", to: "https://github.com/descanto" },
+      { label: "Docs", to: "https://docs.descanto.com/docs/canto" },
+      { label: "API reference", to: "https://docs.descanto.com/docs/canto/api/overview" },
+      { label: "TypeScript SDK", to: "https://docs.descanto.com/docs/canto/sdk/typescript" },
+      { label: "MCP server", to: "https://docs.descanto.com/docs/canto/mcp" },
     ],
   },
   {
@@ -41,11 +32,11 @@ const columns: { heading: string; links: { label: string; to: string }[] }[] = [
 ];
 
 function FooterLink({ label, to }: { label: string; to: string }) {
-  const cls = "text-[13px] text-white/60 hover:text-white";
-  return to.startsWith("http") ? (
-    <a href={to} className={cls}>{label}</a>
-  ) : (
+  const cls = "text-[13px] text-graphite hover:text-ink";
+  return to.startsWith("/") ? (
     <Link to={to} className={cls}>{label}</Link>
+  ) : (
+    <a href={to} className={cls}>{label}</a>
   );
 }
 
@@ -55,20 +46,20 @@ export function Footer() {
       <div className="mx-auto flex max-w-[1440px] justify-between px-20 pt-18 pb-14 max-lg:flex-col max-lg:gap-12 max-lg:px-8">
         <div className="flex w-75 flex-col gap-3.5">
           <div className="flex items-center gap-2.5">
-            <Mascot size={22} />
-            <span className="font-display font-semibold tracking-tight">descanto</span>
+            <Mark size={22} />
+            <span className="font-display font-bold tracking-tight">canto</span>
           </div>
-          <p className="text-[13px] leading-5 text-white/55">
-            Agents that work like people.
+          <p className="text-[13px] leading-5 text-graphite">
+            Instant-wake cloud desktops for agents.
             <br />
-            Computers built for agents.
+            Always there. Pay only when it thinks.
           </p>
-          <p className="text-xs text-white/35">© 2026 Descanto</p>
+          <p className="text-xs text-faint">© 2026 Descanto</p>
         </div>
         <div className="flex gap-18 max-md:grid max-md:grid-cols-2 max-md:gap-10">
           {columns.map((col) => (
             <div key={col.heading} className="flex flex-col gap-3">
-              <span className="text-xs font-semibold tracking-widest text-white/40 uppercase">{col.heading}</span>
+              <span className="text-xs font-semibold tracking-widest text-faint uppercase">{col.heading}</span>
               {col.links.map((l) => (
                 <FooterLink key={l.label} {...l} />
               ))}

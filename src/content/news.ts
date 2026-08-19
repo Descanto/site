@@ -4,7 +4,7 @@ export interface NewsPost {
   slug: string;
   title: string;
   description: string;
-  category: "Botto" | "Canto" | "Company" | "Engineering";
+  category: "Canto" | "Company" | "Engineering";
   date: string; // ISO yyyy-mm-dd
   readMinutes: number;
   featured: boolean;
@@ -20,7 +20,11 @@ function parseFrontmatter(src: string): { meta: Record<string, string>; body: st
   const meta: Record<string, string> = {};
   for (const line of match[1].split("\n")) {
     const idx = line.indexOf(":");
-    if (idx > 0) meta[line.slice(0, idx).trim()] = line.slice(idx + 1).trim();
+    if (idx > 0) {
+      let value = line.slice(idx + 1).trim();
+      if (value.startsWith('"') && value.endsWith('"')) value = value.slice(1, -1);
+      meta[line.slice(0, idx).trim()] = value;
+    }
   }
   return { meta, body: src.slice(match[0].length) };
 }

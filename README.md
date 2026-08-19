@@ -1,6 +1,6 @@
 # Descanto/site
 
-descanto.com — marketing site for Descanto (Botto + Canto). Vite + React 19 + Tailwind v4, dark-only, deployed to Cloudflare Pages.
+descanto.com — marketing site for Canto, instant-wake cloud desktops for agents. Vite + React 19 + Tailwind v4, light mode per the brand kit, deployed to Cloudflare Pages.
 
 ## Develop
 
@@ -17,7 +17,7 @@ Drop a markdown file in `src/content/news/`:
 ---
 title: My post title
 description: One-line summary shown on cards and at the top of the post.
-category: Botto | Canto | Company | Engineering
+category: Canto | Company | Engineering
 date: 2026-09-01
 featured: false
 ---
@@ -35,7 +35,7 @@ Manual escape hatch: `bun run deploy` (uses your local wrangler auth).
 
 ## Structure
 
-- `src/pages/` — one file per route (`/`, `/botto`, `/canto`, `/canto/pricing`, `/news`, `/news/:slug`, `/about`)
+- `src/pages/` — one file per route (`/`, `/pricing`, `/news`, `/news/:slug`, `/about`)
 - `src/content/news/` — markdown articles (the news system)
-- `src/components/` — Nav (with dropdown menus), Footer, Mascot, ui/button
+- `src/components/` — Nav (with dropdown menus), Footer, Mark (brand logo), ui/button
 - `src/styles.css` — Tailwind v4 theme tokens (colors, fonts) — single source of truth for the design system

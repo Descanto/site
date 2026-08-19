@@ -1,4 +1,4 @@
-export const appName = "Descanto Docs";
+export const appName = "Canto Docs";
 export const docsRoute = "/docs";
 
 export const gitConfig = {

@@ -1,11 +1,19 @@
 <!doctype html>
-<html lang="en" class="dark">
+<html lang="en">
   <head>
     <meta charset="UTF-8" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Descanto — Agents that work like people. Computers built for agents.</title>
-    <meta name="description" content="Descanto builds Botto, your own team of AI teammates, and Canto, the instant-wake cloud desktops they work on." />
+    <title>Canto — instant-wake cloud desktops for agents</title>
+    <meta name="description" content="Canto gives computer-use agents a persistent Linux desktop that hibernates when idle and wakes in under a second. Honest, awake-time-only billing." />
+    <script>
+      // Apply the theme before first paint to avoid a flash. Kept in sync with src/lib/theme.ts.
+      (function () {
+        var stored = localStorage.getItem("canto-theme");
+        var dark = stored ? stored === "dark" : window.matchMedia("(prefers-color-scheme: dark)").matches;
+        if (dark) document.documentElement.classList.add("dark");
+      })();
+    </script>
   </head>
   <body>
     <div id="root"></div>

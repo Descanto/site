@@ -9,10 +9,10 @@ const inter = Inter({
 
 export const metadata = {
   title: {
-    template: "%s | Descanto Docs",
-    default: "Descanto Docs",
+    template: "%s | Canto Docs",
+    default: "Canto Docs",
   },
-  description: "Documentation for Descanto products: Canto, instant-wake persistent Linux desktops for computer-use agents, and Botto, the open agent for your Mac.",
+  description: "Documentation for Canto: instant-wake, persistent Linux desktops for computer-use agents.",
 };
 
 export default function Layout({ children }: { children: ReactNode }) {
