@@ -68,7 +68,7 @@ JSON (`id`, `orgId`, `tier`, `state`, `imageVersion`, `generation`,
 desktop.wake({ wait?, expectedGeneration? }) -> Promise<Operation>
 desktop.hibernate({ wait?, expectedGeneration? }) -> Promise<Operation>
 desktop.destroy({ wait?, expectedGeneration? }) -> Promise<Operation>
-desktop.fork({ count, ephemeral?, acknowledgeSharedState, wait?, expectedGeneration? }) -> Promise<Desktop[] | Operation>
+desktop.fork({ count, ephemeral?, acknowledgeSharedState, wait? }) -> Promise<Desktop[] | Operation>
 desktop.exec(command, { timeoutSecs? }) -> Promise<{ exitCode, stdout, stderr }>
 desktop.exec(command, { detached: true }) -> Promise<Process>
 desktop.getProcess(processId, { tailBytes? }) -> Promise<ProcessStatus>
