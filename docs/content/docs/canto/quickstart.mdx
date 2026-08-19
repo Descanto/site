@@ -83,6 +83,40 @@ See the [full tool table](/docs/canto/mcp#tools) for every field.
 </Tab>
 </Tabs>
 
+### Bootstrap it with env vars and a setup script
+
+Optionally, bootstrap the desktop on its first wake with environment
+variables and a setup script -- useful for agent workloads that need
+credentials or tooling installed before the first `exec`:
+
+<Tabs items={['curl', 'TypeScript SDK']}>
+<Tab value="curl">
+```bash
+curl -sS -X POST "$BASE/desktops" \
+  -H "$AUTH" -H 'Content-Type: application/json' \
+  -d '{
+    "tier": "small",
+    "env": {"APP_ENV": "staging"},
+    "setup_script": "#!/bin/sh\napt-get update && apt-get install -y ripgrep\n"
+  }'
+```
+</Tab>
+<Tab value="TypeScript SDK">
+```ts
+const desktop = await canto.desktops.create({
+  tier: "small",
+  env: { APP_ENV: "staging" },
+  setupScript: "#!/bin/sh\napt-get update && apt-get install -y ripgrep\n",
+});
+```
+</Tab>
+</Tabs>
+
+`env` is written to `/root/.canto/env` in the guest and `setup_script` runs
+once, both on the desktop's first successful wake -- see
+[Concepts: env and setup_script](/docs/canto/concepts/desktops-and-lifecycle#env-and-setup_script)
+for the caps and charset rule.
+
 ## 3. Wake it
 
 A freshly created desktop starts `provisioning`/`hibernated`, not `awake` --
@@ -155,6 +189,44 @@ stdout/stderr are each truncated at 50KB in the tool result (never in the
 underlying API call) to protect the calling model's context window.
 </Tab>
 </Tabs>
+
+<Callout title="Long-running commands: run detached" type="info">
+  A blocking `exec` is bounded by `timeout_secs` (60s default, clamped to
+  300s max). For anything longer -- a build, a test suite, a background
+  server -- run it detached instead and poll for status:
+
+  <Tabs items={['curl', 'TypeScript SDK', 'MCP']}>
+  <Tab value="curl">
+  ```bash
+  # Spawn it -- returns immediately with a process_id.
+  PROC=$(curl -sS -X POST "$BASE/desktops/$DESKTOP_ID/exec" \
+    -H "$AUTH" -H 'Content-Type: application/json' \
+    -d '{"command": "sleep 60 && echo done", "detached": true}')
+  PROCESS_ID=$(echo "$PROC" | jq -r .process_id)
+
+  # Poll it whenever you want to check in.
+  curl -sS "$BASE/desktops/$DESKTOP_ID/processes/$PROCESS_ID" -H "$AUTH"
+  ```
+  </Tab>
+  <Tab value="TypeScript SDK">
+  ```ts
+  const proc = await desktop.exec("sleep 60 && echo done", { detached: true });
+  const status = await proc.status();
+  status.status; // "running" | "exited" | "lost"
+  ```
+  </Tab>
+  <Tab value="MCP">
+  ```json
+  { "tool": "exec", "arguments": { "desktop_id": "...", "command": "sleep 60 && echo done", "detached": true } }
+  ```
+
+  Then poll with the `get_process` tool: `{ "desktop_id": "...", "process_id": "..." }`.
+  </Tab>
+  </Tabs>
+
+  A detached process is killed when the desktop hibernates -- see
+  [Concepts: background processes](/docs/canto/concepts/operations#background-processes-detached-exec).
+</Callout>
 
 ## 5. Work with files
 
@@ -231,11 +303,31 @@ Hibernating preserves the desktop's full disk state and stops billing
 compute -- see [Billing](/docs/canto/concepts/billing) for exactly how awake-time
 is metered. Wake it again any time with the same call from step 3.
 
+<Callout title="Fork it" type="info">
+  A hibernated desktop can be cloned into up to 20 independent copies with
+  `POST /v1/desktops/{id}/fork`:
+
+  ```bash
+  curl -sS -X POST "$BASE/desktops/$DESKTOP_ID/fork?wait=true" \
+    -H "$AUTH" -H 'Content-Type: application/json' \
+    -d '{"count": 3, "acknowledge_shared_state": true}'
+  ```
+
+  Forks come back hibernated -- wake the ones you need. See
+  [Concepts: Forking](/docs/canto/concepts/forking) for the full model,
+  including why `acknowledge_shared_state` has no default.
+</Callout>
+
 <Cards>
   <Card
     title="Concepts: Operations"
     href="/docs/canto/concepts/operations"
-    description="Operation handles, polling, ?wait, and idempotency in depth."
+    description="Operation handles, polling, ?wait, idempotency, and background processes."
+  />
+  <Card
+    title="Concepts: Forking"
+    href="/docs/canto/concepts/forking"
+    description="Clone a hibernated desktop into N independent copies."
   />
   <Card
     title="API reference"

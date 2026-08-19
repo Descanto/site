@@ -48,10 +48,15 @@ default -- this will change once a hosted Canto API launches.
 ## Desktops
 
 ```ts
-canto.desktops.create({ tier, billingMode?, imageVersion?, idleTimeoutSecs? }) -> Promise<Desktop>
+canto.desktops.create({ tier, billingMode?, imageVersion?, idleTimeoutSecs?, env?, setupScript? }) -> Promise<Desktop>
 canto.desktops.list({ state? }) -> Promise<Desktop[]>
 canto.desktops.get(id) -> Promise<Desktop>
 ```
+
+`env` (a `Record<string, string>`) and `setupScript` (a string) bootstrap a
+new desktop on its first successful wake -- see
+[Concepts: env and setup_script](/docs/canto/concepts/desktops-and-lifecycle#env-and-setup_script)
+for the charset rule and the 100-key/64 KiB and 64 KiB caps.
 
 A `Desktop` exposes camelCase properties mapped from the wire's snake_case
 JSON (`id`, `orgId`, `tier`, `state`, `imageVersion`, `generation`,
@@ -61,8 +66,10 @@ JSON (`id`, `orgId`, `tier`, `state`, `imageVersion`, `generation`,
 desktop.wake({ wait?, expectedGeneration? }) -> Promise<Operation>
 desktop.hibernate({ wait?, expectedGeneration? }) -> Promise<Operation>
 desktop.destroy({ wait?, expectedGeneration? }) -> Promise<Operation>
-desktop.fork() -> never // always throws CantoApiError (status 501) -- honest passthrough
+desktop.patch({ idleTimeoutSecs? }) -> Promise<Desktop> // e.g. change TTL / disable auto-hibernate (0)
+desktop.fork({ count, acknowledgeSharedState, ephemeral?, wait?, expectedGeneration? }) -> Promise<Desktop[]>
 desktop.exec(command, { timeoutSecs? }) -> Promise<{ exitCode, stdout, stderr }>
+desktop.exec(command, { detached: true }) -> Promise<Process>
 desktop.readFile(path) -> Promise<Uint8Array>
 desktop.writeFile(path, data: Uint8Array | string) -> Promise<void> // string is UTF-8 encoded
 desktop.stream({ claim?, takeover? }) -> Promise<{ url, expiresUnix }>
@@ -74,6 +81,51 @@ Guest file paths (`readFile`/`writeFile`) accept either an absolute
 -- a single leading `/` is stripped before the request is sent, matching
 `controld`'s own path-parameter convention (sent without a leading slash;
 the server re-prepends it).
+
+## Detached exec and the `Process` handle
+
+Pass `{ detached: true }` to spawn a command in the guest instead of
+blocking on it -- the call resolves as soon as the command is spawned
+(`202` under the hood), returning a `Process` handle rather than
+`{ exitCode, stdout, stderr }`:
+
+```ts
+const proc = await d.exec("long-running-task.sh", { detached: true });
+proc.processId; // "p_..."
+
+const status = await proc.status({ tailBytes? }); // -> ProcessStatusResponse
+status.status; // "running" | "exited" | "lost"
+status.exitCode; // only meaningful once status === "exited"
+status.stdoutTail;
+status.stderrTail;
+```
+
+`status()` re-fetches `GET /v1/desktops/{id}/processes/{process_id}` each
+call -- poll it yourself on whatever cadence fits (there's no built-in
+`wait`-style helper for processes, unlike desktop mutations). See
+[Concepts: background processes](/docs/canto/concepts/operations#background-processes-detached-exec)
+for the tail-size cap and the "killed on hibernate" caveat.
+
+## Forking
+
+`desktop.fork(...)` mirrors the REST contract directly -- `count` and
+`acknowledgeSharedState` are required, `ephemeral` optional:
+
+```ts
+const forks = await hibernated.fork({
+  count: 3,
+  acknowledgeSharedState: true, // required -- omitting it throws, same as `false`
+});
+forks; // Desktop[], length 3, each state: "hibernated"
+
+await forks[0].wake();
+```
+
+The source desktop must already be `hibernated`, or the call throws
+`CantoApiError` (`409`). See
+[Concepts: Forking](/docs/canto/concepts/forking) for the full model
+(copy-on-write semantics, why `acknowledgeSharedState` has no default, and
+ephemeral forks).
 
 ## Operations and usage
 

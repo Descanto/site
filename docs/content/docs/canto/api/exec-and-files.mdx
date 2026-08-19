@@ -1,11 +1,11 @@
 ---
 title: Exec and files
-description: Run commands and read/write files on an awake desktop's guest.
+description: Run commands (blocking or detached), poll processes, and read/write files on an awake desktop's guest.
 ---
 
-All three routes below only work while the desktop is `awake` -- a `409`
-means the desktop isn't awake, or its control claim is already held by
-another client (see [Streaming](/docs/canto/api/streaming) for claims).
+The routes below only work while the desktop is `awake` -- a `409` means
+the desktop isn't awake, or its control claim is already held by another
+client (see [Streaming](/docs/canto/api/streaming) for claims).
 
 ## Run a command
 
@@ -18,13 +18,14 @@ another client (see [Streaming](/docs/canto/api/streaming) for claims).
 Request body (`ExecBody`):
 
 ```json
-{ "command": "echo hello", "timeout_secs": 10 }
+{ "command": "echo hello", "timeout_secs": 10, "detached": false }
 ```
 
 | Field | Type | Required | Description |
 |---|---|---|---|
 | `command` | string | yes | |
-| `timeout_secs` | integer \| null | no | Defaults to 60s when omitted; clamped (never rejected) to 300s. |
+| `timeout_secs` | integer \| null | no | Defaults to 60s when omitted; clamped (never rejected) to 300s. Ignored when `detached: true`. |
+| `detached` | boolean | no | If `true`, the command is spawned in the guest and this route answers `202 {process_id}` instead of waiting for it to exit. Defaults to `false` (blocking). |
 
 ```bash
 curl -sS -X POST "$BASE/desktops/$DESKTOP_ID/exec" \
@@ -32,7 +33,7 @@ curl -sS -X POST "$BASE/desktops/$DESKTOP_ID/exec" \
   -d '{"command": "echo hello", "timeout_secs": 10}'
 ```
 
-Response (`ExecResponse`):
+Response (`ExecResponse`, `detached: false`):
 
 ```json
 { "exit_code": 0, "stdout": "hello\n", "stderr": "" }
@@ -40,13 +41,76 @@ Response (`ExecResponse`):
 
 | Status | Meaning |
 |---|---|
-| `200` | Command ran to completion in the guest |
+| `200` | `detached: false` (default): the command ran to completion in the guest |
+| `202` | `detached: true`: the command was spawned in the guest; poll [`GET .../processes/{process_id}`](#poll-a-detached-process) for its status |
 | `400` | Malformed id/body, or empty command |
 | `401` | Missing/invalid credentials |
 | `404` | Desktop not found or belongs to another org |
 | `409` | Desktop is not awake, or its control claim is already held |
 | `503` | The desktop's host is currently unreachable -- retry |
 | `504` | The command timed out inside the guest -- retry |
+
+### Run a command, detached
+
+Pass `"detached": true` to spawn a long-running command in the background
+instead of blocking on it -- see
+[Concepts: background processes](/docs/canto/concepts/operations#background-processes-detached-exec)
+for the full model.
+
+```bash
+curl -sS -X POST "$BASE/desktops/$DESKTOP_ID/exec" \
+  -H "$AUTH" -H 'Content-Type: application/json' \
+  -d '{"command": "sleep 300 && echo done > /tmp/marker", "detached": true}'
+```
+
+Response (`DetachedExecResponse`, `202`):
+
+```json
+{ "process_id": "p_..." }
+```
+
+## Poll a detached process
+
+`GET /v1/desktops/{id}/processes/{process_id}`
+
+| Param | In | Required | Description |
+|---|---|---|---|
+| `id` | path | yes | Desktop id |
+| `process_id` | path | yes | Process id returned by a prior detached `POST .../exec` |
+| `tail_bytes` | query | no | How many trailing bytes of stdout/stderr to return. Omitted/`0` means hostd's own default (64 KiB); capped at 512 KiB. |
+
+```bash
+curl -sS "$BASE/desktops/$DESKTOP_ID/processes/$PROCESS_ID?tail_bytes=65536" -H "$AUTH"
+```
+
+Response (`ProcessStatusResponse`):
+
+```json
+{
+  "process_id": "p_...",
+  "status": "running",
+  "exit_code": 0,
+  "stdout_tail": "",
+  "stderr_tail": ""
+}
+```
+
+| Field | Type | Description |
+|---|---|---|
+| `process_id` | string | |
+| `status` | string | `running` \| `exited` \| `lost` |
+| `exit_code` | integer | Valid only when `status == "exited"` |
+| `stdout_tail` | string | Trailing `tail_bytes` of stdout captured so far |
+| `stderr_tail` | string | Trailing `tail_bytes` of stderr captured so far |
+
+| Status | Meaning |
+|---|---|
+| `200` | The process's current status |
+| `400` | Malformed id, or a non-numeric `tail_bytes` |
+| `401` | Missing/invalid credentials |
+| `404` | Desktop not found (or belongs to another org), or `process_id` is unknown |
+| `409` | Desktop is not awake |
+| `503` | The desktop's host is currently unreachable -- retry |
 
 ## Read a file
 

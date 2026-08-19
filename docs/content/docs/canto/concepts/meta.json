@@ -3,6 +3,7 @@
   "pages": [
     "desktops-and-lifecycle",
     "operations",
+    "forking",
     "orgs-and-auth",
     "billing"
   ]

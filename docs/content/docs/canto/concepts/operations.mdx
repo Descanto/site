@@ -1,6 +1,6 @@
 ---
 title: Operations
-description: Async handles, polling, ?wait, and idempotency.
+description: Async handles, polling, ?wait, idempotency, and background processes.
 ---
 
 `wake`, `hibernate`, and `destroy` don't apply their change synchronously.
@@ -80,4 +80,49 @@ creates two independent rows rather than colliding. A non-ASCII
   automatically to every retry of that call -- which is exactly what the
   TypeScript SDK does (`crypto.randomUUID()`) when you don't supply one
   yourself.
+</Callout>
+
+## Background processes (detached exec)
+
+Control-plane operations (above) aren't the only pollable, async thing in
+the API. [`POST /v1/desktops/{id}/exec`](/docs/canto/api/exec-and-files#run-a-command)
+accepts `"detached": true` to spawn a command in the guest and hand back a
+`process_id` instead of blocking until it exits -- useful for anything
+longer than the request's own timeout budget (builds, long test runs,
+servers you want running in the background).
+
+```bash
+curl -sS -X POST "$BASE/desktops/$ID/exec" \
+  -H "$AUTH" -H 'Content-Type: application/json' \
+  -d '{"command": "long-running-task.sh", "detached": true}'
+# -> 202 {"process_id": "p_..."}
+```
+
+Poll it with [`GET /v1/desktops/{id}/processes/{process_id}`](/docs/canto/api/exec-and-files#poll-a-detached-process):
+
+```bash
+curl -sS "$BASE/desktops/$ID/processes/$PROCESS_ID" -H "$AUTH"
+```
+
+```json
+{
+  "process_id": "p_...",
+  "status": "running",
+  "exit_code": 0,
+  "stdout_tail": "...",
+  "stderr_tail": ""
+}
+```
+
+`status` is one of `running`, `exited`, or `lost` (`exit_code` is only
+meaningful once `status == "exited"`). `stdout_tail`/`stderr_tail` are the
+*trailing* bytes captured so far -- not the full output -- sized by the
+optional `tail_bytes` query param (default 64 KiB, capped at **512 KiB**).
+
+<Callout title="Killed on hibernate" type="warn">
+  A detached process is a property of the running guest, not of the
+  desktop's persisted state. Hibernating the desktop kills it -- there is
+  no "resume on wake." If you need a task to survive a hibernate/wake
+  cycle, checkpoint its progress to disk yourself (or to a file you read
+  back after waking) rather than relying on the process still being alive.
 </Callout>

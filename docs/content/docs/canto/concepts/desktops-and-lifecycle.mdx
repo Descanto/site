@@ -1,6 +1,6 @@
 ---
 title: Desktops and lifecycle
-description: Lifecycle states and generation fencing.
+description: Lifecycle states, generation fencing, TTL/auto-hibernate, and first-wake env/setup.
 ---
 
 A **desktop** is a real, persistent Linux machine: an id, an org, a tier, an
@@ -64,7 +64,63 @@ caller acting on a desktop it fetched a while ago and hasn't refreshed
 since. Omitting `expected_generation` skips the check entirely.
 
 <Callout title="Fork">
-  `POST /v1/desktops/{id}/fork` exists in the API surface but always
-  returns `501 Not Implemented` -- an honest stub, not a bug. It isn't
-  documented as a working feature anywhere in these docs.
+  `POST /v1/desktops/{id}/fork` creates independent copies of a hibernated
+  desktop -- see [Concepts: Forking](/docs/canto/concepts/forking) for the
+  full model.
 </Callout>
+
+## TTL and auto-hibernate
+
+Every desktop carries `idle_timeout_secs` -- seconds of guest idle time,
+measured **from wake**, before the desktop is automatically hibernated:
+
+- Set it at creation via `CreateDesktopBody.idle_timeout_secs`, or change it
+  on an existing desktop with
+  [`PATCH /v1/desktops/{id}`](/docs/canto/api/desktops#update-a-desktop):
+
+  ```bash
+  curl -sS -X PATCH "$BASE/desktops/$DESKTOP_ID" \
+    -H "$AUTH" -H 'Content-Type: application/json' \
+    -d '{"idle_timeout_secs": 3600}'
+  ```
+
+- `0` means **never** auto-hibernate. A negative value is `400`.
+- Omitting `idle_timeout_secs` on a `PATCH` is a no-op -- the current
+  desktop is returned unchanged, per normal PATCH semantics.
+- The clock resets from each wake, not from the last guest activity inside
+  it -- "idle" here means "time since this desktop last transitioned to
+  `awake`," not an activity heuristic.
+
+<Callout title="Ephemeral desktops auto-destroy, not just hibernate" type="warn">
+  A desktop created as `ephemeral` (currently only possible via
+  [fork](/docs/canto/concepts/forking) with `"ephemeral": true`) does not
+  just hibernate at its idle timeout -- it **DESTROYs** itself. Its
+  `idle_timeout_secs` is forced to `900` (15 minutes) at creation
+  regardless of what its source desktop's own value was. Treat an
+  ephemeral fork as disposable: don't park anything in it you'd mind
+  losing.
+</Callout>
+
+## env and setup_script
+
+`POST /v1/desktops` accepts two optional first-wake bootstrap fields:
+
+```json
+{
+  "tier": "small",
+  "env": { "APP_ENV": "staging", "API_TOKEN": "..." },
+  "setup_script": "#!/bin/sh\napt-get update && apt-get install -y ripgrep\n"
+}
+```
+
+| Field | Written where | Caps |
+|---|---|---|
+| `env` | `/root/.canto/env` in the guest, on the desktop's first successful wake | 100 keys / 64 KiB total serialized size; every key must match `^[A-Za-z_][A-Za-z0-9_]*$` |
+| `setup_script` | Run once in the guest under hostd's reserved `process_id = "setup"`, on first successful wake | 64 KiB |
+
+Both are `400` past their cap (or, for `env`, on any key that doesn't match
+the POSIX env-name rule). Neither is echoed back by `GET`/`POST` on the
+desktop -- they're write-only bootstrap inputs, not persisted/readable
+fields on the `DesktopJson` wire shape. `setup_script` runs exactly once,
+on the desktop's first wake; it does not re-run on subsequent wakes or
+after a hibernate/wake cycle.
