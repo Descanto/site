@@ -7,7 +7,6 @@ export function Provider({ children }: { children: ReactNode }) {
   return (
     <RootProvider
       search={{ SearchDialog }}
-      theme={{ defaultTheme: "dark" }}
     >
       {children}
     </RootProvider>

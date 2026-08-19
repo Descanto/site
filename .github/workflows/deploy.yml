@@ -10,9 +10,9 @@ permissions:
   deployments: write
 
 jobs:
-  deploy:
+  deploy-www:
     runs-on: ubuntu-latest
-    name: Build and deploy
+    name: Build and deploy site
     steps:
       - uses: actions/checkout@v4
 
@@ -40,3 +40,33 @@ jobs:
             branch=$(printf '%s' "$HEAD_REF" | tr -c 'a-zA-Z0-9-' '-')
           fi
           bunx wrangler pages deploy dist --project-name descanto-www --branch "$branch"
+
+  deploy-docs:
+    runs-on: ubuntu-latest
+    name: Build and deploy docs
+    defaults:
+      run:
+        working-directory: docs
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: oven-sh/setup-bun@v2
+
+      - name: Install
+        run: bun install --frozen-lockfile
+
+      - name: Build
+        run: bun run build
+
+      - name: Deploy
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: 010c4c6b0df9ff6b8de54f1788a3905b
+          HEAD_REF: ${{ github.head_ref }}
+        run: |
+          if [ "${{ github.ref }}" = "refs/heads/main" ]; then
+            branch=main
+          else
+            branch=$(printf '%s' "$HEAD_REF" | tr -c 'a-zA-Z0-9-' '-')
+          fi
+          bunx wrangler pages deploy out --project-name descanto-docs --branch "$branch"

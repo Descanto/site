@@ -13,6 +13,9 @@ export const metadata = {
     default: "Canto Docs",
   },
   description: "Documentation for Canto: instant-wake, persistent Linux desktops for computer-use agents.",
+  icons: {
+    icon: "/favicon.svg",
+  },
 };
 
 export default function Layout({ children }: { children: ReactNode }) {
