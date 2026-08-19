@@ -1,11 +1,12 @@
 ---
 title: MCP server
-description: Drive Canto desktops from Claude Code, Claude Desktop, or Cursor.
+description: Drive Canto desktops from Claude Code, Cursor, Codex, Copilot, Antigravity, OpenCode, and any MCP client.
 ---
 
 `@descanto/vm-mcp` is an MCP (Model Context Protocol) stdio server exposing Canto
 cloud desktops to MCP-compatible AI clients -- Claude Code, Claude Desktop,
-Cursor, and any other MCP client. It's a thin wrapper over
+Cursor, Codex, GitHub Copilot, Antigravity, OpenCode, and any other MCP client.
+It's a thin wrapper over
 [`@descanto/vm-sdk`](/docs/canto/sdk/typescript): one process, one org's worth of
 desktops, driven entirely through the [tools](#tools) below.
 
@@ -30,7 +31,7 @@ claude mcp add canto --env CANTO_API_KEY=canto_sk_... -- npx -y @descanto/vm-mcp
 
 ### Claude Desktop
 
-Add to `claude_desktop_config.json`:
+Add to `claude_desktop_config.json` (Settings → Developer → Edit Config):
 
 ```json
 {
@@ -48,7 +49,7 @@ Add to `claude_desktop_config.json`:
 
 ### Cursor
 
-Add to `.cursor/mcp.json` (project) or the global MCP settings:
+Add to `.cursor/mcp.json` (project) or `~/.cursor/mcp.json` (global):
 
 ```json
 {
@@ -57,6 +58,84 @@ Add to `.cursor/mcp.json` (project) or the global MCP settings:
       "command": "npx",
       "args": ["-y", "@descanto/vm-mcp"],
       "env": {
+        "CANTO_API_KEY": "canto_sk_..."
+      }
+    }
+  }
+}
+```
+
+### Codex
+
+Use the CLI:
+
+```bash
+codex mcp add canto --env CANTO_API_KEY=canto_sk_... -- npx -y @descanto/vm-mcp
+```
+
+or add the server to `~/.codex/config.toml` by hand:
+
+```toml
+[mcp_servers.canto]
+command = "npx"
+args = ["-y", "@descanto/vm-mcp"]
+env = { CANTO_API_KEY = "canto_sk_..." }
+```
+
+### GitHub Copilot (VS Code)
+
+Add to `.vscode/mcp.json`. Copilot uses the top-level `servers` key and requires
+`"type": "stdio"`:
+
+```json
+{
+  "servers": {
+    "canto": {
+      "type": "stdio",
+      "command": "npx",
+      "args": ["-y", "@descanto/vm-mcp"],
+      "env": {
+        "CANTO_API_KEY": "canto_sk_..."
+      }
+    }
+  }
+}
+```
+
+### Antigravity
+
+In the agent panel, open **… → MCP Servers → Manage MCP Servers → View raw
+config** (writes `~/.gemini/config/mcp_config.json`):
+
+```json
+{
+  "mcpServers": {
+    "canto": {
+      "command": "npx",
+      "args": ["-y", "@descanto/vm-mcp"],
+      "env": {
+        "CANTO_API_KEY": "canto_sk_..."
+      }
+    }
+  }
+}
+```
+
+### OpenCode
+
+Add to `opencode.json` (project) or `~/.config/opencode/opencode.json` (global).
+OpenCode nests servers under `mcp`, takes `command` as an array, and uses
+`environment` rather than `env`:
+
+```json
+{
+  "$schema": "https://opencode.ai/config.json",
+  "mcp": {
+    "canto": {
+      "type": "local",
+      "command": ["npx", "-y", "@descanto/vm-mcp"],
+      "enabled": true,
+      "environment": {
         "CANTO_API_KEY": "canto_sk_..."
       }
     }
