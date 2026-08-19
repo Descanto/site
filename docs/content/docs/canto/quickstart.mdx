@@ -211,7 +211,7 @@ underlying API call) to protect the calling model's context window.
   <Tab value="TypeScript SDK">
   ```ts
   const proc = await desktop.exec("sleep 60 && echo done", { detached: true });
-  const status = await proc.status();
+  const status = await desktop.getProcess(proc.processId);
   status.status; // "running" | "exited" | "lost"
   ```
   </Tab>

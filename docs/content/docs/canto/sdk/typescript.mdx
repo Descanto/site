@@ -51,6 +51,7 @@ default -- this will change once a hosted Canto API launches.
 canto.desktops.create({ tier, billingMode?, imageVersion?, idleTimeoutSecs?, env?, setupScript? }) -> Promise<Desktop>
 canto.desktops.list({ state? }) -> Promise<Desktop[]>
 canto.desktops.get(id) -> Promise<Desktop>
+canto.desktops.update(id, { idleTimeoutSecs? }) -> Promise<Desktop> // PATCH by id, no prior get() needed
 ```
 
 `env` (a `Record<string, string>`) and `setupScript` (a string) bootstrap a
@@ -60,16 +61,18 @@ for the charset rule and the 100-key/64 KiB and 64 KiB caps.
 
 A `Desktop` exposes camelCase properties mapped from the wire's snake_case
 JSON (`id`, `orgId`, `tier`, `state`, `imageVersion`, `generation`,
-`currentGenerationId`, `idleTimeoutSecs`, `billingMode`, `hostId`), plus:
+`currentGenerationId`, `idleTimeoutSecs`, `billingMode`, `hostId`,
+`ephemeral`), plus:
 
 ```ts
 desktop.wake({ wait?, expectedGeneration? }) -> Promise<Operation>
 desktop.hibernate({ wait?, expectedGeneration? }) -> Promise<Operation>
 desktop.destroy({ wait?, expectedGeneration? }) -> Promise<Operation>
-desktop.patch({ idleTimeoutSecs? }) -> Promise<Desktop> // e.g. change TTL / disable auto-hibernate (0)
-desktop.fork({ count, acknowledgeSharedState, ephemeral?, wait?, expectedGeneration? }) -> Promise<Desktop[]>
+desktop.fork({ count, ephemeral?, acknowledgeSharedState, wait?, expectedGeneration? }) -> Promise<Desktop[] | Operation>
 desktop.exec(command, { timeoutSecs? }) -> Promise<{ exitCode, stdout, stderr }>
 desktop.exec(command, { detached: true }) -> Promise<Process>
+desktop.getProcess(processId, { tailBytes? }) -> Promise<ProcessStatus>
+desktop.patch({ idleTimeoutSecs? }) -> Promise<Desktop> // PATCH, refreshes this instance in place
 desktop.readFile(path) -> Promise<Uint8Array>
 desktop.writeFile(path, data: Uint8Array | string) -> Promise<void> // string is UTF-8 encoded
 desktop.stream({ claim?, takeover? }) -> Promise<{ url, expiresUnix }>
@@ -82,6 +85,20 @@ Guest file paths (`readFile`/`writeFile`) accept either an absolute
 `controld`'s own path-parameter convention (sent without a leading slash;
 the server re-prepends it).
 
+## TTL: `update`/`patch`
+
+Two equivalent ways to change a desktop's `idle_timeout_secs` (`0` disables
+auto-hibernate) -- a static call by id, or an instance method that
+refreshes the `Desktop` you already have in place:
+
+```ts
+await canto.desktops.update(desktopId, { idleTimeoutSecs: 3600 });
+// or, if you already hold a Desktop:
+await desktop.patch({ idleTimeoutSecs: 3600 });
+```
+
+See [Concepts: TTL and auto-hibernate](/docs/canto/concepts/desktops-and-lifecycle#ttl-and-auto-hibernate).
+
 ## Detached exec and the `Process` handle
 
 Pass `{ detached: true }` to spawn a command in the guest instead of
@@ -93,14 +110,14 @@ blocking on it -- the call resolves as soon as the command is spawned
 const proc = await d.exec("long-running-task.sh", { detached: true });
 proc.processId; // "p_..."
 
-const status = await proc.status({ tailBytes? }); // -> ProcessStatusResponse
+const status = await d.getProcess(proc.processId, { tailBytes: 65536 });
 status.status; // "running" | "exited" | "lost"
 status.exitCode; // only meaningful once status === "exited"
 status.stdoutTail;
 status.stderrTail;
 ```
 
-`status()` re-fetches `GET /v1/desktops/{id}/processes/{process_id}` each
+`getProcess` re-fetches `GET /v1/desktops/{id}/processes/{process_id}` each
 call -- poll it yourself on whatever cadence fits (there's no built-in
 `wait`-style helper for processes, unlike desktop mutations). See
 [Concepts: background processes](/docs/canto/concepts/operations#background-processes-detached-exec)
@@ -109,7 +126,10 @@ for the tail-size cap and the "killed on hibernate" caveat.
 ## Forking
 
 `desktop.fork(...)` mirrors the REST contract directly -- `count` and
-`acknowledgeSharedState` are required, `ephemeral` optional:
+`acknowledgeSharedState` are required, `ephemeral` optional. Like
+`wake`/`hibernate`/`destroy`, it defaults to `{ wait: true }` and resolves
+`Desktop[]`; pass `{ wait: false }` to get the raw `Operation` handle back
+instead:
 
 ```ts
 const forks = await hibernated.fork({
