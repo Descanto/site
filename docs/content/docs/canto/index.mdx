@@ -27,9 +27,11 @@ idle time in between.
 ## How it's built
 
 - A small, versioned [REST API](/docs/canto/api/overview) (`/v1/**`) is the one
-  source of truth: create/list/get desktops, wake/hibernate/destroy them,
-  run commands, read/write files, get a stream ticket, and query usage.
-- Every mutation (`wake`/`hibernate`/`destroy`) returns an
+  source of truth: create/list/get/update desktops, wake/hibernate/destroy/
+  [fork](/docs/canto/concepts/forking) them, run commands (blocking or
+  [detached](/docs/canto/concepts/operations#background-processes-detached-exec)),
+  read/write files, get a stream ticket, and query usage.
+- Every mutation (`wake`/`hibernate`/`destroy`/`fork`) returns an
   [operation handle](/docs/canto/concepts/operations) you can poll or long-poll,
   rather than blocking your connection open.
 - A [TypeScript SDK](/docs/canto/sdk/typescript) wraps the API with a friendlier,

@@ -61,8 +61,7 @@ operation settle `failed`.
 | `401 Unauthorized` | Missing/non-`Bearer`/garbage `Authorization` header, or a key/JWT that fails WorkOS verification. |
 | `404 Not Found` | The desktop/operation truly doesn't exist, **or** it belongs to a different org than the caller's -- these two cases are byte-identical on purpose. See [org scoping](/docs/canto/concepts/orgs-and-auth#org-scoping-404-never-403). |
 | `409 Conflict` | Stale `expected_generation`, wrong desktop state for the requested transition, a guest op against a desktop that isn't currently `awake`, or a stream `control` claim already held by another client. |
-| `413 Payload Too Large` | A `files` `PUT` body over the 8 MiB cap, or any request body over axum's own 2 MiB default limit. |
-| `501 Not Implemented` | `POST /v1/desktops/{id}/fork` -- an honest stub until hostd's `Fork` RPC lands. |
+| `413 Payload Too Large` | A `files` `PUT` body over the 8 MiB cap, `POST /v1/desktops/{id}/fork` when hostd has no free capacity for the requested `count` (surfaced on the settled operation unless `?wait=true`), or any request body over axum's own 2 MiB default limit. |
 | `503 Service Unavailable` | A mutation (`wake`/`hibernate`/`destroy`/`fork`) sent to a non-leader replica; a guest op whose desktop's host is currently unreachable (retryable); or WorkOS itself is unreachable. |
 | `504 Gateway Timeout` | A guest op (`exec`/`files`) that ran past its own deadline inside the guest -- a normal, retryable outcome, not a server bug. |
 | `500 Internal Server Error` | Anything else (a DB error, an unmapped internal failure) -- the body never carries the real error text. |
@@ -77,7 +76,16 @@ policy acts on the former, not the latter.
 - **File writes** (`PUT /v1/desktops/{id}/files/{path}`) are capped at
   **8 MiB** -- `413` past that.
 - **`exec` timeouts** default to 60s and are clamped (never rejected) to a
-  **300s** maximum, regardless of what `timeout_secs` requests.
+  **300s** maximum, regardless of what `timeout_secs` requests. Ignored
+  entirely for a `detached` exec -- see
+  [exec and files](/docs/canto/api/exec-and-files#run-a-command-detached).
+- **Detached process output tails** (`GET .../processes/{process_id}`)
+  default to hostd's own 64 KiB and are capped at **512 KiB** via
+  `tail_bytes`.
+- **`env`** on desktop create is capped at **100 keys / 64 KiB** total
+  serialized size, and every key must match `^[A-Za-z_][A-Za-z0-9_]*$`.
+- **`setup_script`** on desktop create is capped at **64 KiB**.
+- **`fork` count** must be in **1..=20** per request.
 - **`?wait=true`** long-polls at a 2s cadence, capped at **120s** per
   request.
 - Every request body is additionally capped at axum's own default **2 MiB**

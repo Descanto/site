@@ -73,15 +73,24 @@ of a local path.
 | Tool | Description |
 |---|---|
 | `list_desktops` | List desktops, optionally filtered by `state`. Returns `{id, state, tier, billingMode, hostId}` per desktop. |
-| `create_desktop` | Provision a desktop: `tier` (small/default/large), optional `billing_mode` (monthly/hourly), optional `idle_timeout_secs`. |
+| `create_desktop` | Provision a desktop: `tier` (small/default/large), optional `billing_mode` (monthly/hourly), optional `idle_timeout_secs`, optional `env` and `setup_script` (bootstrap the guest on first wake). |
 | `wake_desktop` | Wake a hibernated desktop (`desktop_id`, `wait` default true). Waking typically takes ~1-10s. |
 | `hibernate_desktop` | Hibernate an awake desktop to pause billing (`desktop_id`, `wait` default true). |
 | `destroy_desktop` | Permanently destroy a desktop and its disk (`desktop_id`). Always waits; irreversible. |
-| `exec` | Run a shell command on an awake desktop (`desktop_id`, `command`, optional `timeout_secs`). stdout/stderr each truncated at 50KB in the result. |
+| `set_idle_timeout` | Update a desktop's `idle_timeout_secs` (`desktop_id`, `idle_timeout_secs`; `0` disables auto-hibernate). |
+| `fork_desktop` | Fork a hibernated desktop into `count` (1-20) independent copies (`desktop_id`, `count`, `acknowledge_shared_state` required `true`, optional `ephemeral`, `wait` default true). Returns the new desktop ids; forks come back hibernated. |
+| `exec` | Run a shell command on an awake desktop (`desktop_id`, `command`, optional `timeout_secs`, optional `detached`). Blocking: stdout/stderr each truncated at 50KB in the result. Detached (`detached: true`): returns `{process_id}` immediately instead of waiting. |
+| `get_process` | Poll a detached process's status (`desktop_id`, `process_id`, optional `tail_bytes`). Returns `{process_id, status, exit_code, stdout_tail, stderr_tail}`; `status` is `running`/`exited`/`lost`. |
 | `read_file` | Read a file from an awake desktop (`desktop_id`, `path`). Text if valid UTF-8 under 50KB, else base64 (capped at 64KB) or an error asking you to use `exec` with head/tail. |
 | `write_file` | Write a file (`desktop_id`, `path`, `content` or `content_base64`). `content_base64` is strictly validated (alphabet, padding, round-trip) before decoding -- malformed input returns a tool error instead of silently writing garbage/zero bytes. |
 | `get_stream_url` | Get a short-lived signed stream URL (`desktop_id`, `claim`: view/control, default view). |
 | `usage` | Awake-time usage and projected cost, per desktop and org-wide (`start_ms`/`end_ms`, default last 30 days). |
+
+`fork_desktop` requires `acknowledge_shared_state: true` explicitly --
+omitting it is rejected the same as passing `false`, since a fork
+duplicates whatever in-guest state (including credentials) was live in the
+source desktop's memory when it last hibernated. See
+[Concepts: Forking](/docs/canto/concepts/forking).
 
 ## Output truncation (context protection)
 
