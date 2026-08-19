@@ -4,15 +4,15 @@ description: Create a desktop, wake it, run a command, and hibernate it.
 ---
 
 This walks through the full desktop lifecycle once, end to end, with every
-step shown three ways: raw `curl`, the [TypeScript SDK](/docs/canto/sdk/typescript),
-and [MCP tools](/docs/canto/mcp). Pick whichever matches how you're integrating.
+step shown three ways: raw `curl`, the [TypeScript SDK](/sdk/typescript),
+and [MCP tools](/mcp). Pick whichever matches how you're integrating.
 
 <Callout title="Operation handles" type="info">
   `wake`, `hibernate`, and `destroy` are asynchronous: they return an
   *operation handle* rather than blocking until the change is done. This
   quickstart uses `?wait=true` (curl) or the SDK's default `wait: true`
   behavior to keep things linear -- see
-  [Concepts: Operations](/docs/canto/concepts/operations) for the handle/polling
+  [Concepts: Operations](/concepts/operations) for the handle/polling
   model itself.
 </Callout>
 
@@ -55,7 +55,7 @@ echo "$DESKTOP"
 `hourly` when omitted. A `201` means a new desktop was created; a `200`
 means an `Idempotency-Key` you sent was already used and you got the
 existing desktop back instead. See
-[POST /v1/desktops](/docs/canto/api/desktops#create-a-desktop).
+[POST /v1/desktops](/api/desktops#create-a-desktop).
 </Tab>
 <Tab value="TypeScript SDK">
 ```ts
@@ -79,7 +79,7 @@ Ask the model to create a desktop, or call the tool directly:
 }
 ```
 
-See the [full tool table](/docs/canto/mcp#tools) for every field.
+See the [full tool table](/mcp#tools) for every field.
 </Tab>
 </Tabs>
 
@@ -114,7 +114,7 @@ const desktop = await canto.desktops.create({
 
 `env` is written to `/root/.canto/env` in the guest and `setup_script` runs
 once, both on the desktop's first successful wake -- see
-[Concepts: env and setup_script](/docs/canto/concepts/desktops-and-lifecycle#env-and-setup_script)
+[Concepts: env and setup_script](/concepts/desktops-and-lifecycle#env-and-setup_script)
 for the caps and charset rule.
 
 ## 3. Wake it
@@ -131,7 +131,7 @@ curl -sS -X POST "$BASE/desktops/$DESKTOP_ID/wake?wait=true" -H "$AUTH"
 `?wait=true` long-polls server-side (2s cadence, capped at 120s) until the
 operation settles, and still returns `200`/`202` either way -- never a
 timeout error. Omit it to get the operation handle back immediately
-(`202`) and poll [`GET /v1/operations/{id}`](/docs/canto/api/operations)
+(`202`) and poll [`GET /v1/operations/{id}`](/api/operations)
 yourself.
 </Tab>
 <Tab value="TypeScript SDK">
@@ -143,7 +143,7 @@ await desktop.wake(); // waits by default
 server's own `?wait=true`, then falls back to client-side re-polling if the
 server's 120s cap is reached while the operation is still pending. Pass
 `{ wait: false }` to get the raw `Operation` handle back immediately
-instead. See [Error handling](/docs/canto/sdk/typescript#error-handling) for what
+instead. See [Error handling](/sdk/typescript#error-handling) for what
 throws when a wake fails.
 </Tab>
 <Tab value="MCP">
@@ -168,7 +168,7 @@ curl -sS -X POST "$BASE/desktops/$DESKTOP_ID/exec" \
 Returns `{"exit_code", "stdout", "stderr"}` once the command finishes
 inside the guest. `timeout_secs` defaults to 60s and is clamped (never
 rejected) to 300s. See
-[exec and files](/docs/canto/api/exec-and-files#run-a-command).
+[exec and files](/api/exec-and-files#run-a-command).
 </Tab>
 <Tab value="TypeScript SDK">
 ```ts
@@ -225,7 +225,7 @@ underlying API call) to protect the calling model's context window.
   </Tabs>
 
   A detached process is killed when the desktop hibernates -- see
-  [Concepts: background processes](/docs/canto/concepts/operations#background-processes-detached-exec).
+  [Concepts: background processes](/concepts/operations#background-processes-detached-exec).
 </Callout>
 
 ## 5. Work with files
@@ -242,7 +242,7 @@ curl -sS "$BASE/desktops/$DESKTOP_ID/files/home/user/task.txt" -H "$AUTH"
 ```
 
 Writes are capped at 8 MiB (`413` past that). See
-[exec and files](/docs/canto/api/exec-and-files#write-a-file).
+[exec and files](/api/exec-and-files#write-a-file).
 </Tab>
 <Tab value="TypeScript SDK">
 ```ts
@@ -277,7 +277,7 @@ Both return a dial-able `tcp://host:port/?ticket=...` URL and its expiry --
 a raw stream ticket, not an embeddable web player. A hosted
 viewer/embed integration is coming; today, point a stream-capable client at
 the ticket URL directly. See
-[Streaming](/docs/canto/api/streaming) for the full claim/takeover model.
+[Streaming](/api/streaming) for the full claim/takeover model.
 
 ## 7. Hibernate
 
@@ -300,7 +300,7 @@ await desktop.hibernate();
 </Tabs>
 
 Hibernating preserves the desktop's full disk state and stops billing
-compute -- see [Billing](/docs/canto/concepts/billing) for exactly how awake-time
+compute -- see [Billing](/concepts/billing) for exactly how awake-time
 is metered. Wake it again any time with the same call from step 3.
 
 <Callout title="Fork it" type="info">
@@ -314,24 +314,24 @@ is metered. Wake it again any time with the same call from step 3.
   ```
 
   Forks come back hibernated -- wake the ones you need. See
-  [Concepts: Forking](/docs/canto/concepts/forking) for the full model,
+  [Concepts: Forking](/concepts/forking) for the full model,
   including why `acknowledge_shared_state` has no default.
 </Callout>
 
 <Cards>
   <Card
     title="Concepts: Operations"
-    href="/docs/canto/concepts/operations"
+    href="/concepts/operations"
     description="Operation handles, polling, ?wait, idempotency, and background processes."
   />
   <Card
     title="Concepts: Forking"
-    href="/docs/canto/concepts/forking"
+    href="/concepts/forking"
     description="Clone a hibernated desktop into N independent copies."
   />
   <Card
     title="API reference"
-    href="/docs/canto/api/overview"
+    href="/api/overview"
     description="Every route and status code."
   />
 </Cards>

@@ -11,7 +11,7 @@ interface Tier {
   highlight: boolean;
 }
 
-// Locked launch prices — must match docs/content/docs/canto/concepts/billing.mdx.
+// Locked launch prices — must match docs/content/docs/concepts/billing.mdx.
 const tiers: Tier[] = [
   {
     name: "Small",

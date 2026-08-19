@@ -149,7 +149,7 @@ export function HomePage() {
         <StaggerItem>
           <div className="flex items-center gap-3 pt-1.5">
             <Button href="mailto:hello@descanto.com?subject=Canto%20early%20access">Request access</Button>
-            <Button variant="outline" href="https://docs.descanto.com/docs/canto">Read the docs</Button>
+            <Button variant="outline" href="https://docs.descanto.com">Read the docs</Button>
           </div>
         </StaggerItem>
       </Stagger>
@@ -249,7 +249,7 @@ $ canto fork release-bot --count 20
         <Reveal className="mx-auto flex max-w-[1440px] flex-col gap-8 px-20 py-24 max-lg:px-8">
           <div className="flex items-baseline justify-between">
             <h2 className="font-display text-[32px] font-bold tracking-tight">How we build</h2>
-            <a href="https://docs.descanto.com/docs/canto" className="text-[13px] font-medium text-graphite hover:text-ink">
+            <a href="https://docs.descanto.com" className="text-[13px] font-medium text-graphite hover:text-ink">
               Read the docs →
             </a>
           </div>
@@ -293,7 +293,7 @@ $ canto fork release-bot --count 20
           <h2 className="font-display text-5xl font-bold tracking-tight">Give your agent a computer</h2>
           <p className="text-base text-graphite">Always there. Pay only when it thinks.</p>
           <div className="flex items-center gap-3 pt-1">
-            <Button variant="outline" href="https://docs.descanto.com/docs/canto">Read the docs</Button>
+            <Button variant="outline" href="https://docs.descanto.com">Read the docs</Button>
             <Button href="mailto:hello@descanto.com?subject=Canto%20early%20access">Request access</Button>
           </div>
           <Link to="/pricing" className="pt-1 text-[13px] font-medium text-graphite hover:text-ink">

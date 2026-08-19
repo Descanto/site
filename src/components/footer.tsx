@@ -7,17 +7,17 @@ const columns: { heading: string; links: { label: string; to: string }[] }[] = [
     links: [
       { label: "Early access", to: "mailto:hello@descanto.com?subject=Canto%20early%20access" },
       { label: "Pricing", to: "/pricing" },
-      { label: "Quickstart", to: "https://docs.descanto.com/docs/canto/quickstart" },
+      { label: "Quickstart", to: "https://docs.descanto.com/quickstart" },
       { label: "Status", to: "https://github.com/descanto" },
     ],
   },
   {
     heading: "Developers",
     links: [
-      { label: "Docs", to: "https://docs.descanto.com/docs/canto" },
-      { label: "API reference", to: "https://docs.descanto.com/docs/canto/api/overview" },
-      { label: "TypeScript SDK", to: "https://docs.descanto.com/docs/canto/sdk/typescript" },
-      { label: "MCP server", to: "https://docs.descanto.com/docs/canto/mcp" },
+      { label: "Docs", to: "https://docs.descanto.com" },
+      { label: "API reference", to: "https://docs.descanto.com/api/overview" },
+      { label: "TypeScript SDK", to: "https://docs.descanto.com/sdk/typescript" },
+      { label: "MCP server", to: "https://docs.descanto.com/mcp" },
     ],
   },
   {

@@ -1,0 +1,5 @@
+# Old fumadocs-era URLs — docs now live at the root.
+/docs/canto/* /:splat 301
+/docs/canto / 301
+/docs/botto / 301
+/docs / 301

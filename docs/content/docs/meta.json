@@ -1,6 +1,12 @@
 {
-  "title": "Canto Docs",
+  "title": "Canto",
   "pages": [
-    "canto"
+    "index",
+    "quickstart",
+    "concepts",
+    "api",
+    "sdk",
+    "mcp",
+    "self-hosting"
   ]
 }

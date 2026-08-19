@@ -7,7 +7,7 @@ description: Drive Canto desktops from Claude Code, Cursor, Codex, Copilot, Anti
 cloud desktops to MCP-compatible AI clients -- Claude Code, Claude Desktop,
 Cursor, Codex, GitHub Copilot, Antigravity, OpenCode, and any other MCP client.
 It's a thin wrapper over
-[`@descanto/vm-sdk`](/docs/canto/sdk/typescript): one process, one org's worth of
+[`@descanto/vm-sdk`](/sdk/typescript): one process, one org's worth of
 desktops, driven entirely through the [tools](#tools) below.
 
 <Callout title="No install needed" type="info">
@@ -165,7 +165,7 @@ OpenCode nests servers under `mcp`, takes `command` as an array, and uses
 omitting it is rejected the same as passing `false`, since a fork
 duplicates whatever in-guest state (including credentials) was live in the
 source desktop's memory when it last hibernated. See
-[Concepts: Forking](/docs/canto/concepts/forking).
+[Concepts: Forking](/concepts/forking).
 
 ## Output truncation (context protection)
 

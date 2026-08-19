@@ -19,7 +19,7 @@ in-flight (or already-settled) state transition:
 ```
 
 Fetch the current state of any operation with
-[`GET /v1/operations/{id}`](/docs/canto/api/operations):
+[`GET /v1/operations/{id}`](/api/operations):
 
 ```bash
 curl -sS "$BASE/operations/$OPERATION_ID" -H "$AUTH"
@@ -46,7 +46,7 @@ just get that in-progress operation back and can keep polling
 Without `?wait=true`, a mutation returns `202 Accepted` immediately with the
 freshly enqueued operation (`state: "pending"`), and it's on you to poll.
 
-The [TypeScript SDK](/docs/canto/sdk/typescript) defaults to `wait: true` and adds
+The [TypeScript SDK](/sdk/typescript) defaults to `wait: true` and adds
 its own client-side re-poll fallback beyond the server's 120s cap -- see
 that page's "wait vs handles" section.
 
@@ -85,7 +85,7 @@ creates two independent rows rather than colliding. A non-ASCII
 ## Background processes (detached exec)
 
 Control-plane operations (above) aren't the only pollable, async thing in
-the API. [`POST /v1/desktops/{id}/exec`](/docs/canto/api/exec-and-files#run-a-command)
+the API. [`POST /v1/desktops/{id}/exec`](/api/exec-and-files#run-a-command)
 accepts `"detached": true` to spawn a command in the guest and hand back a
 `process_id` instead of blocking until it exits -- useful for anything
 longer than the request's own timeout budget (builds, long test runs,
@@ -98,7 +98,7 @@ curl -sS -X POST "$BASE/desktops/$ID/exec" \
 # -> 202 {"process_id": "p_..."}
 ```
 
-Poll it with [`GET /v1/desktops/{id}/processes/{process_id}`](/docs/canto/api/exec-and-files#poll-a-detached-process):
+Poll it with [`GET /v1/desktops/{id}/processes/{process_id}`](/api/exec-and-files#poll-a-detached-process):
 
 ```bash
 curl -sS "$BASE/desktops/$ID/processes/$PROCESS_ID" -H "$AUTH"

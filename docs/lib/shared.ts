@@ -1,5 +1,5 @@
 export const appName = "Canto Docs";
-export const docsRoute = "/docs";
+export const docsRoute = "/";
 
 export const gitConfig = {
   user: "descanto",

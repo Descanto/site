@@ -33,7 +33,7 @@ Authorization: Bearer <credential>
 ```
 
 `<credential>` is either a `canto_sk_...` API key or a WorkOS AuthKit JWT
-access token. See [Concepts: Orgs and auth](/docs/canto/concepts/orgs-and-auth)
+access token. See [Concepts: Orgs and auth](/concepts/orgs-and-auth)
 for the two forms and org-scoping semantics.
 
 ## Error format
@@ -59,7 +59,7 @@ operation settle `failed`.
 | `200 OK` | `POST /v1/desktops` with an `Idempotency-Key` already used by this org -- returns the **existing** desktop, not a new one. |
 | `400 Bad Request` | Malformed JSON body, an invalid `tier`/`billing_mode`/desktop or operation id, a non-numeric/out-of-range `start`/`end` on `GET /v1/usage`, a non-`true`/`false` `?wait=` value, a non-ASCII `Idempotency-Key`, or a `..`-traversing `files` path. |
 | `401 Unauthorized` | Missing/non-`Bearer`/garbage `Authorization` header, or a key/JWT that fails WorkOS verification. |
-| `404 Not Found` | The desktop/operation truly doesn't exist, **or** it belongs to a different org than the caller's -- these two cases are byte-identical on purpose. See [org scoping](/docs/canto/concepts/orgs-and-auth#org-scoping-404-never-403). |
+| `404 Not Found` | The desktop/operation truly doesn't exist, **or** it belongs to a different org than the caller's -- these two cases are byte-identical on purpose. See [org scoping](/concepts/orgs-and-auth#org-scoping-404-never-403). |
 | `409 Conflict` | Stale `expected_generation`, wrong desktop state for the requested transition, a guest op against a desktop that isn't currently `awake`, or a stream `control` claim already held by another client. |
 | `413 Payload Too Large` | A `files` `PUT` body over the 8 MiB cap, `POST /v1/desktops/{id}/fork` when hostd has no free capacity for the requested `count` (surfaced on the settled operation unless `?wait=true`), or any request body over axum's own 2 MiB default limit. |
 | `503 Service Unavailable` | A mutation (`wake`/`hibernate`/`destroy`/`fork`) sent to a non-leader replica; a guest op whose desktop's host is currently unreachable (retryable); or WorkOS itself is unreachable. |
@@ -68,7 +68,7 @@ operation settle `failed`.
 
 `503`/`504` mean "this exact request is safe to retry" (a transient/timing
 condition); `500` means "something is actually broken server-side." The
-[TypeScript SDK](/docs/canto/sdk/typescript#retry-semantics)'s default retry
+[TypeScript SDK](/sdk/typescript#retry-semantics)'s default retry
 policy acts on the former, not the latter.
 
 ## Limits
@@ -78,7 +78,7 @@ policy acts on the former, not the latter.
 - **`exec` timeouts** default to 60s and are clamped (never rejected) to a
   **300s** maximum, regardless of what `timeout_secs` requests. Ignored
   entirely for a `detached` exec -- see
-  [exec and files](/docs/canto/api/exec-and-files#run-a-command-detached).
+  [exec and files](/api/exec-and-files#run-a-command-detached).
 - **Detached process output tails** (`GET .../processes/{process_id}`)
   default to hostd's own 64 KiB and are capped at **512 KiB** via
   `tail_bytes`.

@@ -30,7 +30,7 @@ curl -sS "$BASE/me" -H "$AUTH"
 `auth_kind` is `"api_key"` or `"session"` -- useful for a dashboard session
 to confirm it authenticated via AuthKit rather than a raw key, or for any
 client to sanity-check which org a given credential resolves to. See
-[API reference: /v1/me](/docs/canto/api/me).
+[API reference: /v1/me](/api/me).
 
 ## Org scoping: 404, never 403
 
@@ -47,6 +47,6 @@ found or not yours," not as "definitely doesn't exist anywhere."
   A missing `Authorization` header, a non-`Bearer` scheme, or a
   key/JWT that fails verification is `401 Unauthorized` -- distinct from
   the `404` org-scoping case above. See
-  [API overview: error format](/docs/canto/api/overview#error-format) for the
+  [API overview: error format](/api/overview#error-format) for the
   full status table.
 </Callout>

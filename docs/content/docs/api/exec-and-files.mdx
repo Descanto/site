@@ -5,7 +5,7 @@ description: Run commands (blocking or detached), poll processes, and read/write
 
 The routes below only work while the desktop is `awake` -- a `409` means
 the desktop isn't awake, or its control claim is already held by another
-client (see [Streaming](/docs/canto/api/streaming) for claims).
+client (see [Streaming](/api/streaming) for claims).
 
 ## Run a command
 
@@ -54,7 +54,7 @@ Response (`ExecResponse`, `detached: false`):
 
 Pass `"detached": true` to spawn a long-running command in the background
 instead of blocking on it -- see
-[Concepts: background processes](/docs/canto/concepts/operations#background-processes-detached-exec)
+[Concepts: background processes](/concepts/operations#background-processes-detached-exec)
 for the full model.
 
 ```bash

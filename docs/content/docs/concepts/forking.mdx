@@ -60,7 +60,7 @@ for exactly as many forks as you need; there's no bulk/unlimited mode.
 Pass `"ephemeral": true` to make the resulting forks throwaway: each gets
 a forced `idle_timeout_secs` of `900` (15 minutes), regardless of what the
 source desktop's own `idle_timeout_secs` was, and -- per
-[TTL and auto-hibernate's ephemeral note](/docs/canto/concepts/desktops-and-lifecycle#ttl-and-auto-hibernate)
+[TTL and auto-hibernate's ephemeral note](/concepts/desktops-and-lifecycle#ttl-and-auto-hibernate)
 -- an ephemeral desktop **auto-destroys** (not just hibernates) once it
 hits that idle timeout. This is the fit for fan-out workloads: spin up N
 disposable copies for a batch of independent tasks, let the ones you
@@ -74,14 +74,14 @@ they auto-hibernate at that timeout like normal, they don't self-destroy.
 
 A successful fork does **not** wake the new desktops. They're created
 directly in the `hibernated` state -- wake each one on demand (per the
-normal [wake](/docs/canto/api/desktops#wake--hibernate--destroy) flow)
+normal [wake](/api/desktops#wake--hibernate--destroy) flow)
 when you're ready to use it. This keeps a large fan-out (`count: 20`) cheap
 until you actually need the compute.
 
 ## Result shape
 
 Like `wake`/`hibernate`/`destroy`, fork returns an
-[operation handle](/docs/canto/concepts/operations). On success, the
+[operation handle](/concepts/operations). On success, the
 settled operation's `result` carries the new desktop ids:
 
 ```json
@@ -95,5 +95,5 @@ settled operation's `result` carries the new desktop ids:
 }
 ```
 
-See [API reference: Desktops -- Fork a desktop](/docs/canto/api/desktops#fork-a-desktop)
+See [API reference: Desktops -- Fork a desktop](/api/desktops#fork-a-desktop)
 for every parameter and status code.

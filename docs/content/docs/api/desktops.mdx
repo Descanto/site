@@ -51,7 +51,7 @@ Request body (`CreateDesktopBody`):
 | `tier` | string | yes | One of `small`/`default`/`large`. |
 | `billing_mode` | string \| null | no | `monthly` or `hourly`; defaults to `hourly` when omitted/empty. |
 | `image_version` | string \| null | no | |
-| `idle_timeout_secs` | integer \| null | no | Seconds of guest idle time (from wake) before auto-hibernate; `0` means never. See [Concepts: TTL and auto-hibernate](/docs/canto/concepts/desktops-and-lifecycle#ttl-and-auto-hibernate). |
+| `idle_timeout_secs` | integer \| null | no | Seconds of guest idle time (from wake) before auto-hibernate; `0` means never. See [Concepts: TTL and auto-hibernate](/concepts/desktops-and-lifecycle#ttl-and-auto-hibernate). |
 | `env` | object \| null | no | Env vars written to `/root/.canto/env` in the guest on first successful wake. Capped at 100 keys / 64 KiB total serialized size; every key must match `^[A-Za-z_][A-Za-z0-9_]*$` -- `400` past either cap or on any invalid key. Not echoed back by `GET`/`POST`. |
 | `setup_script` | string \| null | no | First-wake setup script, run once under hostd's reserved `process_id = "setup"`. Capped at 64 KiB -- `400` past that. Not echoed back. |
 
@@ -66,7 +66,7 @@ curl -sS -X POST "$BASE/desktops" \
   }'
 ```
 
-See [Concepts: env and setup_script](/docs/canto/concepts/desktops-and-lifecycle#env-and-setup_script)
+See [Concepts: env and setup_script](/concepts/desktops-and-lifecycle#env-and-setup_script)
 for the full charset/cap rules and the `/root/.canto/env` guest layout.
 
 | Status | Meaning |
@@ -98,7 +98,7 @@ curl -sS "$BASE/desktops/$DESKTOP_ID" -H "$AUTH"
 `PATCH /v1/desktops/{id}`
 
 Today the only updatable field is `idle_timeout_secs` -- see
-[Concepts: TTL and auto-hibernate](/docs/canto/concepts/desktops-and-lifecycle#ttl-and-auto-hibernate).
+[Concepts: TTL and auto-hibernate](/concepts/desktops-and-lifecycle#ttl-and-auto-hibernate).
 
 | Param | In | Required | Description |
 |---|---|---|---|
@@ -151,7 +151,7 @@ Request body (`MutationBody`, optional -- an empty body is equivalent to
 
 `expected_generation` is an optional fencing generation the caller expects
 the desktop to currently be on -- see
-[Concepts: generation fencing](/docs/canto/concepts/desktops-and-lifecycle#generation-fencing).
+[Concepts: generation fencing](/concepts/desktops-and-lifecycle#generation-fencing).
 
 ```bash
 curl -sS -X POST "$BASE/desktops/$DESKTOP_ID/wake?wait=true" -H "$AUTH"
@@ -170,8 +170,8 @@ curl -sS -X POST "$BASE/desktops/$DESKTOP_ID/destroy?wait=true" -H "$AUTH"
 | `503` | This node is not the leader |
 
 Both `200` and `202` return an `OperationJson` -- see
-[API reference: Operations](/docs/canto/api/operations) for its shape and
-[Concepts: Operations](/docs/canto/concepts/operations) for the polling model.
+[API reference: Operations](/api/operations) for its shape and
+[Concepts: Operations](/concepts/operations) for the polling model.
 
 ## Fork a desktop
 
@@ -179,7 +179,7 @@ Both `200` and `202` return an `OperationJson` -- see
 
 Creates `count` new, independent desktops as memory-snapshot copies of a
 **Hibernated** source desktop. See
-[Concepts: Forking](/docs/canto/concepts/forking) for the full model
+[Concepts: Forking](/concepts/forking) for the full model
 (copy-on-write semantics, `acknowledge_shared_state`, ephemeral forks).
 
 | Param | In | Required | Description |

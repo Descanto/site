@@ -14,7 +14,7 @@ A Canto desktop always exists once created -- its disk, its generation
 history, its identity -- but it isn't always *running*. It moves through a
 small set of lifecycle states (`provisioning`, `waking`, `awake`,
 `hibernating`, `hibernated`, `destroyed`; see
-[Desktops and lifecycle](/docs/canto/concepts/desktops-and-lifecycle)), and
+[Desktops and lifecycle](/concepts/desktops-and-lifecycle)), and
 compute is only billed while it's `awake`. Hibernated desktops cost nothing
 in hourly billing and keep their full disk state, ready to wake again on the
 next `POST /v1/desktops/{id}/wake`.
@@ -26,17 +26,17 @@ idle time in between.
 
 ## How it's built
 
-- A small, versioned [REST API](/docs/canto/api/overview) (`/v1/**`) is the one
+- A small, versioned [REST API](/api/overview) (`/v1/**`) is the one
   source of truth: create/list/get/update desktops, wake/hibernate/destroy/
-  [fork](/docs/canto/concepts/forking) them, run commands (blocking or
-  [detached](/docs/canto/concepts/operations#background-processes-detached-exec)),
+  [fork](/concepts/forking) them, run commands (blocking or
+  [detached](/concepts/operations#background-processes-detached-exec)),
   read/write files, get a stream ticket, and query usage.
 - Every mutation (`wake`/`hibernate`/`destroy`/`fork`) returns an
-  [operation handle](/docs/canto/concepts/operations) you can poll or long-poll,
+  [operation handle](/concepts/operations) you can poll or long-poll,
   rather than blocking your connection open.
-- A [TypeScript SDK](/docs/canto/sdk/typescript) wraps the API with a friendlier,
+- A [TypeScript SDK](/sdk/typescript) wraps the API with a friendlier,
   camelCase, promise-based client and sensible retry/wait defaults.
-- An [MCP server](/docs/canto/mcp) exposes the same operations as tools, so
+- An [MCP server](/mcp) exposes the same operations as tools, so
   Claude Code, Claude Desktop, Cursor, and any other MCP client can drive a
   Canto desktop directly.
 
@@ -45,33 +45,33 @@ idle time in between.
 <Cards>
   <Card
     title="Quickstart"
-    href="/docs/canto/quickstart"
+    href="/quickstart"
     description="Create your first desktop, wake it, run a command, and hibernate it -- with curl, the SDK, or MCP."
   />
   <Card
     title="Concepts"
-    href="/docs/canto/concepts/desktops-and-lifecycle"
+    href="/concepts/desktops-and-lifecycle"
     description="Lifecycle states, operations, org scoping, and billing."
   />
   <Card
     title="API reference"
-    href="/docs/canto/api/overview"
+    href="/api/overview"
     description="Every route, every status code, straight from the OpenAPI contract."
   />
   <Card
     title="TypeScript SDK"
-    href="/docs/canto/sdk/typescript"
+    href="/sdk/typescript"
     description="@descanto/vm-sdk: the ergonomic client."
   />
   <Card
     title="MCP server"
-    href="/docs/canto/mcp"
+    href="/mcp"
     description="Drive Canto desktops from Claude Code, Claude Desktop, or Cursor."
   />
 </Cards>
 
 <Callout title="Early access">
   Canto is early access. Desktops are manually provisioned -- see
-  [Quickstart: get access](/docs/canto/quickstart#1-get-access) for how to request
+  [Quickstart: get access](/quickstart#1-get-access) for how to request
   an API key.
 </Callout>

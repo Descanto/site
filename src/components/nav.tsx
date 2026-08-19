@@ -89,9 +89,9 @@ function DropdownPanel({ primary, secondary }: { primary: MenuEntry[]; secondary
 }
 
 const developer: MenuEntry[] = [
-  { to: "https://docs.descanto.com/docs/canto", title: "Docs", description: "Quickstart, concepts, and the full API reference." },
-  { to: "https://docs.descanto.com/docs/canto/sdk/typescript", title: "TypeScript SDK", description: "@descanto/vm-sdk — the ergonomic client." },
-  { to: "https://docs.descanto.com/docs/canto/mcp", title: "MCP server", description: "Drive desktops from Claude Code, Cursor, or any MCP client." },
+  { to: "https://docs.descanto.com", title: "Docs", description: "Quickstart, concepts, and the full API reference." },
+  { to: "https://docs.descanto.com/sdk/typescript", title: "TypeScript SDK", description: "@descanto/vm-sdk — the ergonomic client." },
+  { to: "https://docs.descanto.com/mcp", title: "MCP server", description: "Drive desktops from Claude Code, Cursor, or any MCP client." },
 ];
 const developerSecondary: MenuEntry[] = [
   { to: "https://github.com/descanto", title: "GitHub", description: "" },
@@ -121,7 +121,7 @@ function NavDropdown({ label, primary, secondary = [] }: { label: string; primar
 
 const mobileLinks: { label: string; to: string }[] = [
   { label: "Pricing", to: "/pricing" },
-  { label: "Docs", to: "https://docs.descanto.com/docs/canto" },
+  { label: "Docs", to: "https://docs.descanto.com" },
   { label: "News", to: "/news" },
   { label: "About", to: "/about" },
   { label: "GitHub", to: "https://github.com/descanto" },
@@ -182,7 +182,7 @@ export function Nav() {
           <NavLink to="/pricing" className="text-[15px] text-ink hover:text-ink">
             Pricing
           </NavLink>
-          <a href="https://docs.descanto.com/docs/canto" className="text-[15px] text-ink hover:text-ink">
+          <a href="https://docs.descanto.com" className="text-[15px] text-ink hover:text-ink">
             Docs
           </a>
           <NavLink to="/news" className="text-[15px] text-ink hover:text-ink">

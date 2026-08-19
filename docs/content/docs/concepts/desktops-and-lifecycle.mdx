@@ -37,13 +37,13 @@ A desktop's `state` field is one of:
 
 `wake`, `hibernate`, and `destroy` are the three mutating transitions,
 triggered by `POST /v1/desktops/{id}/{wake,hibernate,destroy}`. Each of
-those returns an [operation handle](/docs/canto/concepts/operations) rather than
+those returns an [operation handle](/concepts/operations) rather than
 blocking until the transition finishes -- see that page for the polling
 model.
 
 Guest operations (`exec`, `files`, `stream`) only work while a desktop is
 `awake`; calling them against a desktop in any other state is a `409
-Conflict` (see [API overview](/docs/canto/api/overview#error-format)).
+Conflict` (see [API overview](/api/overview#error-format)).
 
 ## Generation fencing
 
@@ -65,7 +65,7 @@ since. Omitting `expected_generation` skips the check entirely.
 
 <Callout title="Fork">
   `POST /v1/desktops/{id}/fork` creates independent copies of a hibernated
-  desktop -- see [Concepts: Forking](/docs/canto/concepts/forking) for the
+  desktop -- see [Concepts: Forking](/concepts/forking) for the
   full model.
 </Callout>
 
@@ -76,7 +76,7 @@ measured **from wake**, before the desktop is automatically hibernated:
 
 - Set it at creation via `CreateDesktopBody.idle_timeout_secs`, or change it
   on an existing desktop with
-  [`PATCH /v1/desktops/{id}`](/docs/canto/api/desktops#update-a-desktop):
+  [`PATCH /v1/desktops/{id}`](/api/desktops#update-a-desktop):
 
   ```bash
   curl -sS -X PATCH "$BASE/desktops/$DESKTOP_ID" \
@@ -93,7 +93,7 @@ measured **from wake**, before the desktop is automatically hibernated:
 
 <Callout title="Ephemeral desktops auto-destroy, not just hibernate" type="warn">
   A desktop created as `ephemeral` (currently only possible via
-  [fork](/docs/canto/concepts/forking) with `"ephemeral": true`) does not
+  [fork](/concepts/forking) with `"ephemeral": true`) does not
   just hibernate at its idle timeout -- it **DESTROYs** itself. Its
   `idle_timeout_secs` is forced to `900` (15 minutes) at creation
   regardless of what its source desktop's own value was. Treat an
