@@ -90,6 +90,19 @@ policy acts on the former, not the latter.
   request.
 - Every request body is additionally capped at axum's own default **2 MiB**
   limit (independent of the 8 MiB file-write cap above).
+- **Screenshots** (`POST .../screenshot`) are capped at **8 MiB** --
+  `413` past that; pass `region`/`scale_percent`. See
+  [Computer use](/api/computer-use).
+- **Input batches** (`POST .../input`) are capped at **50 actions, 32 KiB**
+  total text, and **10s** total `wait` time per batch.
+- **Files v2 chunked reads/writes** (`?offset=`/`?length=`/`?append=`) cap
+  each window/chunk at **8 MiB**, same as a whole-file write. Directory
+  listings (`GET .../dir/{path}`) are capped at **2000 entries**. See
+  [Exec and files](/api/exec-and-files).
+- **Webhook** endpoint URLs are capped at **2000 chars**, must be
+  `https://`, and can't target a loopback/link-local host. Delivery-log
+  reads (`?limit=`) default to **50**, capped at **200**. See
+  [Webhooks](/api/webhooks).
 
 ## Why hand-written, not `fumadocs-openapi`
 

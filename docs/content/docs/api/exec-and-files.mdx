@@ -1,6 +1,6 @@
 ---
 title: Exec and files
-description: Run commands (blocking or detached), poll processes, and read/write files on an awake desktop's guest.
+description: Run commands (blocking or detached), poll processes, and read/write/list files on an awake desktop's guest.
 ---
 
 The routes below only work while the desktop is `awake` -- a `409` means
@@ -120,20 +120,28 @@ Response (`ProcessStatusResponse`):
 |---|---|---|---|
 | `id` | path | yes | Desktop id |
 | `path` | path | yes | Absolute guest path, without its leading `/` (e.g. `home/user/notes.txt` for `/home/user/notes.txt`) |
+| `offset` | query | no | Files v2 chunked read: return the byte window starting here instead of the whole file. The `200` response then carries `X-Canto-File-Size` (total size) and `X-Canto-Eof` (`true`/`false`) headers; an offset at or past EOF is an empty `200` body with `X-Canto-Eof: true`. |
+| `length` | query | no | Window length for a chunked read (requires `offset`); defaults to (and is capped at) 8 MiB -- `400` above the cap. |
 
 ```bash
 curl -sS "$BASE/desktops/$DESKTOP_ID/files/home/user/notes.txt" -H "$AUTH"
+
+# Chunked read of a large file:
+curl -sS "$BASE/desktops/$DESKTOP_ID/files/home/user/big.log?offset=0&length=8388608" \
+  -H "$AUTH" -D -
 ```
 
-Response is `200` with `application/octet-stream` (raw file bytes).
+Response is `200` with `application/octet-stream` -- the whole file, or
+(with `offset`) the requested window.
 
 | Status | Meaning |
 |---|---|
-| `200` | Raw file content |
-| `400` | Malformed id, or a path that's empty/contains a NUL byte/contains a `..` segment |
+| `200` | Raw file content (the requested window, for a chunked read) |
+| `400` | Malformed id, a path that's empty/contains a NUL byte/contains a `..` segment, non-numeric `offset`/`length`, `length` without `offset`, or `length` over 8 MiB |
 | `401` | Missing/invalid credentials |
 | `404` | Desktop not found (or belongs to another org), or the file itself does not exist |
 | `409` | Desktop is not awake, or its control claim is already held |
+| `413` | Whole-file read of a file over 8 MiB -- switch to chunked reads (`?offset=`/`length=`) |
 | `503` | The desktop's host is currently unreachable -- retry |
 | `504` | The read timed out inside the guest -- retry |
 
@@ -145,21 +153,132 @@ Response is `200` with `application/octet-stream` (raw file bytes).
 |---|---|---|---|
 | `id` | path | yes | Desktop id |
 | `path` | path | yes | Absolute guest path, without its leading `/` |
+| `append` | query | no | Files v2 chunked upload: append the body iff the file's current size equals `offset` (which becomes required with `append=true`). A size mismatch is a `409` whose problem body carries a `currentSize` extension member, making retried chunks idempotent. |
+| `offset` | query | no | Required with `append=true`: the byte offset this chunk expects the file to currently end at. |
 
-Request body: raw `application/octet-stream` file content.
+Request body: raw `application/octet-stream` file content (one chunk, when
+appending).
 
 ```bash
 curl -sS -X PUT "$BASE/desktops/$DESKTOP_ID/files/home/user/notes.txt" \
   -H "$AUTH" --data-binary "hello from canto"
+
+# Chunked upload of a large file -- first chunk, then append at offset:
+curl -sS -X PUT "$BASE/desktops/$DESKTOP_ID/files/home/user/big.bin" \
+  -H "$AUTH" --data-binary @chunk0
+curl -sS -X PUT "$BASE/desktops/$DESKTOP_ID/files/home/user/big.bin?append=true&offset=8388608" \
+  -H "$AUTH" --data-binary @chunk1
 ```
 
 | Status | Meaning |
 |---|---|
-| `204` | File written |
-| `400` | Malformed id, or a path that's empty/contains a NUL byte/contains a `..` segment |
+| `204` | File written (or chunk appended) |
+| `400` | Malformed id, a path that's empty/contains a NUL byte/contains a `..` segment, `append=true` without `offset`, or non-numeric params |
 | `401` | Missing/invalid credentials |
 | `404` | Desktop not found or belongs to another org |
-| `409` | Desktop is not awake, or its control claim is already held |
-| `413` | File exceeds the **8 MiB** size limit |
+| `409` | Desktop is not awake, its control claim is already held, or an append's `size != offset` guard failed (body carries `currentSize`) |
+| `413` | Body exceeds the **8 MiB** per-request limit |
 | `503` | The desktop's host is currently unreachable -- retry |
 | `504` | The write timed out inside the guest -- retry |
+
+## Delete a file
+
+`DELETE /v1/desktops/{id}/files/{path}`
+
+| Param | In | Required | Description |
+|---|---|---|---|
+| `id` | path | yes | Desktop id |
+| `path` | path | yes | Absolute guest path, without its leading `/`. The filesystem root itself (`/`, `/.`) is rejected `400`. |
+| `recursive` | query | no | Delete a directory tree. Without it, deleting a directory is a `409`. |
+
+```bash
+curl -sS -X DELETE "$BASE/desktops/$DESKTOP_ID/files/home/user/notes.txt" -H "$AUTH"
+curl -sS -X DELETE "$BASE/desktops/$DESKTOP_ID/files/home/user/tmp?recursive=true" -H "$AUTH"
+```
+
+| Status | Meaning |
+|---|---|
+| `204` | Deleted |
+| `400` | Malformed id, an invalid path (empty/NUL/`..`), or the filesystem root |
+| `401` | Missing/invalid credentials |
+| `404` | Desktop not found (or belongs to another org), or the path itself does not exist (a second `DELETE` of the same path `404`s) |
+| `409` | Desktop is not awake, or the path is a directory and `recursive` was not set |
+| `503` | The desktop's host is currently unreachable -- retry |
+| `504` | The delete timed out inside the guest -- retry |
+
+## Stat a file
+
+`GET /v1/desktops/{id}/files-meta/{path}`
+
+| Param | In | Required | Description |
+|---|---|---|---|
+| `id` | path | yes | Desktop id |
+| `path` | path | yes | Absolute guest path, without its leading `/` |
+
+```bash
+curl -sS "$BASE/desktops/$DESKTOP_ID/files-meta/home/user/notes.txt" -H "$AUTH"
+```
+
+Response (`FileStatJson`):
+
+```json
+{
+  "path": "home/user/notes.txt",
+  "fileType": "file",
+  "sizeBytes": 17,
+  "modifiedAt": "2026-08-20T12:00:00Z",
+  "mode": "644"
+}
+```
+
+`fileType` is `"file"` \| `"directory"` \| `"symlink"` \| `"other"`; `mode`
+is the permission bits as octal text.
+
+| Status | Meaning |
+|---|---|
+| `200` | The path's metadata |
+| `400` | Malformed id, or a path that's empty/contains a NUL byte/contains a `..` segment |
+| `401` | Missing/invalid credentials |
+| `404` | Desktop not found (or belongs to another org), or the path itself does not exist |
+| `409` | Desktop is not awake |
+| `503` | The desktop's host is currently unreachable -- retry |
+| `504` | The stat timed out inside the guest -- retry |
+
+## List a directory
+
+`GET /v1/desktops/{id}/dir/{path}`
+
+| Param | In | Required | Description |
+|---|---|---|---|
+| `id` | path | yes | Desktop id |
+| `path` | path | yes | Absolute guest directory path, without its leading `/`. The guest root is listed as `GET .../dir/` (a trailing slash, empty capture) -- `.` works too, but URL normalization collapses it to the same thing. |
+
+```bash
+curl -sS "$BASE/desktops/$DESKTOP_ID/dir/home/user" -H "$AUTH"
+```
+
+Response (`ListDirResponse`) -- direct children, sorted by name (byte
+order), capped at **2000 entries**:
+
+```json
+{
+  "path": "home/user",
+  "entries": [
+    { "name": "notes.txt", "fileType": "file", "sizeBytes": 17, "modifiedAt": "2026-08-20T12:00:00Z" }
+  ],
+  "truncated": false
+}
+```
+
+`truncated` is `true` when the listing was cut at the 2000-entry cap (or
+lost records to the guest-side output bound).
+
+| Status | Meaning |
+|---|---|
+| `200` | The directory's direct children |
+| `400` | Malformed id, or a path that's empty/contains a NUL byte/contains a `..` segment |
+| `401` | Missing/invalid credentials |
+| `404` | Desktop not found (or belongs to another org), or the path itself does not exist |
+| `409` | Desktop is not awake, or the path is not a directory |
+| `503` | The desktop's host is currently unreachable -- retry |
+| `504` | The listing timed out inside the guest -- retry |

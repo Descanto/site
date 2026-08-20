@@ -159,13 +159,37 @@ OpenCode nests servers under `mcp`, takes `command` as an array, and uses
 | `read_file` | Read a file from an awake desktop (`desktop_id`, `path`). Text if valid UTF-8 under 50KB, else base64 (capped at 64KB) or an error asking you to use `exec` with head/tail. |
 | `write_file` | Write a file (`desktop_id`, `path`, `content` or `content_base64`). `content_base64` is strictly validated (alphabet, padding, round-trip) before decoding -- malformed input returns a tool error instead of silently writing garbage/zero bytes. |
 | `get_stream_url` | Get a short-lived signed stream URL (`desktop_id`, `claim`: view/control, default view). |
+| `expose_port` | Publish a guest TCP port at a stable URL (`desktop_id`, `port`, optional `public`). Desktop must be awake. Returns `{url, token?, port, public}` -- the `canto_pt_...` token is shown **once** and grants access to whatever the guest serves there. |
+| `list_ports` | List a desktop's port exposures (`desktop_id`). Returns `{ports: [...]}` with `status` `bound`/`unbound`; never includes tokens. |
+| `stop_port` | Stop an exposure by guest port number (`desktop_id`, `port`). The URL 404s afterwards. |
 | `usage` | Awake-time usage and projected cost, per desktop and org-wide (`start_ms`/`end_ms`, default last 30 days). |
+| `screenshot` | Capture the desktop's display as a PNG image block (`desktop_id`, optional `region` `{x,y,width,height}`, `scale_percent` 1-100). Results over 2MB are rejected with a hint to pass `scale_percent` -- always scale down on large displays. |
+| `click` | Click (`desktop_id`, optional `x`/`y` to move first, `button` left/right/middle, `double`). Returns the final `{cursor}` -- as does every input tool below; there is no separate cursor-read tool. |
+| `move_mouse` | Move the cursor to absolute coordinates (`desktop_id`, `x`, `y`). |
+| `drag` | Drag from `from_x`/`from_y` (default: current cursor) to `to_x`/`to_y` (`desktop_id`, optional `button`). |
+| `scroll` | Scroll the wheel at the current cursor position (`desktop_id`, `direction` up/down/left/right, `amount` 1-50). |
+| `type_text` | Type into the focused element (`desktop_id`, `text` up to 8KB) -- click the target first. |
+| `press_key` | Press a key combo (`desktop_id`, `combo`: `+`-joined X keysyms, e.g. `ctrl+shift+t`, `Return`). |
+| `set_resolution` | Resize the display (`desktop_id`, `width` 640-2560, `height` 480-1600). Returns the size actually applied; a 501 error means this desktop's image can't resize at runtime -- use `screenshot`'s `scale_percent` instead. |
 
 `fork_desktop` requires `acknowledge_shared_state: true` explicitly --
 omitting it is rejected the same as passing `false`, since a fork
 duplicates whatever in-guest state (including credentials) was live in the
 source desktop's memory when it last hibernated. See
 [Concepts: Forking](/concepts/forking).
+
+Computer-use tools (`screenshot`, `click`, `move_mouse`, `drag`, `scroll`,
+`type_text`, `press_key`, `set_resolution`) require an **awake** desktop
+and are never gated by a noVNC control session -- a human viewer and these
+tools can interleave. They're also not transactional: an error mid-batch
+means earlier effects already applied, so re-screenshot before retrying
+rather than blindly re-sending clicks. See
+[Concepts: Computer use](/concepts/computer-use).
+
+`expose_port`/`list_ports`/`stop_port` mirror
+[`POST`/`GET`/`DELETE .../ports`](/api/ports) directly -- see
+[Concepts: Port ingress](/concepts/ingress) for the token/hibernation
+model.
 
 ## Output truncation (context protection)
 

@@ -1,0 +1,76 @@
+---
+title: Snapshots and restore
+description: Generation history, branch semantics, and retention buckets.
+---
+
+Every desktop accumulates a **History** of **Generations** -- point-in-time
+snapshots recorded each time a hibernate confirms. [`GET
+.../generations`](/api/snapshots#list-generations) lists them; [`POST
+.../restore`](/api/snapshots#restore-a-generation) moves a desktop's head
+back to one.
+
+This is a different feature from [forking](/concepts/forking): a
+restore rewinds the *same* desktop's own history in place, while a fork
+creates a brand-new, independent desktop from another one's snapshot.
+
+## Branch semantics
+
+Restoring **never destroys** newer Generations -- History only grows. If
+you restore to a Generation from an hour ago and then decide you want the
+more recent state back, it's still there: restore forward again to the
+Generation you just moved away from. There's no "undo" that discards
+anything; every restore is itself just another point you can navigate to
+or away from.
+
+What restore actually does depends on the desktop's current state:
+
+- **Hibernated desktop**: the restore is registry-only -- the head pointer
+  moves, but nothing is applied to disk/memory until the next `wake`,
+  which brings up the target Generation.
+- **Awake desktop**: the *current* live state is snapshotted first (this
+  new Generation is named by the settled operation's `capturedGeneration`
+  field), so nothing live is lost, and then the desktop is woken at the
+  restore target. You can always get back to exactly where you started.
+
+A `disk_only` Generation (see below) can't be restored yet -- that's a
+`409`.
+
+## Generation kinds
+
+| `kind` | What it captures |
+|---|---|
+| `full` | Disk **and** memory -- the same kind of snapshot a normal hibernate produces. Restoring one wakes the desktop with its guest processes' memory state intact, exactly as if it had just been woken from that hibernate. |
+| `disk_only` | Disk state only. Not yet restorable via the API (a `409` on `POST .../restore`). |
+
+## Retention buckets
+
+Every Generation is tagged with a `retentionBucket`, computed at read time
+using the same age boundaries the retention garbage collector uses -- so
+what `GET .../generations` shows you can never disagree with what's about
+to be collected:
+
+| Bucket | Age |
+|---|---|
+| `recent` | Under 1 hour old |
+| `hourly` | Under 24 hours old |
+| `daily` | 24 hours and older |
+
+A Generation that's no longer restorable -- deleted, or currently having
+its storage bundle garbage-collected -- simply doesn't appear in the list
+at all; there's no separate "expired" state to check for.
+
+<Callout title="Destroyed desktops: a 7-day recovery window" type="info">
+  A destroyed desktop's Generation rows aren't deleted immediately --
+  they're tombstoned (`tombstonedAt` is set) and kept around for a 7-day
+  recovery window before final cleanup. This is a backstop, not a
+  documented restore-after-destroy API; treat `destroy` as the
+  operationally irreversible action it's described as everywhere else in
+  these docs.
+</Callout>
+
+## Fencing
+
+Like `wake`/`hibernate`/`destroy`, `restore` accepts an optional
+`expectedGeneration` for the same compare-and-swap guard against
+stale-read races -- see
+[Concepts: generation fencing](/concepts/desktops-and-lifecycle#generation-fencing).

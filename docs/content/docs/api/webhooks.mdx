@@ -1,0 +1,179 @@
+---
+title: Webhooks
+description: Endpoint CRUD, event types, HMAC signature verification, and the delivery log.
+---
+
+Webhook endpoints notify your own server about desktop lifecycle events,
+instead of you polling for them.
+
+## Event types
+
+| Event | Fired when |
+|---|---|
+| `desktop.created` | A new desktop finishes provisioning. |
+| `desktop.woken` | A desktop's guest becomes responsive after a wake. |
+| `desktop.hibernated` | A desktop finishes hibernating -- `data.reason` distinguishes a normal hibernate confirm from a host-failure-triggered one. |
+| `desktop.destroyed` | A desktop is permanently destroyed. |
+
+Every delivery's JSON payload carries at least:
+
+```json
+{ "type": "desktop.woken", "desktopId": "desk_..." }
+```
+
+## List webhook endpoints
+
+`GET /v1/webhooks`
+
+```bash
+curl -sS "$BASE/webhooks" -H "$AUTH"
+```
+
+```json
+{
+  "webhooks": [
+    {
+      "id": "wh_...",
+      "url": "https://example.com/hooks/canto",
+      "events": ["desktop.woken", "desktop.hibernated"],
+      "createdAt": "2026-08-20T12:00:00Z"
+    }
+  ]
+}
+```
+
+Endpoints belonging to the caller's org -- never includes `secret`.
+
+| Status | Meaning |
+|---|---|
+| `200` | The org's webhook endpoints |
+| `401` | Missing/invalid credentials |
+
+## Create a webhook endpoint
+
+`POST /v1/webhooks`
+
+Request body (`CreateWebhookBody`):
+
+```json
+{ "url": "https://example.com/hooks/canto", "events": ["desktop.woken"] }
+```
+
+| Field | Type | Required | Description |
+|---|---|---|---|
+| `url` | string | yes | Absolute `https://` URL, at most 2000 chars, no userinfo (`user:pass@`). Loopback and link-local hosts (`localhost`, `127.0.0.0/8`, `::1`, `0.0.0.0`/`::`, `169.254.0.0/16`, `fe80::/10`) are rejected in either scheme, except on deployments that opt in to allowing them for local dev. |
+| `events` | string[] | yes | Non-empty; one or more of the [event types](#event-types) above; deduped server-side. |
+
+```bash
+curl -sS -X POST "$BASE/webhooks" \
+  -H "$AUTH" -H 'Content-Type: application/json' \
+  -d '{"url": "https://example.com/hooks/canto", "events": ["desktop.woken", "desktop.hibernated"]}'
+```
+
+Response (`CreateWebhookResponse`, `201`) -- the **only** response that
+ever carries `secret`:
+
+```json
+{
+  "id": "wh_...",
+  "url": "https://example.com/hooks/canto",
+  "events": ["desktop.woken", "desktop.hibernated"],
+  "secret": "canto_whsec_...",
+  "createdAt": "2026-08-20T12:00:00Z"
+}
+```
+
+Store `secret` -- it's shown exactly once. There's no rotation endpoint
+yet; rotating means delete + recreate.
+
+| Status | Meaning |
+|---|---|
+| `201` | Webhook endpoint created -- `secret` shown exactly once |
+| `400` | Invalid/non-https URL, a loopback or link-local URL host, userinfo in the URL, URL over 2000 chars, empty/unknown `events`, the per-org endpoint cap reached, or a malformed body |
+| `401` | Missing/invalid credentials |
+
+## Delete a webhook endpoint
+
+`DELETE /v1/webhooks/{id}`
+
+```bash
+curl -sS -X DELETE "$BASE/webhooks/$WEBHOOK_ID" -H "$AUTH"
+```
+
+Deleting an endpoint cascades its delivery log; any still-pending
+deliveries silently stop.
+
+| Status | Meaning |
+|---|---|
+| `204` | Endpoint deleted |
+| `401` | Missing/invalid credentials |
+| `404` | No such webhook in the caller's org (also returned for a wrong-org id -- never distinguishable from absent) |
+
+## List an endpoint's deliveries
+
+`GET /v1/webhooks/{id}/deliveries`
+
+| Param | In | Required | Description |
+|---|---|---|---|
+| `id` | path | yes | The webhook endpoint id |
+| `limit` | query | no | Max deliveries to return. Default `50`, max `200`. |
+
+```bash
+curl -sS "$BASE/webhooks/$WEBHOOK_ID/deliveries?limit=20" -H "$AUTH"
+```
+
+```json
+{
+  "deliveries": [
+    {
+      "id": "whd_...",
+      "eventType": "desktop.woken",
+      "state": "delivered",
+      "attempts": 1,
+      "lastStatus": 200,
+      "lastError": null,
+      "nextAttemptAt": null,
+      "payload": { "type": "desktop.woken", "desktopId": "desk_..." },
+      "createdAt": "2026-08-20T12:00:00Z",
+      "deliveredAt": "2026-08-20T12:00:01Z"
+    }
+  ]
+}
+```
+
+Newest first. `state` is `pending` \| `delivered` \| `failed`.
+`nextAttemptAt` is `null` once a delivery has settled. `payload` is the
+exact JSON body that is/was POSTed to your endpoint.
+
+| Status | Meaning |
+|---|---|
+| `200` | The endpoint's delivery log, newest first |
+| `400` | Non-numeric or out-of-range `limit` |
+| `401` | Missing/invalid credentials |
+| `404` | No such webhook in the caller's org |
+
+## Verifying deliveries
+
+Every delivery carries:
+
+```
+Canto-Webhook-Id: whd_...
+Canto-Webhook-Event: desktop.woken
+Canto-Signature: t=1755691200,v1=<hex HMAC-SHA256>
+```
+
+`Canto-Signature` is `t=<unix-secs>,v1=<hex HMAC-SHA256(secret, "{t}.{raw_body}")>`.
+Verify it over the **raw** request body (before any JSON parsing), with a
+constant-time comparison and a freshness check against `t` (a 300s
+tolerance is the SDK helpers' default):
+
+```bash
+# conceptually:
+expected = hex(HMAC_SHA256(secret, f"{t}.{raw_body}"))
+```
+
+Both the [TypeScript](/sdk/typescript#webhooks) and
+[Python](/sdk/python#webhooks) SDKs ship a `verifyWebhookSignature` /
+`verify_webhook_signature` helper that does this correctly (constant-time
+compare, malformed-header handling, no exceptions on a forged header) --
+prefer it over reimplementing the check.

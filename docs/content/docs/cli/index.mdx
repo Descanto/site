@@ -1,0 +1,103 @@
+---
+title: CLI
+description: "canto: the command-line interface for Canto cloud desktops."
+---
+
+`@descanto/vm-cli` ships the `canto` command -- a thin wrapper over
+[`@descanto/vm-sdk`](/sdk/typescript) (bundled in) for driving desktops
+from a shell or a CI pipeline.
+
+## Install
+
+```bash
+npm install -g @descanto/vm-cli
+canto --help
+
+# or run it without installing:
+npx -y @descanto/vm-cli --help
+```
+
+## Auth
+
+Highest wins:
+
+1. `--api-key <canto_sk_...>` (exists for CI; beware shell history)
+2. `CANTO_API_KEY` env var
+3. `~/.config/canto/config.json` (`$XDG_CONFIG_HOME/canto/config.json` when
+   set), written `0600` by `canto login`
+
+```bash
+canto login    # prompts (hidden) for the key, validates via /v1/me, saves config
+canto whoami
+```
+
+Base URL resolves the same way: `--base-url` -> `CANTO_BASE_URL` -> the
+config file -> the SDK default. `canto login` follows that same chain when
+validating the key, so it always talks to the API every later command
+will. Logging in again merges into the existing config file rather than
+replacing it -- an existing `baseUrl` survives a re-login, and only
+`--base-url` (not `CANTO_BASE_URL`, which stays env-scoped for that one
+invocation) gets persisted.
+
+## Commands
+
+```bash
+canto list [--state awake]
+canto create [--tier default] [--billing-mode hourly] [--idle-timeout 600] \
+             [--env K=V ...] [--setup-script file.sh] [--ephemeral]
+canto wake <id> [--no-wait]
+canto hibernate <id> [--no-wait]
+canto destroy <id> [--yes] [--no-wait]          # prompts unless --yes or --json
+canto fork <id> --count N --acknowledge-shared-state [--ephemeral] [--no-wait]
+
+canto exec <id> <command...> [--timeout SECS]   # exits with the guest exit code
+canto exec <id> -d <command...>                 # detached: prints the processId
+canto exec-status <id> <process-id> [--wait]
+
+canto files get <id> <remote-path> [local-path] # omitted/- writes raw bytes to stdout
+canto files put <id> <local-path> <remote-path> # - reads stdin
+
+canto stream <id> [--claim view|control] [--takeover] [--open]
+canto usage [--days 30] [--start MS --end MS]
+
+canto keys create <name> | canto keys list | canto keys revoke <id>
+canto webhooks create --url U --event E [--event E ...]
+canto webhooks list | canto webhooks delete <id>
+canto webhooks deliveries <id> [--limit N]
+```
+
+Each command maps directly onto the [API reference](/api/overview): `canto
+create` is `POST /v1/desktops`, `canto exec` is `POST .../exec`, and so on
+-- see the linked reference pages for field-level detail on each
+(`--tier`, `--billing-mode`, `--idle-timeout`, `--env`, `--setup-script`
+map onto [`CreateDesktopBody`](/api/desktops#create-a-desktop);
+`--acknowledge-shared-state` is the same required acknowledgment
+[forking](/concepts/forking) requires everywhere else).
+
+`canto exec -d` mirrors the SDK's `detached: true` -- it prints the
+`processId` and returns immediately instead of blocking; poll it with
+`canto exec-status <id> <process-id> [--wait]`.
+
+## `--json` contract
+
+Every command accepts `--json`: exactly the API's JSON (or the SDK's
+settled result) on stdout, nothing else on stdout; `problem+json` (or
+`{ "error": { "message": ... } }` for non-API failures) on stderr. This
+makes `canto ... --json | jq` safe to script against without worrying
+about interleaved human-readable output.
+
+Exit codes: `0` success, `1` API/runtime error, `2` usage error -- except
+blocking `canto exec` (and `canto exec-status --wait`), which instead
+propagates the guest command's own exit code, so `canto exec $ID make test
+&& echo ok` works the way you'd expect from a local shell.
+
+## Development
+
+```bash
+bun install
+bun run test        # vitest, SDK/fetch mocked
+bun run typecheck
+bun run build        # tsup, bundles @descanto/vm-sdk (noExternal)
+```
+
+Releases go out in lockstep with `@descanto/vm-sdk` / `@descanto/vm-mcp`.

@@ -1,0 +1,88 @@
+---
+title: Port ingress
+description: Expose a guest TCP port at a stable public URL, token-gated or public, plus the dashboard's in-browser noVNC viewer.
+---
+
+Any TCP service listening inside an awake desktop -- a dev server, an
+internal dashboard, anything the guest binds a port to -- can be published
+at a stable public URL with
+[`POST /v1/desktops/{id}/ports`](/api/ports#expose-a-guest-port).
+
+## The URL scheme
+
+An exposed port gets a URL of the form:
+
+```
+https://{port}-{desktopId}.canto.run
+```
+
+The port and desktop id are both baked into the hostname, so each
+exposure gets its own stable, distinct URL -- no path prefixing, no
+collisions between desktops exposing the same port number. The URL never
+changes for the lifetime of the exposure, including across hibernate/wake
+cycles.
+
+## Private vs public
+
+Exposures are **private by default**: creating one mints a
+`canto_pt_...` token, shown exactly once in the create response, required
+at the ingress via `?canto_token=` or an `X-Canto-Token` header. Without
+it, the URL answers `401`.
+
+Pass `{"public": true}` to skip the token entirely and serve the port to
+the whole internet -- the create response then carries no `token` field at
+all. Only the desktop's UUID in the hostname obscures a public exposure;
+treat it as unauthenticated the moment you create it.
+
+The token deliberately doesn't ride `Authorization` -- that header is
+forwarded to your guest app untouched, and the ingress strips its own
+credential before the request reaches the guest. That means a guest app
+with its own auth scheme built on `Authorization` keeps working unmodified
+behind a private exposure.
+
+Because the token is hash-stored and unrecoverable once shown, re-exposing
+an already-exposed port is a `409`, not an idempotent success. Rotate a
+token by deleting the exposure and creating a new one -- which also means
+a new URL for the same guest port, since a fresh exposure mints a fresh
+one.
+
+## Hibernation semantics
+
+The exposure itself is **desired state**; the live host-side binding is
+not. Hibernating a desktop makes its exposed URLs answer `503` without
+deleting anything -- waking the desktop rebinds automatically, and the URL
+resumes working with no client-side action needed. `GET .../ports`
+reports each exposure's `status` as `"bound"` (live) or `"unbound"`
+(asleep, or a rebind hasn't succeeded yet).
+
+In short: creating and deleting exposures is a durable, desktop-level
+operation; whether the URL currently answers is tied to whether the
+desktop is awake, same as [exec and files](/api/exec-and-files).
+
+<Callout title="Requires an awake desktop to create" type="warn">
+  `POST .../ports` itself requires the desktop to be `awake` -- you can't
+  pre-provision an exposure on a desktop that's never woken. Once created,
+  though, the exposure persists across hibernate/wake; you don't need to
+  re-create it on every wake.
+</Callout>
+
+## Browser access: the dashboard's noVNC embed
+
+Separately from port ingress, the dashboard's desktop-detail page renders
+the live screen in-browser using [noVNC](https://novnc.com/), reusing the
+same [stream-ticket](/api/streaming) flow the API exposes: a short-lived
+ticket is requested, then a WebSocket bridge streams the framebuffer to
+the browser. Opening a desktop's detail page and clicking **Connect**
+requests a `control` claim with `takeover: true` -- an owner viewing their
+own desktop expects their clicks and keystrokes to work -- so viewing a
+desktop you also intend to drive by API at the same time is expected to
+interleave (see [Concepts: Computer use](/concepts/computer-use#no-retry-semantics)
+on why API input is never gated by this claim). Tickets are single-use
+with a short TTL; the panel automatically re-requests a fresh one on
+reconnect.
+
+The noVNC embed and port ingress are independent features that happen to
+share the visual result (a live view of the desktop) through different
+paths -- the embed rides the existing stream-ticket API, while port
+ingress publishes an arbitrary guest TCP service, VNC or otherwise, at a
+public URL.

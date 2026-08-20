@@ -143,12 +143,138 @@ The source desktop must already be `hibernated`, or the call throws
 (copy-on-write semantics, why `acknowledgeSharedState` has no default, and
 ephemeral forks).
 
+## Computer use
+
+The classic agent loop -- *look (screenshot) → act (mouse/keyboard) → look
+again* -- against an **awake** desktop:
+
+```ts
+const shot = await d.screenshot(); // { data: Uint8Array (PNG), width, height }
+await d.screenshot({ region: { x: 0, y: 0, width: 800, height: 600 }, scalePercent: 50 });
+
+await d.mouse.move({ x: 100, y: 200 });
+await d.mouse.click({ x: 100, y: 200 }); // every input call resolves
+await d.mouse.doubleClick({ button: "left" }); //   with the final cursor {x, y}
+await d.mouse.drag({ to: { x: 300, y: 300 } });
+await d.mouse.scroll({ direction: "down", amount: 3 });
+const cursor = await d.mouse.position(); // empty batch = cursor read
+
+await d.keyboard.type("hello world");
+await d.keyboard.press("ctrl+shift+t"); // +-joined X keysyms
+
+await d.display.get(); // { width, height } (live)
+await d.display.set({ width: 1280, height: 800 }); // 640-2560 x 480-1600
+```
+
+`d.input(actions)` is the raw batch primitive the sugar above composes --
+an ordered action list costs exactly **one** guest round trip, no matter
+how many actions it carries (max 50 actions, 32 KiB total text, 10s total
+waits per batch). See
+[Concepts: Computer use](/concepts/computer-use) for the full loop and
+[API reference: Computer use](/api/computer-use) for every action type.
+
+Notes:
+
+- A `413` from `screenshot()` means the PNG exceeded the 8 MiB transfer
+  cap -- pass `region` and/or `scalePercent`.
+- `input()`/`screenshot()` are **never** auto-retried (a replayed click
+  double-clicks); a mid-batch failure (`500`) means actions *before* the
+  failure already executed -- re-screenshot before retrying.
+- `display.set()` throwing a `501` `CantoApiError` is the "runtime resize
+  unsupported" signal: this desktop's image/X server can't do RandR
+  resizes, so its resolution is effectively fixed until the golden image
+  is upgraded. The applied size survives hibernate/wake; a cold boot
+  reverts to `1024x768`.
+
+## Port ingress
+
+Publish a TCP service listening inside an awake desktop at a stable public
+URL:
+
+```ts
+const p = await d.exposePort(8080);
+p.url; // https://8080-<desktopId>.canto.run
+p.token; // canto_pt_... -- shown EXACTLY ONCE, never recoverable
+
+await fetch(`${p.url}/health`, { headers: { "X-Canto-Token": p.token } });
+// ...or `${p.url}/health?canto_token=${p.token}`
+
+await d.listPorts(); // [{ id, port, public, url, status, createdAt }] -- never a token
+await d.stopPort(8080); // the URL 404s forever after
+```
+
+Exposures are **private by default**: without the token the URL answers
+`401`. Pass `{ public: true }` to skip the token entirely and serve the
+port to the whole internet (the response then carries no `token` field) --
+only the desktop's UUID in the hostname obscures it.
+
+Because the token is hash-stored and unrecoverable, re-exposing an already
+exposed port is a `409` rather than an idempotent success -- rotate with
+`stopPort` then `exposePort`. A `501` means the deployment has no ingress
+domain configured. See [Concepts: Port ingress](/concepts/ingress) for the
+hibernation-survival model and the dashboard's noVNC embed.
+
+## Snapshots and restore
+
+```ts
+const generations = await d.listGenerations(); // -> Generation[], newest first
+await d.restore(generationId, { wait?, expectedGeneration?, idempotencyKey? }); // -> Operation
+```
+
+Restoring never destroys newer Generations, so you can always restore
+forward again. A Hibernated desktop's head moves in the registry alone
+(the next `wake()` applies the target); an Awake desktop is snapshotted
+first -- its current state enters History as a new Generation -- then
+woken at the target, so nothing live is lost. `restore` is **not**
+auto-retried unless you pass `idempotencyKey` yourself, since a blind
+retry of a non-keyed restore could enqueue a second operation. See
+[Concepts: Snapshots and restore](/concepts/snapshots) for retention
+buckets and the full branch model.
+
 ## Operations and usage
 
 ```ts
 canto.operations.get(id) -> Promise<Operation>
 canto.usage.query({ startMs, endMs }) -> Promise<UsageResponse>
 ```
+
+## Webhooks
+
+```ts
+const hook = await canto.webhooks.create({
+  url: "https://example.com/hooks/canto",
+  events: ["desktop.woken", "desktop.hibernated"],
+});
+hook.secret; // canto_whsec_... -- shown EXACTLY ONCE, store it
+
+await canto.webhooks.list(); // -> WebhookSummary[], never includes secret
+await canto.webhooks.delete(hook.id);
+await canto.webhooks.deliveries(hook.id, { limit: 50 }); // -> WebhookDelivery[], newest first
+```
+
+`create`/`delete` are deliberately **not** auto-retried (a retried
+`create` would mint a second, distinct endpoint; a replayed `delete` would
+turn a transient network blip into a spurious 404). `list`/`deliveries`
+are plain `GET`s, retried like any read.
+
+Verify a delivery in your receiver with `verifyWebhookSignature`:
+
+```ts
+import { verifyWebhookSignature } from "@descanto/vm-sdk";
+
+const ok = verifyWebhookSignature({
+  payload: rawBody, // Buffer | string -- the RAW request body
+  header: req.headers["canto-signature"],
+  secret: storedSecret,
+});
+```
+
+It checks the `Canto-Signature` header
+(`t=<unix-secs>,v1=<hex HMAC-SHA256(secret, "{t}.{raw_body}")>`) with a
+constant-time comparison and a freshness check (`toleranceSecs`, default
+300s) -- never throws on a malformed header, just returns `false`. See
+[API reference: Webhooks](/api/webhooks#verifying-deliveries) for the
+full event-type list and delivery-log shape.
 
 ## Wait vs handles
 

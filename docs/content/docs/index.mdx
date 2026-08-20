@@ -30,15 +30,32 @@ idle time in between.
   source of truth: create/list/get/update desktops, wake/hibernate/destroy/
   [fork](/concepts/forking) them, run commands (blocking or
   [detached](/concepts/operations#background-processes-detached-exec)),
-  read/write files, get a stream ticket, and query usage.
-- Every mutation (`wake`/`hibernate`/`destroy`/`fork`) returns an
+  read/write/list files (including
+  [large-file chunked transfer](/api/exec-and-files#write-a-file)), get a
+  stream ticket, and query usage.
+- [Computer use](/concepts/computer-use) drives an awake desktop's GUI
+  directly -- screenshot, mouse/keyboard input as a single-round-trip
+  batch, and live display geometry.
+- [Port ingress](/concepts/ingress) publishes any guest TCP port at a
+  stable `https://{port}-{desktopId}.canto.run` URL, token-gated or
+  public, plus an in-browser noVNC viewer on the dashboard.
+- [Snapshots](/concepts/snapshots) let you list a desktop's Generation
+  history and restore an earlier one, with branch semantics (nothing is
+  ever destroyed by a restore) and read-time retention buckets.
+- [Webhooks](/api/webhooks) notify your own server about desktop lifecycle
+  events (`desktop.created`, `.woken`, `.hibernated`, `.destroyed`),
+  HMAC-signed and with a full delivery log.
+- Every mutation (`wake`/`hibernate`/`destroy`/`fork`/`restore`) returns an
   [operation handle](/concepts/operations) you can poll or long-poll,
   rather than blocking your connection open.
-- A [TypeScript SDK](/sdk/typescript) wraps the API with a friendlier,
-  camelCase, promise-based client and sensible retry/wait defaults.
-- An [MCP server](/mcp) exposes the same operations as tools, so
-  Claude Code, Claude Desktop, Cursor, and any other MCP client can drive a
-  Canto desktop directly.
+- A [TypeScript SDK](/sdk/typescript) and a [Python SDK](/sdk/python) wrap
+  the API with friendlier, promise-/async-based clients and sensible
+  retry/wait defaults.
+- A [CLI](/cli) (`canto`) drives every route from a shell or a CI
+  pipeline, with a `--json` contract for scripting.
+- An [MCP server](/mcp) exposes the same operations (including computer
+  use and port ingress) as tools, so Claude Code, Claude Desktop, Cursor,
+  and any other MCP client can drive a Canto desktop directly.
 
 ## Where to go next
 
@@ -62,6 +79,16 @@ idle time in between.
     title="TypeScript SDK"
     href="/sdk/typescript"
     description="@descanto/vm-sdk: the ergonomic client."
+  />
+  <Card
+    title="Python SDK"
+    href="/sdk/python"
+    description="descanto-vm: sync + async, mirrors the TypeScript SDK method-for-method."
+  />
+  <Card
+    title="CLI"
+    href="/cli"
+    description="canto: drive every route from a shell or CI, with --json for scripting."
   />
   <Card
     title="MCP server"

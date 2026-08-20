@@ -1,0 +1,74 @@
+---
+title: Computer use
+description: The look-act loop, the input-batch primitive, and why it's never auto-retried.
+---
+
+Computer use is the GUI-driving surface for an **awake** desktop --
+[screenshot](/api/computer-use#take-a-screenshot),
+[input](/api/computer-use#send-input), and
+[display geometry](/api/computer-use#get-display-geometry). It's the
+same three primitives an agent needs to drive any real desktop: see what's
+on screen, act on it, see the result.
+
+## The look → act loop
+
+An agent driving a Canto desktop typically loops:
+
+1. **Look**: `POST .../screenshot` to see the current state of the screen.
+2. **Act**: `POST .../input` with a batch of mouse/keyboard actions.
+3. **Look again**: another screenshot, to observe the effect of what just
+   happened.
+
+There's no built-in "act and confirm" combinator -- the loop is explicit,
+on the caller's side, by design. This keeps each call cheap (a screenshot
+is a single guest round trip; so is an entire input batch) and keeps the
+agent in control of exactly when it re-observes.
+
+## The input-batch primitive
+
+`POST /v1/desktops/{id}/input` takes an ordered list of actions --
+`mouse_move`, `click`, `button_press`/`button_release`, `drag`, `scroll`,
+`type`, `key`, `wait` -- and runs the whole list as **one guest round
+trip**, regardless of how many actions it carries (up to the batch caps:
+50 actions, 32 KiB of text, 10s of total `wait` time). This is the
+primitive; higher-level SDK sugar (`mouse.click()`, `keyboard.type()`,
+`mouse.drag()`, ...) is just a batch of one or two actions under the hood.
+
+Composing a whole gesture -- move, then click, then type -- into a single
+batch call is both faster (one round trip instead of three) and more
+predictable than issuing them as separate requests, since nothing else can
+interleave between actions *within* a batch the way it could between
+separate calls.
+
+## Awake requirement
+
+Every computer-use route requires the desktop to be `awake` -- a `409`
+means it isn't. There's no cached screenshot or display geometry for a
+hibernated desktop; `GET .../display` always does a live guest round trip
+by design, so it can't silently return stale data. Wake the desktop first
+(see [Desktops and lifecycle](/concepts/desktops-and-lifecycle)).
+
+## No-retry semantics
+
+Input and screenshot calls are **never** safe to blindly retry:
+
+- A replayed `click` double-clicks. A replayed `type` types twice. Both
+  the TypeScript and Python SDKs' automatic retry logic deliberately
+  excludes `input()`/`screenshot()` calls -- see
+  [TypeScript SDK: retry semantics](/sdk/typescript#retry-semantics).
+- A batch is **not transactional**: if an action fails mid-batch (a `500`),
+  every action *before* the failure already executed in the guest. The
+  right response to a mid-batch failure is to take a fresh screenshot and
+  decide what to do next -- not to resend the same batch.
+- API input is **never** gated by a noVNC control claim (see
+  [Streaming](/api/streaming)) -- a human watching the desktop through the
+  dashboard's embedded viewer and an agent sending input calls can
+  interleave freely. There's no lock to acquire first.
+
+<Callout title="Not a video stream" type="info">
+  Computer use is a request/response loop, not a live feed -- for a
+  continuously updating view (a human watching an agent work, or vice
+  versa), use [Streaming](/api/streaming) and the dashboard's noVNC embed
+  instead. See [Concepts: Port ingress](/concepts/ingress) for the related
+  in-browser access model for arbitrary guest services.
+</Callout>

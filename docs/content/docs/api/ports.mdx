@@ -1,0 +1,137 @@
+---
+title: Ports
+description: Expose a guest TCP port at a stable public URL.
+---
+
+Any TCP service listening inside an awake desktop can be published at a
+stable `https://` URL -- a dev server, a VNC-adjacent app, anything the
+guest binds a port to. See [Concepts: Port ingress](/concepts/ingress)
+for the URL scheme, token model, and hibernation behavior in full.
+
+<Callout title="Requires ingress to be enabled" type="info">
+  `POST .../ports` `501`s if the deployment has no ingress domain
+  configured -- this is a deployment-level opt-in, not on by default.
+</Callout>
+
+## List a desktop's port exposures
+
+`GET /v1/desktops/{id}/ports`
+
+| Param | In | Required | Description |
+|---|---|---|---|
+| `id` | path | yes | Desktop id |
+
+```bash
+curl -sS "$BASE/desktops/$DESKTOP_ID/ports" -H "$AUTH"
+```
+
+```json
+{
+  "ports": [
+    {
+      "id": "...",
+      "port": 8080,
+      "public": false,
+      "url": "https://8080-desk_abc123.canto.run",
+      "status": "bound",
+      "created_at": "2026-08-20T12:00:00Z"
+    }
+  ]
+}
+```
+
+`status` is `"bound"` (a live listener on the host) or `"unbound"` (the
+desktop is hibernated, or a rebind-on-wake hasn't succeeded yet -- the URL
+`503`s while unbound and starts working again on its own once rebound).
+Tokens are never included here or anywhere but the create response below.
+
+| Status | Meaning |
+|---|---|
+| `200` | Every exposure for this desktop |
+| `401` | Missing/invalid credentials |
+| `404` | Desktop not found or belongs to another org |
+
+## Expose a guest port
+
+`POST /v1/desktops/{id}/ports`
+
+Binds a host-side proxy for the given guest port and returns the public
+`https://{port}-{desktopId}.canto.run` URL.
+
+| Param | In | Required | Description |
+|---|---|---|---|
+| `id` | path | yes | Desktop id (must be `awake` to create the exposure) |
+
+Request body (`CreatePortBody`):
+
+```json
+{ "port": 8080, "public": false }
+```
+
+| Field | Type | Required | Description |
+|---|---|---|---|
+| `port` | integer | yes | The guest TCP port to expose, `1..=65535`. |
+| `public` | boolean | no | Serve the port to the whole internet with no token. Default `false`: a `canto_pt_...` token is minted and required at the ingress. |
+
+```bash
+curl -sS -X POST "$BASE/desktops/$DESKTOP_ID/ports" \
+  -H "$AUTH" -H 'Content-Type: application/json' \
+  -d '{"port": 8080}'
+```
+
+Response (`CreatePortResponse`, `201`) -- the **only** response that ever
+carries the plaintext `token`:
+
+```json
+{
+  "id": "...",
+  "port": 8080,
+  "public": false,
+  "url": "https://8080-desk_abc123.canto.run",
+  "status": "bound",
+  "token": "canto_pt_...",
+  "created_at": "2026-08-20T12:00:00Z"
+}
+```
+
+`token` is present only for **private** (non-`public`) exposures, shown
+exactly once -- it's hash-stored server-side and never recoverable again.
+Absent (not `null`) for public exposures. Pass it back as `?canto_token=`
+or an `X-Canto-Token` header when calling the URL; the ingress strips its
+own credential before forwarding the request, so `Authorization` reaches
+your guest app untouched.
+
+Because the token can't be recovered, re-exposing an already-exposed port
+is a `409`, not an idempotent success -- rotate by deleting and
+re-creating the exposure.
+
+| Status | Meaning |
+|---|---|
+| `201` | Port exposed -- `token` (private exposures only) shown exactly once |
+| `400` | Malformed id/body, or port out of range |
+| `401` | Missing/invalid credentials |
+| `404` | Desktop not found or belongs to another org |
+| `409` | Desktop is not awake, or this port is already exposed |
+| `501` | Port ingress is not enabled on this deployment |
+
+## Stop a port exposure
+
+`DELETE /v1/desktops/{id}/ports/{port}`
+
+| Param | In | Required | Description |
+|---|---|---|---|
+| `id` | path | yes | Desktop id |
+| `port` | path | yes | The exposed guest port number |
+
+Closes the live host binding (best-effort) and deletes the exposure -- the
+URL `404`s forever after.
+
+```bash
+curl -sS -X DELETE "$BASE/desktops/$DESKTOP_ID/ports/8080" -H "$AUTH"
+```
+
+| Status | Meaning |
+|---|---|
+| `204` | Exposure stopped |
+| `401` | Missing/invalid credentials |
+| `404` | No such exposure (or desktop not found / other org) |

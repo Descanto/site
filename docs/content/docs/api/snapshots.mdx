@@ -1,0 +1,108 @@
+---
+title: Snapshots
+description: List a desktop's Generation history and restore an earlier one.
+---
+
+Every hibernate confirm records a **Generation** -- a point-in-time
+snapshot of a desktop's disk (and, for a full snapshot, its memory) -- in
+that desktop's History. See
+[Concepts: Snapshots and restore](/concepts/snapshots) for retention
+buckets, branch semantics, and how this differs from
+[forking](/concepts/forking).
+
+## List generations
+
+`GET /v1/desktops/{id}/generations`
+
+| Param | In | Required | Description |
+|---|---|---|---|
+| `id` | path | yes | Desktop id |
+
+```bash
+curl -sS "$BASE/desktops/$DESKTOP_ID/generations" -H "$AUTH"
+```
+
+```json
+{
+  "generations": [
+    {
+      "id": "gen_...",
+      "kind": "full",
+      "createdAt": "2026-08-20T12:00:00Z",
+      "retentionBucket": "recent",
+      "current": true,
+      "tombstonedAt": null
+    }
+  ]
+}
+```
+
+Newest first. Only still-restorable Generations are listed -- deleted ones,
+and ones whose bundle is currently being garbage-collected, are omitted. A
+`hibernating` snapshot in flight has no entry yet; rows are recorded at
+Hibernate confirm.
+
+| Field | Type | Description |
+|---|---|---|
+| `id` | string | |
+| `kind` | string | `"full"` (disk + memory) or `"disk_only"`. |
+| `createdAt` | string | RFC 3339. |
+| `retentionBucket` | string | `"recent"` (< 1h old), `"hourly"` (< 24h), or `"daily"` -- computed at read time with the same boundaries the retention reconciler uses, so the API can never disagree with what GC is about to collect. |
+| `current` | boolean | Whether this is the desktop's current head. |
+| `tombstonedAt` | string \| null | Set only on a destroyed desktop's rows (the 7-day recovery window). RFC 3339. |
+
+| Status | Meaning |
+|---|---|
+| `200` | This desktop's History, newest first |
+| `400` | Malformed id |
+| `401` | Missing/invalid credentials |
+| `404` | Desktop not found or belongs to another org |
+
+## Restore a generation
+
+`POST /v1/desktops/{id}/restore`
+
+Moves the desktop's head to an earlier Generation. Restoring never
+destroys newer Generations -- you can always restore forward again.
+
+| Param | In | Required | Description |
+|---|---|---|---|
+| `id` | path | yes | Desktop id |
+| `wait` | query | no | Long-poll until the operation settles (2s cadence, 120s cap) |
+| `Idempotency-Key` | header | no | Client-supplied dedup key, scoped per-desktop |
+
+Request body (`RestoreBody`, camelCase):
+
+```json
+{ "generationId": "gen_...", "expectedGeneration": null }
+```
+
+| Field | Type | Required | Description |
+|---|---|---|---|
+| `generationId` | string | yes | The Generation to restore -- must belong to this desktop's own History (see [List generations](#list-generations)). |
+| `expectedGeneration` | integer \| null | no | Optional fencing CAS, same semantics as wake/hibernate/destroy -- see [Concepts: generation fencing](/concepts/desktops-and-lifecycle#generation-fencing). |
+
+```bash
+curl -sS -X POST "$BASE/desktops/$DESKTOP_ID/restore?wait=true" \
+  -H "$AUTH" -H 'Content-Type: application/json' \
+  -d '{"generationId": "gen_..."}'
+```
+
+On success, the settled operation's `result` carries
+`{"state", "generation", "capturedGeneration"}`:
+
+- A **Hibernated** desktop restores registry-only and stays Hibernated --
+  the target is actually applied on the next `wake`.
+- An **Awake** desktop is snapshotted first: its current state enters
+  History as a new Generation (named by `capturedGeneration`), so nothing
+  live is lost, then it's woken at the target.
+
+| Status | Meaning |
+|---|---|
+| `200` | Operation settled (`result` as above), or the `?wait=true` cap was reached while still pending/running |
+| `202` | Operation enqueued (no `?wait=true`) |
+| `400` | Malformed id or body |
+| `401` | Missing/invalid credentials |
+| `404` | Desktop not found/foreign org, or `generationId` unknown, belonging to another desktop, or no longer restorable because retention has begun collecting its bundle (byte-identical detail `"generation not found"`) |
+| `409` | Disk-only target (not yet restorable), wrong desktop state (via `?wait=true` settle), or stale `expectedGeneration` |
+| `503` | This node is not the leader |

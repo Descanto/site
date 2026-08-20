@@ -1,0 +1,211 @@
+---
+title: Python SDK
+description: "descanto-vm: the Python client for the Canto API, sync and async."
+---
+
+`descanto-vm` (import name `descanto_vm`) is the Python client for
+`controld`'s public REST API (`/v1/**`). It mirrors the
+[TypeScript SDK](/sdk/typescript) method-for-method: `Desktop`/`Process`/
+`Operation` handles, the same `wait` semantics, the same typed errors, the
+same idempotency-keyed auto-retry. Sync and async share one request/parse
+core, so they can't drift apart. `httpx` is the only runtime dependency --
+plain dataclasses, no pydantic.
+
+## Install
+
+```bash
+pip install descanto-vm
+```
+
+## Quickstart (sync)
+
+```python
+from descanto_vm import Canto
+
+canto = Canto(api_key="canto_sk_...")   # or set CANTO_API_KEY in the environment
+
+d = canto.desktops.create(tier="default", billing_mode="hourly")
+d.wake()                                # waits for the operation to settle
+print(d.exec("whoami").stdout)
+
+proc = d.exec("make -j8", detached=True)
+status = proc.wait_done()               # polls; raises CantoProcessLostError on "lost"
+print(status.exit_code)
+
+d.file_put("/root/notes.txt", "hello")
+print(d.file_get("/root/notes.txt"))
+
+children = d.fork(count=3, acknowledge_shared_state=True)  # ack is REQUIRED
+d.hibernate()
+d.destroy()
+```
+
+## Quickstart (async)
+
+```python
+import asyncio
+from descanto_vm import AsyncCanto
+
+async def main():
+    async with AsyncCanto(api_key="canto_sk_...") as canto:
+        d = await canto.desktops.create(tier="default")
+        await d.wake()
+        result = await d.exec("uname -a")
+        print(result.stdout)
+
+asyncio.run(main())
+```
+
+`AsyncCanto` exposes exactly the same surface as `Canto`, `async`-flavored
+-- both are thin shells over one shared request/parse core.
+
+## Auth
+
+`Canto(api_key=...)` takes a `canto_sk_...` API key or an AuthKit JWT
+access token, sent as `Authorization: Bearer <credential>`. If omitted,
+the SDK reads `CANTO_API_KEY` from the environment. The key is never
+included in `repr()`. Plain-`http` credentials are refused except to
+loopback (the same rule webhook URLs follow -- see
+[Webhooks](#webhooks) below).
+
+## Desktops
+
+```python
+canto.desktops.create(tier="default", billing_mode=None, image_version=None,
+                       idle_timeout_secs=None, env=None, setup_script=None)  # -> Desktop
+canto.desktops.list(state=None)          # -> list[Desktop]
+canto.desktops.get(desktop_id)           # -> Desktop
+canto.desktops.update(desktop_id, idle_timeout_secs=None)  # -> Desktop
+```
+
+A `Desktop` wraps the last-known `DesktopData` snapshot plus the owning
+client, with mutation methods that refresh that snapshot in place once
+settled:
+
+```python
+d.wake(wait=True, expected_generation=None)        # -> Operation
+d.hibernate(wait=True, expected_generation=None)   # -> Operation
+d.destroy(wait=True, expected_generation=None)      # -> Operation (irreversible)
+d.fork(count, acknowledge_shared_state=False, ephemeral=False, wait=True)  # -> list[Desktop] | Operation
+d.exec(command, timeout_secs=None, detached=False)  # -> ExecResult | Process
+d.get_process(process_id, tail_bytes=None)          # -> ProcessStatus
+d.file_get(path)                                    # -> bytes
+d.file_put(path, data)                              # data: bytes | str (UTF-8 encoded)
+d.stream(claim="view", takeover=False)              # -> StreamTicket
+d.set_idle_timeout(idle_timeout_secs)                # -> Desktop (refreshes in place)
+d.refresh()                                          # -> Desktop (re-fetches current state)
+```
+
+`d.fork()` requires `acknowledge_shared_state=True` explicitly -- passing
+anything else (including the `False` default) raises `ValueError` before
+any request is sent, the same acknowledgment
+[the TypeScript SDK](/sdk/typescript#forking) requires. See
+[Concepts: Forking](/concepts/forking).
+
+### Detached exec and the `Process` handle
+
+```python
+proc = d.exec("long-running-task.sh", detached=True)
+proc.id  # "p_..."
+
+status = proc.status(tail_bytes=65536)
+status.status       # "running" | "exited" | "lost"
+status.exit_code    # only meaningful once status == "exited"
+status.stdout_tail
+status.stderr_tail
+
+# Or poll to completion directly:
+status = proc.wait_done(poll_ms=1000, timeout_ms=60_000)
+```
+
+`wait_done` polls until the process is no longer `running`: `exited`
+returns the final status, `lost` raises `CantoProcessLostError`, and
+exceeding `timeout_ms` raises `CantoTimeoutError`.
+
+## Error handling
+
+Every non-2xx response raises `CantoApiError`, parsed from the API's
+RFC 9457 `application/problem+json` body -- falling back to raw text for a
+non-conformant body, mirroring the TypeScript SDK's parser byte-for-byte:
+
+```python
+from descanto_vm import CantoApiError
+
+try:
+    canto.desktops.get("nonexistent")
+except CantoApiError as err:
+    err.status         # 404
+    err.title          # "Not Found"
+    err.detail         # "desktop not found"
+    err.operation_id    # set when the problem concerns a specific operation
+```
+
+The same three-error-type split as the TypeScript SDK applies to
+`wait=True` (default) mutations -- see
+[TypeScript SDK: three error types](/sdk/typescript#three-error-types-one-for-each-failure-mode):
+`CantoApiError` for a fast `409`, `CantoOperationError` for a `failed`
+operation observed only after the server's own 120s `?wait=true` cap
+(carries `.operation`), and `CantoTimeoutError` for a poll-budget
+exhaustion while still pending. `wait=False` never raises for a failed
+operation -- it hands back the raw `Operation` instead.
+
+## Retries
+
+Only `GET`s and the idempotent desktop mutations (`create`/`wake`/
+`hibernate`/`destroy`, which auto-mint a `uuid4` `Idempotency-Key`) are
+retried, on `429`/`503`/`504` or a transport error -- honoring
+`Retry-After` (capped at 30s), else full-jitter exponential backoff, up
+to `max_retries=3`. `create`-like calls that mint a shown-once secret or
+would double-apply an effect (`keys.*`, `webhooks.create`/`delete`,
+`exec`, `file_put`, `fork`) are **never** auto-retried, for the same
+reasons documented in the
+[TypeScript SDK's retry semantics](/sdk/typescript#retry-semantics).
+
+## Webhooks
+
+```python
+from descanto_vm import Canto, verify_webhook_signature
+
+canto = Canto()
+hook = canto.webhooks.create("https://example.com/hooks/canto", ["desktop.woken"])
+print(hook.secret)   # canto_whsec_... -- shown exactly once, store it
+
+canto.webhooks.list()                 # -> list[WebhookSummary], never includes secret
+canto.webhooks.delete(hook.id)
+canto.webhooks.deliveries(hook.id, limit=50)  # -> list[WebhookDelivery], newest first
+
+# In your receiver, verify over the RAW request body:
+ok = verify_webhook_signature(
+    payload=raw_body_bytes,
+    header=request.headers["Canto-Signature"],
+    secret=stored_secret,
+)
+```
+
+`verify_webhook_signature` checks the `Canto-Signature` header
+(`t=<unix-secs>,v1=<hex HMAC-SHA256(secret, "{t}.{raw_body}")>`) with a
+constant-time comparison and a freshness check (`tolerance_secs=300` by
+default) -- it never raises on a malformed header, just returns `False`.
+See [API reference: Webhooks](/api/webhooks#verifying-deliveries) for the
+full event-type and delivery-log reference.
+
+## Development
+
+```bash
+cd canto/sdk-python
+uv sync          # or: pip install -e . pytest
+uv run pytest    # httpx.MockTransport only -- no network
+```
+
+`tests/test_openapi_contract.py` pins the SDK's routes and wire-field
+manifests against the repo's committed `canto/controld/openapi/v1.json`.
+
+<Callout title="Feature parity with the TypeScript SDK" type="info">
+  As of this SDK's `0.0.1` release, it covers desktops (create/list/get/
+  update, wake/hibernate/destroy/fork, exec, files, stream, idle timeout),
+  keys, usage, and webhooks. [Computer use](/api/computer-use),
+  [port ingress](/api/ports), and
+  [snapshots/restore](/api/snapshots) are TypeScript-SDK-only so far --
+  drive those routes directly over HTTP in the meantime if you need them
+  from Python.
+</Callout>

@@ -1,0 +1,200 @@
+---
+title: Computer use
+description: Screenshot, mouse/keyboard input, and display geometry -- the look-act loop for driving an awake desktop's GUI.
+---
+
+The routes below only work while the desktop is `awake` -- a `409` means
+the desktop isn't awake. A `501` means this desktop's host predates the
+computer-use API. See [Concepts: Computer use](/concepts/computer-use)
+for the look → act loop these compose into, and why input is never
+auto-retried.
+
+## Take a screenshot
+
+`POST /v1/desktops/{id}/screenshot`
+
+| Param | In | Required | Description |
+|---|---|---|---|
+| `id` | path | yes | Desktop id |
+
+Request body (`ScreenshotBody`, all fields optional -- an empty/absent body
+captures the full display as binary PNG):
+
+```json
+{ "encoding": "base64", "region": null, "scale_percent": 50 }
+```
+
+| Field | Type | Required | Description |
+|---|---|---|---|
+| `encoding` | string \| null | no | `"binary"` (default): raw PNG bytes, `Content-Type: image/png`. `"base64"`: a JSON body with the base64 PNG plus its post-crop/post-scale dimensions. |
+| `region` | object \| null | no | Optional crop rectangle in screen pixels: `{x, y, width, height}`, all four required together. An out-of-screen region is clamped by the guest's own capture tool. |
+| `scale_percent` | integer \| null | no | `1`-`100`: downscale to this percent of the (possibly cropped) size. Omitted = full size. |
+
+```bash
+curl -sS -X POST "$BASE/desktops/$DESKTOP_ID/screenshot" \
+  -H "$AUTH" -H 'Content-Type: application/json' \
+  -d '{}' -o screenshot.png
+
+curl -sS -X POST "$BASE/desktops/$DESKTOP_ID/screenshot" \
+  -H "$AUTH" -H 'Content-Type: application/json' \
+  -d '{"encoding": "base64", "scale_percent": 50}'
+```
+
+Response (`encoding: "base64"`):
+
+```json
+{ "data_base64": "...", "width": 640, "height": 400 }
+```
+
+| Status | Meaning |
+|---|---|
+| `200` | The captured PNG -- raw bytes (default) or a base64 JSON body |
+| `400` | Malformed body, a partial `region`, or `scale_percent` outside 1-100 |
+| `401` | Missing/invalid credentials |
+| `404` | Desktop not found or belongs to another org |
+| `409` | Desktop is not awake |
+| `413` | Screenshot larger than the 8 MiB transfer cap -- retry with `region`/`scale_percent` |
+| `500` | The screenshot failed inside the guest (X session down) |
+| `501` | This desktop's host does not support the computer-use API yet |
+| `503` | The desktop's host is currently unreachable -- retry |
+| `504` | The screenshot timed out inside the guest -- retry |
+
+## Send input
+
+`POST /v1/desktops/{id}/input`
+
+Runs a batch of input actions in order, as **one guest round trip**
+regardless of batch size.
+
+| Param | In | Required | Description |
+|---|---|---|---|
+| `id` | path | yes | Desktop id |
+
+Request body (`InputBody`):
+
+```json
+{
+  "actions": [
+    { "type": "mouse_move", "x": 100, "y": 200 },
+    { "type": "click", "button": "left" },
+    { "type": "type", "text": "hello world" },
+    { "type": "key", "combo": "ctrl+shift+t" },
+    { "type": "wait", "ms": 250 }
+  ]
+}
+```
+
+`actions` (required, `InputActionJson[]`) is a `type`-discriminated list,
+capped at **50 actions, 32 KiB total text, 10 s total waits** per batch:
+
+| `type` | Fields | Notes |
+|---|---|---|
+| `mouse_move` | `x`, `y` | Absolute cursor move. |
+| `click` | `x?`, `y?`, `button?`, `double?` | Moves first if `x`/`y` given. `double` clicks twice, 120 ms apart. |
+| `button_press` | `button` | Press-and-hold, for manual drag choreography. |
+| `button_release` | `button` | Release a held button. |
+| `drag` | `from?`, `to`, `button?` | Drags from `from` (or the current cursor) to `to`. |
+| `scroll` | `direction`, `amount?` | `amount` 1-50, default 1. |
+| `type` | `text`, `delay_ms?` | 1-8192 UTF-8 bytes, no NUL. `delay_ms` per keystroke, 0-500, default 12. |
+| `key` | `combo` | `+`-joined X keysyms, up to 8 tokens (e.g. `"ctrl+shift+t"`, `"Return"`). |
+| `wait` | `ms` | In-batch pause, 1-5000 ms. |
+
+An **empty** `actions` list is valid and performs the cursor-position read
+alone.
+
+```bash
+curl -sS -X POST "$BASE/desktops/$DESKTOP_ID/input" \
+  -H "$AUTH" -H 'Content-Type: application/json' \
+  -d '{"actions": [{"type": "click", "x": 400, "y": 300}]}'
+```
+
+Response (`InputResponse`) -- always the **final** cursor position after
+the whole batch ran:
+
+```json
+{ "cursor": { "x": 400, "y": 300 } }
+```
+
+<Callout title="Not gated by noVNC, not transactional" type="warn">
+  API input is **never** gated by a noVNC control claim -- a human viewer
+  and an API caller can interleave freely. A batch is also **not
+  transactional**: a mid-batch failure (`500`) means every action
+  *before* the failure already executed. Re-screenshot before retrying
+  rather than blindly re-sending a batch -- a replayed click double-clicks.
+</Callout>
+
+| Status | Meaning |
+|---|---|
+| `200` | The whole batch executed; `cursor` is the final position |
+| `400` | Malformed body, unknown `type`/`button`/`direction`, or a batch cap exceeded |
+| `401` | Missing/invalid credentials |
+| `404` | Desktop not found or belongs to another org |
+| `409` | Desktop is not awake |
+| `500` | An action failed mid-batch -- actions before it already ran |
+| `501` | This desktop's host does not support the computer-use API yet |
+| `503` | The desktop's host is currently unreachable -- retry |
+| `504` | The batch timed out inside the guest |
+
+## Get display geometry
+
+`GET /v1/desktops/{id}/display`
+
+One guest round trip -- there is deliberately no cached copy, so this only
+works while `awake`.
+
+```bash
+curl -sS "$BASE/desktops/$DESKTOP_ID/display" -H "$AUTH"
+```
+
+```json
+{ "width": 1024, "height": 768 }
+```
+
+| Status | Meaning |
+|---|---|
+| `200` | The live X display geometry |
+| `400` | Malformed id |
+| `401` | Missing/invalid credentials |
+| `404` | Desktop not found or belongs to another org |
+| `409` | Desktop is not awake |
+| `501` | This desktop's host does not support the computer-use API yet |
+| `503` | The desktop's host is currently unreachable -- retry |
+| `504` | The read timed out inside the guest -- retry |
+
+## Set display geometry
+
+`PUT /v1/desktops/{id}/display`
+
+Request body (`SetDisplayBody`):
+
+```json
+{ "width": 1280, "height": 800 }
+```
+
+| Field | Type | Required | Description |
+|---|---|---|---|
+| `width` | integer | yes | `640`-`2560` |
+| `height` | integer | yes | `480`-`1600` |
+
+```bash
+curl -sS -X PUT "$BASE/desktops/$DESKTOP_ID/display" \
+  -H "$AUTH" -H 'Content-Type: application/json' \
+  -d '{"width": 1280, "height": 800}'
+```
+
+Response is the geometry actually applied, re-read from the X server after
+the resize -- not necessarily identical to what was requested. It survives
+hibernate/wake (VM-memory snapshots); a cold boot reverts to the image
+default `1024x768`.
+
+| Status | Meaning |
+|---|---|
+| `200` | The applied geometry (`DisplayResponse`) |
+| `400` | Size outside `640`-`2560` x `480`-`1600` |
+| `401` | Missing/invalid credentials |
+| `404` | Desktop not found or belongs to another org |
+| `409` | Desktop is not awake |
+| `500` | The resize failed inside the guest for a non-RandR reason |
+| `501` | This desktop's image/X server does not support runtime RandR resizes (or its host predates the computer-use API) -- resolution is effectively fixed until the golden image gains RandR support |
+| `503` | The desktop's host is currently unreachable -- retry |
+| `504` | The resize timed out inside the guest -- retry |
