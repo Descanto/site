@@ -6,7 +6,7 @@ import { Reveal, Stagger, StaggerItem } from "@/components/motion";
 
 const PAGE_TITLE = "Canto — instant-wake cloud desktops for agents";
 const PAGE_DESCRIPTION =
-  "Canto gives computer-use agents a persistent Linux desktop that hibernates when idle and wakes in under a second. Honest, awake-time-only billing from $4.50/mo.";
+  "Canto gives computer-use agents a persistent Linux desktop that hibernates when idle and wakes in under a second. Honest, awake-time-only billing from $6/mo.";
 
 function usePageMeta(title: string, description: string) {
   useEffect(() => {
