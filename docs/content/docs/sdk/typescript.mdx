@@ -193,7 +193,7 @@ URL:
 
 ```ts
 const p = await d.exposePort(8080);
-p.url; // https://8080-<desktopId>.canto.run
+p.url; // https://8080-<desktopId>.canto.host
 p.token; // canto_pt_... -- shown EXACTLY ONCE, never recoverable
 
 await fetch(`${p.url}/health`, { headers: { "X-Canto-Token": p.token } });
