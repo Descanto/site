@@ -42,5 +42,18 @@ export async function generateMetadata(props: {
   return {
     title: page.data.title,
     description: page.data.description,
+    alternates: {
+      canonical: `https://docs.descanto.com${page.url === "/" ? "/" : page.url}`,
+    },
+    openGraph: {
+      // Repeat type/images here: page-level openGraph replaces the layout's
+      // wholesale (shallow merge), it does not extend it.
+      type: "website",
+      siteName: "Descanto Docs",
+      images: ["https://descanto.com/og.png"],
+      title: page.data.title,
+      description: page.data.description,
+      url: `https://docs.descanto.com${page.url === "/" ? "/" : page.url}`,
+    },
   };
 }

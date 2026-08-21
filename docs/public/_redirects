@@ -3,3 +3,16 @@
 /docs/canto / 301
 /docs/botto / 301
 /docs / 301
+
+# Predictable developer-portal path: the docs root IS the developer portal.
+/developers / 301
+/developer / 301
+
+# Trust anchors live on the apex — one canonical copy, no duplicate content.
+/about https://descanto.com/about 301
+/contact https://descanto.com/contact 301
+/privacy https://descanto.com/privacy 301
+/terms https://descanto.com/terms 301
+
+# Machine-readable API surface lives on the apex.
+/openapi.json https://descanto.com/openapi.json 301
