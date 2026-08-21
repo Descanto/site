@@ -2,6 +2,8 @@
 // Relays the contact form to CONTACT_TO via Resend. RESEND_API_KEY is a
 // Pages secret; CONTACT_TO / CONTACT_FROM are plain-text vars with defaults.
 
+import { rateLimitHeaders } from "../_ratelimit";
+
 interface Env {
   RESEND_API_KEY: string;
   CONTACT_TO?: string;
@@ -25,7 +27,7 @@ const MAX_MESSAGE_LENGTH = 5000;
 function json(status: number, body: Record<string, unknown>): Response {
   return new Response(JSON.stringify(body), {
     status,
-    headers: { "Content-Type": "application/json" },
+    headers: { "Content-Type": "application/json", ...rateLimitHeaders() },
   });
 }
 

@@ -25,6 +25,8 @@ Not a fit: stateless one-shot code execution (a plain sandbox is cheaper), Windo
 - Python SDK: https://docs.descanto.com/sdk/python
 - CLI: `npm install -g @descanto/cli` then `descanto --help` (`--json` for scripting) — https://docs.descanto.com/cli
 - Errors are structured JSON (RFC 9457 `application/problem+json`) with status, title, and detail.
+- Versioning: URL-versioned under `/v1`; additive changes only, breaking changes ship as `/v2`. Deprecations signaled via `Deprecation`/`Sunset` headers plus 90 days notice: https://docs.descanto.com/api/overview#versioning-and-deprecation
+- Rate limits: honor `Retry-After` on 429/503; IETF RateLimit headers documented at https://docs.descanto.com/api/overview#rate-limiting
 - Mutations (wake/hibernate/destroy/fork/restore) return an operation handle to poll: `GET /v1/operations/{id}`.
 
 ## Docs
@@ -50,4 +52,4 @@ Not a fit: stateless one-shot code execution (a plain sandbox is cheaper), Windo
 
 ## Markdown for agents
 
-Every page on descanto.com serves a markdown rendition via content negotiation: request it with `Accept: text/markdown`. The sitemap is at https://descanto.com/sitemap.xml.
+Every page on descanto.com serves a markdown rendition via content negotiation: request it with `Accept: text/markdown`. Sitemaps: https://descanto.com/sitemap.xml (site) and https://docs.descanto.com/sitemap.xml (docs).

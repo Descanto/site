@@ -2,6 +2,8 @@
 // Adds the requester to the Resend "Early Access" audience and emails the
 // request to CONTACT_TO so every signup is also an actionable inbox item.
 
+import { rateLimitHeaders } from "../_ratelimit";
+
 interface Env {
   RESEND_API_KEY: string;
   CONTACT_TO?: string;
@@ -28,7 +30,7 @@ const TIERS = new Set(["small", "default", "large", "unsure"]);
 function json(status: number, body: Record<string, unknown>): Response {
   return new Response(JSON.stringify(body), {
     status,
-    headers: { "Content-Type": "application/json" },
+    headers: { "Content-Type": "application/json", ...rateLimitHeaders() },
   });
 }
 

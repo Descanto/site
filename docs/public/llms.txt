@@ -19,4 +19,5 @@
 ## Machine-readable
 
 - OpenAPI spec: https://descanto.com/openapi.json (also at https://api.descanto.com/v1/openapi.json)
-- Sitemap: https://descanto.com/sitemap.xml
+- Docs sitemap: https://docs.descanto.com/sitemap.xml
+- Site sitemap: https://descanto.com/sitemap.xml

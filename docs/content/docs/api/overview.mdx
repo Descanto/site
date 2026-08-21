@@ -1,6 +1,6 @@
 ---
-title: Overview
-description: Base URL, auth, error format, and limits.
+title: API reference overview
+description: Base URL, auth, error format, limits, versioning and deprecation policy, and rate-limit conventions for the Descanto API.
 ---
 
 <Callout title="Hand-written reference" type="info">
@@ -103,6 +103,50 @@ policy acts on the former, not the latter.
   `https://`, and can't target a loopback/link-local host. Delivery-log
   reads (`?limit=`) default to **50**, capped at **200**. See
   [Webhooks](/api/webhooks).
+
+## Versioning and deprecation
+
+The API is versioned in the URL path: every route lives under `/v1`, and
+the OpenAPI document you integrate against is the committed contract for
+that version. Within `v1`:
+
+- **Additive changes only.** New endpoints, new optional request fields,
+  and new response fields may appear without notice. Parse responses
+  leniently: unknown fields must be ignored.
+- **No breaking changes without a deprecation window.** Removing or
+  renaming a field, changing a type, or changing an endpoint's semantics
+  will not happen inside `v1`. Behavior like that ships as `/v2`, with
+  `v1` continuing to run alongside it.
+- **Deprecation signaling.** When an endpoint or a whole version is
+  scheduled for removal, responses from it will carry the standard
+  [`Deprecation` header](https://datatracker.ietf.org/doc/html/rfc9745)
+  and, once a shutdown date is set, a
+  [`Sunset` header](https://datatracker.ietf.org/doc/html/rfc8594) with
+  that date. The deprecation will also be announced in the
+  [changelog](https://descanto.com/news) with at least **90 days** notice
+  before sunset. Nothing in the API is deprecated today, so you won't see
+  these headers yet.
+
+Treat the absence of `Deprecation`/`Sunset` headers as "safe to build on."
+
+## Rate limiting
+
+Early-access deployments are provisioned per org and not currently
+rate-limited at the HTTP layer, so you won't see `429`s under normal use.
+The conventions below are the contract for when limits are enforced:
+
+- A throttled request returns **`429 Too Many Requests`** as
+  `application/problem+json` (same envelope as every other error), with a
+  **`Retry-After`** header saying how many seconds to wait.
+- Rate-limited responses will carry the IETF
+  [RateLimit headers](https://datatracker.ietf.org/doc/draft-ietf-httpapi-ratelimit-headers/)
+  (`RateLimit-Limit`, `RateLimit-Remaining`, `RateLimit-Reset`) so clients
+  can self-throttle before hitting a `429`.
+- Until then, the practical limits are the per-request caps in
+  [Limits](#limits) and your org's desktop quota.
+
+If you're building a client today: honor `Retry-After` on any `429` or
+`503`, and back off exponentially when neither header is present.
 
 ## Why hand-written, not `fumadocs-openapi`
 

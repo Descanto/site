@@ -1,5 +1,19 @@
 import { describe, expect, test } from "bun:test";
 import { prefersMarkdown, markdownAssetPath } from "../functions/_lib";
+import { rateLimitHeaders, RATE_LIMIT } from "../functions/_ratelimit";
+
+describe("rateLimitHeaders", () => {
+  test("emits the IETF RateLimit header set with a policy", () => {
+    const h = rateLimitHeaders();
+    expect(h["RateLimit-Policy"]).toBe(`${RATE_LIMIT.limit};w=${RATE_LIMIT.windowSecs}`);
+    expect(Number(h["RateLimit-Limit"])).toBe(RATE_LIMIT.limit);
+    expect(Number(h["RateLimit-Remaining"])).toBeLessThan(RATE_LIMIT.limit);
+    expect(Number(h["RateLimit-Reset"])).toBeGreaterThan(0);
+  });
+  test("remaining is clamped at zero", () => {
+    expect(rateLimitHeaders(-5)["RateLimit-Remaining"]).toBe("0");
+  });
+});
 
 describe("prefersMarkdown", () => {
   test("plain text/markdown wins", () => {
