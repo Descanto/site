@@ -8,8 +8,11 @@ import { execSync } from "node:child_process";
 const OUT = join(import.meta.dir, "..", "docs", "out");
 const built = existsSync(join(OUT, "sitemap.xml"));
 
+// Plain conditional rather than describe.if: bun still executes the describe
+// callback when .if(false), so a top-level readFileSync would throw in the
+// www CI job, where docs/out is never built.
 describe.if(built)("docs sitemap", () => {
-  const sitemap = readFileSync(join(OUT, "sitemap.xml"), "utf8");
+  const sitemap = built ? readFileSync(join(OUT, "sitemap.xml"), "utf8") : "";
 
   test("lists every mdx page exactly once", () => {
     const mdxCount = Number(
