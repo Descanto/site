@@ -41,6 +41,9 @@ describe.if(built)("prerendered output", () => {
     const org = ld["@graph"].find((n: { "@type": string }) => n["@type"] === "Organization");
     expect(org.contactPoint.email).toBe("hello@descanto.com");
     expect(org.sameAs.length).toBeGreaterThan(0);
+    expect(org.legalName).toBe("DV CENTRAL HOLDINGS LTD");
+    expect(org.address["@type"]).toBe("PostalAddress");
+    expect(org.address.postalCode).toBe("WC2H 9JQ");
   });
 
   test("every static page is prerendered with its own title and canonical", () => {

@@ -55,7 +55,11 @@ export function Footer() {
             <br />
             Always there. Pay only when it thinks.
           </p>
-          <p className="text-xs text-faint">© 2026 Descanto</p>
+          <p className="text-xs text-faint">
+            © 2026 DV CENTRAL HOLDINGS LTD, trading as Descanto
+            <br />
+            71-75 Shelton Street, Covent Garden, London WC2H 9JQ
+          </p>
         </div>
         <div className="flex gap-18 max-md:grid max-md:grid-cols-2 max-md:gap-10">
           {columns.map((col) => (

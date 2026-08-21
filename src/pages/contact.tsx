@@ -46,6 +46,13 @@ export function ContactPage() {
               <Button size="sm" variant="outline" href="https://github.com/descanto">GitHub</Button>
               <Button size="sm" variant="outline" href="mailto:hello@descanto.com">Email us</Button>
             </div>
+            <address className="pt-3 text-[13px] not-italic leading-relaxed text-faint">
+              DV CENTRAL HOLDINGS LTD (trading as Descanto)
+              <br />
+              71-75 Shelton Street, Covent Garden
+              <br />
+              London WC2H 9JQ, United Kingdom
+            </address>
           </div>
           <div className="min-w-0 flex-1">
             <ContactForm />
