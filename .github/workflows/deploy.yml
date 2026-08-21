@@ -24,6 +24,9 @@ jobs:
       - name: Build
         run: bun run build
 
+      - name: Test
+        run: bun run test
+
       # Pushes to main deploy to production; PRs get a preview URL on the same project.
       # The action's `command:` input is not shell-expanded, so deploy directly
       # with wrangler here. Branch name goes through an env var and is sanitized —

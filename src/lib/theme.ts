@@ -15,7 +15,8 @@ function apply(theme: Theme) {
 
 export function useTheme(): [Theme, (t: Theme) => void] {
   const [theme, setThemeState] = useState<Theme>(
-    () => (localStorage.getItem(STORAGE_KEY) as Theme) ?? "system",
+    // localStorage doesn't exist during build-time prerendering.
+    () => (typeof localStorage === "undefined" ? "system" : ((localStorage.getItem(STORAGE_KEY) as Theme) ?? "system")),
   );
 
   useEffect(() => {

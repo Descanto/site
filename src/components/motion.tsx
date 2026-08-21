@@ -1,6 +1,10 @@
 import { motion, useReducedMotion, type Variants } from "framer-motion";
 import type { ReactNode } from "react";
 
+// During build-time prerendering there's no viewport to animate against —
+// render plain, fully-visible markup so crawlers (and no-JS readers) see it.
+const isServer = typeof document === "undefined";
+
 const rise: Variants = {
   hidden: { opacity: 0, y: 24 },
   show: { opacity: 1, y: 0, transition: { duration: 0.6, ease: [0.22, 1, 0.36, 1] } },
@@ -9,7 +13,7 @@ const rise: Variants = {
 /** Scroll-triggered fade-up, once, xAI style. Wrap any section block. */
 export function Reveal({ children, delay = 0, className }: { children: ReactNode; delay?: number; className?: string }) {
   const reduced = useReducedMotion();
-  if (reduced) return <div className={className}>{children}</div>;
+  if (isServer || reduced) return <div className={className}>{children}</div>;
   return (
     <motion.div
       className={className}
@@ -27,7 +31,7 @@ export function Reveal({ children, delay = 0, className }: { children: ReactNode
 /** Page-load stagger container for the hero: children with <StaggerItem> rise in sequence. */
 export function Stagger({ children, className }: { children: ReactNode; className?: string }) {
   const reduced = useReducedMotion();
-  if (reduced) return <div className={className}>{children}</div>;
+  if (isServer || reduced) return <div className={className}>{children}</div>;
   return (
     <motion.div
       className={className}

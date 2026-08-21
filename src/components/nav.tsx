@@ -101,7 +101,7 @@ const developerSecondary: MenuEntry[] = [
 const company: MenuEntry[] = [
   { to: "/about", title: "About", description: "What Canto is building, and why." },
   { to: "/news", title: "News", description: "Launches, releases, and engineering notes." },
-  { to: "/about#contact", title: "Contact", description: "hello@descanto.com — the repo is the front door." },
+  { to: "/contact", title: "Contact", description: "hello@descanto.com — the repo is the front door." },
 ];
 
 function NavDropdown({ label, primary, secondary = [] }: { label: string; primary: MenuEntry[]; secondary?: MenuEntry[] }) {

@@ -1,1 +1,5 @@
-/* /index.html 200
+# Old marketing URLs. No SPA fallback here on purpose: every route is
+# prerendered to a static HTML file, so unknown paths must fall through to
+# Pages' 404.html with a real 404 status (agents probe paths and believe 200s).
+/canto / 301
+/canto/pricing /pricing 301

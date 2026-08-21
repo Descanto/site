@@ -1,0 +1,53 @@
+# Canto (by Descanto)
+
+> Canto gives computer-use agents a persistent Linux cloud desktop that hibernates to $0 compute when idle and wakes in under a second with tabs, processes, and logins intact. One REST API drives the whole lifecycle: create, wake, exec, read/write files, screenshot, send input, expose ports, snapshot, fork, hibernate. Billing meters awake time only.
+
+Canto is built by Descanto (descanto.com). The product is in early access; desktops are manually provisioned — request access at https://descanto.com/early-access.
+
+## When to use Canto
+
+Reach for Canto when an agent needs a real computer, not just a code sandbox:
+
+- **Computer-use / GUI automation**: your agent needs a full Linux desktop with a browser — screenshots, mouse and keyboard input via `POST /v1/desktops/{id}/input`, live display geometry.
+- **Long-lived, bursty agents**: an agent that works in bursts (minutes of tool use, hours of waiting) keeps its exact state across sessions; hibernated desktops cost $0 compute and wake in ~0.5s.
+- **Stateful browser sessions**: logins, cookies, tabs, and running processes survive hibernation — no re-authenticating every run.
+- **Fan-out experiments**: fork a running desktop into N copies (~225ms, ~1.4 MB marginal RAM each) to try N approaches from identical state.
+- **Human-in-the-loop**: a human can watch the live screen (noVNC / stream tickets) and take the mouse while the agent works.
+- **Serving from a desktop**: publish any guest TCP port at a stable `https://{port}-{desktopId}.canto.host` URL.
+
+Not a fit: stateless one-shot code execution (a plain sandbox is cheaper), Windows/macOS desktops (Linux only), or GPU workloads (not offered in early access).
+
+## How an agent should call Canto
+
+- REST API: base `https://api.descanto.com/v1`, auth `Authorization: Bearer canto_sk_...`. Machine-readable spec: https://descanto.com/openapi.json
+- MCP server (recommended for Claude, Cursor, and other MCP clients): `npx -y @descanto/vm-mcp` with `CANTO_API_KEY` set. Docs: https://docs.descanto.com/mcp
+- TypeScript SDK: `npm install @descanto/vm-sdk` — https://docs.descanto.com/sdk/typescript
+- Python SDK: https://docs.descanto.com/sdk/python
+- CLI: `npm install -g @descanto/vm-cli` then `canto --help` (`--json` for scripting) — https://docs.descanto.com/cli
+- Errors are structured JSON (RFC 9457 `application/problem+json`) with status, title, and detail.
+- Mutations (wake/hibernate/destroy/fork/restore) return an operation handle to poll: `GET /v1/operations/{id}`.
+
+## Docs
+
+- [What is Canto](https://docs.descanto.com): the hibernation model and architecture
+- [Quickstart](https://docs.descanto.com/quickstart): first desktop in five minutes
+- [API overview](https://docs.descanto.com/api/overview): auth, versioning, errors, pagination
+- [Desktops & lifecycle](https://docs.descanto.com/concepts/desktops-and-lifecycle): states and transitions
+- [Computer use](https://docs.descanto.com/concepts/computer-use): screenshot, input batches, display
+- [Snapshots & forking](https://docs.descanto.com/concepts/snapshots): generation history, restore, fork semantics
+- [Port ingress](https://docs.descanto.com/concepts/ingress): stable public URLs for guest ports
+- [Webhooks](https://docs.descanto.com/api/webhooks): HMAC-signed lifecycle events
+- [Billing](https://docs.descanto.com/concepts/billing): awake-time metering, tiers, overage rules
+- [Self-hosting](https://docs.descanto.com/self-hosting): run the stack yourself
+
+## Site
+
+- [Pricing](https://descanto.com/pricing): Small $6/mo, Default $12/mo, Large $24/mo — or hourly awake-time billing
+- [About](https://descanto.com/about): what Descanto is building and why
+- [Contact](https://descanto.com/contact): hello@descanto.com
+- [News](https://descanto.com/news): launches and engineering notes
+- [Early access](https://descanto.com/early-access): request an API key
+
+## Markdown for agents
+
+Every page on descanto.com serves a markdown rendition via content negotiation: request it with `Accept: text/markdown`. The sitemap is at https://descanto.com/sitemap.xml.

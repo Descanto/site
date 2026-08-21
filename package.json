@@ -5,8 +5,9 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "tsc -b && vite build",
+    "build": "tsc -b && vite build && vite build --ssr src/entry-server.tsx --outDir dist-server && bun scripts/prerender.ts",
     "preview": "vite preview",
+    "test": "bun test tests",
     "typecheck": "tsc -b --pretty false",
     "deploy": "bun run build && wrangler pages deploy dist --project-name descanto-www"
   },

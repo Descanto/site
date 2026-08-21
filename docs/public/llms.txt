@@ -1,0 +1,22 @@
+# Canto docs (docs.descanto.com)
+
+> Developer documentation for Canto, the instant-wake cloud desktop platform for computer-use agents by Descanto. The canonical agent guide (when to use Canto, API surface, SDKs, CLI, MCP) lives at https://descanto.com/llms.txt.
+
+## Key pages
+
+- [What is Canto](https://docs.descanto.com/): the hibernation model and architecture
+- [Quickstart](https://docs.descanto.com/quickstart): first desktop in five minutes
+- [API overview](https://docs.descanto.com/api/overview): auth, versioning, errors, pagination
+- [Desktops API](https://docs.descanto.com/api/desktops): create, wake, hibernate, fork, destroy
+- [Exec and files](https://docs.descanto.com/api/exec-and-files): run commands, read/write files
+- [Computer use](https://docs.descanto.com/api/computer-use): screenshot, input, display
+- [Ports](https://docs.descanto.com/api/ports): public URLs for guest TCP ports
+- [Webhooks](https://docs.descanto.com/api/webhooks): HMAC-signed lifecycle events
+- [TypeScript SDK](https://docs.descanto.com/sdk/typescript) · [Python SDK](https://docs.descanto.com/sdk/python)
+- [CLI](https://docs.descanto.com/cli): the `canto` command (`npm i -g @descanto/vm-cli`)
+- [MCP server](https://docs.descanto.com/mcp): `npx -y @descanto/vm-mcp`
+
+## Machine-readable
+
+- OpenAPI spec: https://descanto.com/openapi.json (also at https://api.descanto.com/v1/openapi.json)
+- Sitemap: https://descanto.com/sitemap.xml

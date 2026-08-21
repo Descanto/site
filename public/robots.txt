@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://descanto.com/sitemap.xml
