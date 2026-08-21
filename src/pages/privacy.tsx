@@ -4,7 +4,8 @@ export function PrivacyPage() {
   return (
     <LegalPage eyebrow="LEGAL" title="Privacy policy" updated="August 21, 2026">
       <p>
-        Descanto ("we", "us") operates Canto, a cloud desktop platform for computer-use agents, at descanto.com and its
+        Descanto ("we", "us" — legally DV CENTRAL HOLDINGS LTD, 71-75 Shelton Street, Covent Garden, London WC2H 9JQ,
+        United Kingdom) operates Canto, a cloud desktop platform for computer-use agents, at descanto.com and its
         subdomains. This policy explains what we collect, why, and what we never do with it. The short version: we
         collect the minimum needed to run the service and answer your messages, we don't sell data, and the contents of
         your desktops are yours.

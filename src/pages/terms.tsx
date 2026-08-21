@@ -4,7 +4,8 @@ export function TermsPage() {
   return (
     <LegalPage eyebrow="LEGAL" title="Terms of service" updated="August 21, 2026">
       <p>
-        These terms govern your use of Canto, the cloud desktop platform operated by Descanto at descanto.com and its
+        These terms govern your use of Canto, the cloud desktop platform operated by Descanto (DV CENTRAL HOLDINGS LTD,
+        71-75 Shelton Street, Covent Garden, London WC2H 9JQ, United Kingdom) at descanto.com and its
         subdomains, including the API at api.descanto.com and desktops served under canto.host. By creating an account
         or using an API key you agree to them. Canto is in early access: capacity is provisioned manually and the
         service is offered as-is while we build toward general availability.
