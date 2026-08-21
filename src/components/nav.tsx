@@ -90,7 +90,7 @@ function DropdownPanel({ primary, secondary }: { primary: MenuEntry[]; secondary
 
 const developer: MenuEntry[] = [
   { to: "https://docs.descanto.com", title: "Docs", description: "Quickstart, concepts, and the full API reference." },
-  { to: "https://docs.descanto.com/sdk/typescript", title: "TypeScript SDK", description: "@descanto/vm-sdk — the ergonomic client." },
+  { to: "https://docs.descanto.com/sdk/typescript", title: "TypeScript SDK", description: "@descanto/sdk — the ergonomic client." },
   { to: "https://docs.descanto.com/mcp", title: "MCP server", description: "Drive desktops from Claude Code, Cursor, or any MCP client." },
 ];
 const developerSecondary: MenuEntry[] = [

@@ -80,9 +80,9 @@ const steps = [
   ["03", "Hibernate", "Hibernate when idle — memory-snapshot preserved, wake in under a second, pay nothing while asleep."],
 ];
 
-const sdkSnippet = `import { Descanto } from "@descanto/vm-sdk";
+const sdkSnippet = `import { Canto } from "@descanto/sdk";
 
-const canto = new Descanto({ apiKey }); // or CANTO_API_KEY env var
+const canto = new Canto({ apiKey }); // or CANTO_API_KEY env var
 
 const d = await canto.desktops.create({ tier: "default", billingMode: "monthly" });
 
@@ -90,13 +90,13 @@ const { stdout } = await d.exec("whoami");
 
 await d.hibernate(); // pay nothing while asleep`;
 
-const mcpClaudeCode = `claude mcp add canto --env CANTO_API_KEY=canto_sk_... -- npx -y @descanto/vm-mcp`;
+const mcpClaudeCode = `claude mcp add canto --env CANTO_API_KEY=canto_sk_... -- npx -y @descanto/mcp`;
 
 const mcpConfig = `{
   "mcpServers": {
     "canto": {
       "command": "npx",
-      "args": ["-y", "@descanto/vm-mcp"],
+      "args": ["-y", "@descanto/mcp"],
       "env": {
         "CANTO_API_KEY": "canto_sk_..."
       }
@@ -234,7 +234,7 @@ $ canto fork release-bot --count 20
           </div>
 
           {tab === "sdk" ? (
-            <CodeBlock title="typescript · @descanto/vm-sdk" code={sdkSnippet} />
+            <CodeBlock title="typescript · @descanto/sdk" code={sdkSnippet} />
           ) : (
             <div className="flex flex-col gap-5">
               <CodeBlock title="bash · claude mcp add" code={mcpClaudeCode} />

@@ -3,18 +3,18 @@ title: CLI
 description: "canto: the command-line interface for Descanto cloud desktops."
 ---
 
-`@descanto/vm-cli` ships the `canto` command -- a thin wrapper over
-[`@descanto/vm-sdk`](/sdk/typescript) (bundled in) for driving desktops
+`@descanto/cli` ships the `canto` command -- a thin wrapper over
+[`@descanto/sdk`](/sdk/typescript) (bundled in) for driving desktops
 from a shell or a CI pipeline.
 
 ## Install
 
 ```bash
-npm install -g @descanto/vm-cli
+npm install -g @descanto/cli
 canto --help
 
 # or run it without installing:
-npx -y @descanto/vm-cli --help
+npx -y @descanto/cli --help
 ```
 
 ## Auth
@@ -97,7 +97,7 @@ propagates the guest command's own exit code, so `canto exec $ID make test
 bun install
 bun run test        # vitest, SDK/fetch mocked
 bun run typecheck
-bun run build        # tsup, bundles @descanto/vm-sdk (noExternal)
+bun run build        # tsup, bundles @descanto/sdk (noExternal)
 ```
 
-Releases go out in lockstep with `@descanto/vm-sdk` / `@descanto/vm-mcp`.
+Releases go out in lockstep with `@descanto/sdk` / `@descanto/mcp`.

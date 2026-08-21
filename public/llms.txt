@@ -20,10 +20,10 @@ Not a fit: stateless one-shot code execution (a plain sandbox is cheaper), Windo
 ## How an agent should call Descanto
 
 - REST API: base `https://api.descanto.com/v1`, auth `Authorization: Bearer canto_sk_...`. Machine-readable spec: https://descanto.com/openapi.json
-- MCP server (recommended for Claude, Cursor, and other MCP clients): `npx -y @descanto/vm-mcp` with `CANTO_API_KEY` set. Docs: https://docs.descanto.com/mcp
-- TypeScript SDK: `npm install @descanto/vm-sdk` — https://docs.descanto.com/sdk/typescript
+- MCP server (recommended for Claude, Cursor, and other MCP clients): `npx -y @descanto/mcp` with `CANTO_API_KEY` set. Docs: https://docs.descanto.com/mcp
+- TypeScript SDK: `npm install @descanto/sdk` — https://docs.descanto.com/sdk/typescript
 - Python SDK: https://docs.descanto.com/sdk/python
-- CLI: `npm install -g @descanto/vm-cli` then `canto --help` (`--json` for scripting) — https://docs.descanto.com/cli
+- CLI: `npm install -g @descanto/cli` then `canto --help` (`--json` for scripting) — https://docs.descanto.com/cli
 - Errors are structured JSON (RFC 9457 `application/problem+json`) with status, title, and detail.
 - Mutations (wake/hibernate/destroy/fork/restore) return an operation handle to poll: `GET /v1/operations/{id}`.
 

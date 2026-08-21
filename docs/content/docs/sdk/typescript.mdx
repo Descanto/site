@@ -1,23 +1,23 @@
 ---
 title: TypeScript SDK
-description: "@descanto/vm-sdk: the ergonomic client for the Descanto API."
+description: "@descanto/sdk: the ergonomic client for the Descanto API."
 ---
 
-`@descanto/vm-sdk` is a fetch-based, zero-runtime-dependency TypeScript client for
+`@descanto/sdk` is a fetch-based, zero-runtime-dependency TypeScript client for
 `controld`'s public REST API (`/v1/**`). ESM + CJS, works in Node >= 18,
 Bun, and edge runtimes with a global `fetch`.
 
 ## Install
 
 ```bash
-npm install @descanto/vm-sdk
-# or: bun add @descanto/vm-sdk / pnpm add @descanto/vm-sdk / yarn add @descanto/vm-sdk
+npm install @descanto/sdk
+# or: bun add @descanto/sdk / pnpm add @descanto/sdk / yarn add @descanto/sdk
 ```
 
 ## Quickstart
 
 ```ts
-import { Canto } from "@descanto/vm-sdk";
+import { Canto } from "@descanto/sdk";
 
 const canto = new Canto({ apiKey }); // or CANTO_API_KEY env var
 
@@ -260,7 +260,7 @@ are plain `GET`s, retried like any read.
 Verify a delivery in your receiver with `verifyWebhookSignature`:
 
 ```ts
-import { verifyWebhookSignature } from "@descanto/vm-sdk";
+import { verifyWebhookSignature } from "@descanto/sdk";
 
 const ok = verifyWebhookSignature({
   payload: rawBody, // Buffer | string -- the RAW request body
@@ -324,7 +324,7 @@ error handling itself: `detail` falls back to the raw response text.
 | `CantoTimeoutError` | A `{ wait: true }` mutation's client-side poll budget (`pollTimeoutSecs`) is exhausted while the operation is **still** pending/running -- not settled at all, distinct from both errors above. |
 
 ```ts
-import { CantoApiError, CantoOperationError } from "@descanto/vm-sdk";
+import { CantoApiError, CantoOperationError } from "@descanto/sdk";
 
 try {
   await d.wake({ expectedGeneration: staleGeneration });

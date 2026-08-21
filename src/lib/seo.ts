@@ -118,9 +118,9 @@ export const homeJsonLd = {
       },
       sameAs: [
         "https://github.com/descanto",
-        "https://www.npmjs.com/package/@descanto/vm-sdk",
-        "https://www.npmjs.com/package/@descanto/vm-cli",
-        "https://www.npmjs.com/package/@descanto/vm-mcp",
+        "https://www.npmjs.com/package/@descanto/sdk",
+        "https://www.npmjs.com/package/@descanto/cli",
+        "https://www.npmjs.com/package/@descanto/mcp",
       ],
     },
   ],
