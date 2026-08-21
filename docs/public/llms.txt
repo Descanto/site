@@ -1,10 +1,10 @@
-# Canto docs (docs.descanto.com)
+# Descanto docs (docs.descanto.com)
 
-> Developer documentation for Canto, the instant-wake cloud desktop platform for computer-use agents by Descanto. The canonical agent guide (when to use Canto, API surface, SDKs, CLI, MCP) lives at https://descanto.com/llms.txt.
+> Developer documentation for Descanto, the instant-wake cloud desktop platform for computer-use agents. The canonical agent guide (when to use Descanto, API surface, SDKs, CLI, MCP) lives at https://descanto.com/llms.txt.
 
 ## Key pages
 
-- [What is Canto](https://docs.descanto.com/): the hibernation model and architecture
+- [What is Descanto](https://docs.descanto.com/): the hibernation model and architecture
 - [Quickstart](https://docs.descanto.com/quickstart): first desktop in five minutes
 - [API overview](https://docs.descanto.com/api/overview): auth, versioning, errors, pagination
 - [Desktops API](https://docs.descanto.com/api/desktops): create, wake, hibernate, fork, destroy

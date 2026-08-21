@@ -4,16 +4,16 @@ export function TermsPage() {
   return (
     <LegalPage eyebrow="LEGAL" title="Terms of service" updated="August 21, 2026">
       <p>
-        These terms govern your use of Canto, the cloud desktop platform operated by Descanto (DV CENTRAL HOLDINGS LTD,
+        These terms govern your use of Descanto, the cloud desktop platform operated by DV CENTRAL HOLDINGS LTD (trading as Descanto,
         71-75 Shelton Street, Covent Garden, London WC2H 9JQ, United Kingdom) at descanto.com and its
         subdomains, including the API at api.descanto.com and desktops served under canto.host. By creating an account
-        or using an API key you agree to them. Canto is in early access: capacity is provisioned manually and the
+        or using an API key you agree to them. Descanto is in early access: capacity is provisioned manually and the
         service is offered as-is while we build toward general availability.
       </p>
 
       <h2>The service</h2>
       <p>
-        Canto provides persistent Linux desktops that hibernate when idle and wake on demand, driven by a REST API,
+        Descanto provides persistent Linux desktops that hibernate when idle and wake on demand, driven by a REST API,
         SDKs, a CLI, and an MCP server. Desktops are isolated microVMs; what you install and run inside them is your
         responsibility. We may update, add, or retire features during early access, and we'll communicate breaking API
         changes through versioned routes and the changelog.

@@ -1,9 +1,9 @@
 ---
 title: MCP server
-description: Drive Canto desktops from Claude Code, Cursor, Codex, Copilot, Antigravity, OpenCode, and any MCP client.
+description: Drive Descanto desktops from Claude Code, Cursor, Codex, Copilot, Antigravity, OpenCode, and any MCP client.
 ---
 
-`@descanto/vm-mcp` is an MCP (Model Context Protocol) stdio server exposing Canto
+`@descanto/vm-mcp` is an MCP (Model Context Protocol) stdio server exposing Descanto
 cloud desktops to MCP-compatible AI clients -- Claude Code, Claude Desktop,
 Cursor, Codex, GitHub Copilot, Antigravity, OpenCode, and any other MCP client.
 It's a thin wrapper over
@@ -21,7 +21,7 @@ desktops, driven entirely through the [tools](#tools) below.
 | Env var | Required | Description |
 |---|---|---|
 | `CANTO_API_KEY` | yes | `canto_sk_...` API key (or AuthKit JWT). The server exits immediately with a clear stderr message if this is unset or blank. |
-| `CANTO_BASE_URL` | no | Override the Canto API base URL. Defaults to the SDK's own default (`controld`'s local-dev address); set this once a hosted Canto API launches. |
+| `CANTO_BASE_URL` | no | Override the Descanto API base URL. Defaults to the SDK's own default (`controld`'s local-dev address); set this once a hosted Descanto API launches. |
 
 ### Claude Code
 
@@ -208,7 +208,7 @@ in practice means small binary files only) -- otherwise the tool returns
 
 ## Errors
 
-A failed Canto API call never crashes the server. Every tool catches
+A failed Descanto API call never crashes the server. Every tool catches
 `CantoApiError` (and any other thrown error) and returns an MCP tool-error
 (`isError: true`) whose message includes the API's HTTP status, title, and
 detail (and `operation_id` when the problem concerns a specific

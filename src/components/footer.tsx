@@ -48,7 +48,7 @@ export function Footer() {
         <div className="flex w-75 flex-col gap-3.5">
           <div className="flex items-center gap-2.5">
             <Mark size={22} />
-            <span className="font-display font-bold tracking-tight">canto</span>
+            <span className="font-display font-bold tracking-tight">descanto</span>
           </div>
           <p className="text-[13px] leading-5 text-graphite">
             Instant-wake cloud desktops for agents.

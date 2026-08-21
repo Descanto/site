@@ -99,7 +99,7 @@ const developerSecondary: MenuEntry[] = [
   { to: "https://github.com/descanto", title: "Status", description: "" },
 ];
 const company: MenuEntry[] = [
-  { to: "/about", title: "About", description: "What Canto is building, and why." },
+  { to: "/about", title: "About", description: "What Descanto is building, and why." },
   { to: "/news", title: "News", description: "Launches, releases, and engineering notes." },
   { to: "/contact", title: "Contact", description: "hello@descanto.com — the repo is the front door." },
 ];
@@ -174,7 +174,7 @@ export function Nav() {
       <nav className="mx-auto flex h-18 max-w-[1440px] items-center gap-10 px-8 max-md:gap-4 max-md:px-5">
         <Link to="/" className="flex shrink-0 items-center gap-2.5">
           <Mark size={24} />
-          <span className="font-display text-lg font-bold tracking-tight">canto</span>
+          <span className="font-display text-lg font-bold tracking-tight">descanto</span>
         </Link>
         <div className="flex flex-1 items-center gap-8 max-md:hidden">
           <NavDropdown label="Developer" primary={developer} secondary={developerSecondary} />

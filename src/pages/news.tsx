@@ -4,7 +4,7 @@ import { posts, featuredPost, formatDate, type NewsPost } from "@/content/news";
 import { Mark } from "@/components/mark";
 import { Button } from "@/components/ui/button";
 
-const filters = ["All", "Canto", "Company", "Engineering"] as const;
+const filters = ["All", "Descanto", "Company", "Engineering"] as const;
 
 function CategoryPill({ category }: { category: string }) {
   return (

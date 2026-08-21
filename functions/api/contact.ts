@@ -62,7 +62,7 @@ export const onRequestPost: PagesFunction<Env> = async ({ request, env }) => {
   }
 
   const to = env.CONTACT_TO ?? "hello@descanto.com";
-  const from = env.CONTACT_FROM ?? "Canto contact form <noreply@descanto.com>";
+  const from = env.CONTACT_FROM ?? "Descanto contact form <noreply@descanto.com>";
 
   const res = await fetch("https://api.resend.com/emails", {
     method: "POST",
@@ -74,7 +74,7 @@ export const onRequestPost: PagesFunction<Env> = async ({ request, env }) => {
       from,
       to: [to],
       reply_to: email,
-      subject: `Canto contact form — ${name}`,
+      subject: `Descanto contact form — ${name}`,
       html: `<p><strong>${escapeHtml(name)}</strong> &lt;${escapeHtml(email)}&gt;</p><p>${escapeHtml(message).replaceAll("\n", "<br>")}</p>`,
       text: `${name} <${email}>\n\n${message}`,
     }),

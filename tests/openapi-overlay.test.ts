@@ -5,7 +5,7 @@ import { operationSummaries } from "../functions/_openapi-overlay";
 describe("overlaySpec", () => {
   test("pins the production server URL", () => {
     const spec = overlaySpec({ servers: [{ url: "/" }], paths: {} });
-    expect(spec.servers).toEqual([{ url: "https://api.descanto.com", description: "Canto production API" }]);
+    expect(spec.servers).toEqual([{ url: "https://api.descanto.com", description: "Descanto production API" }]);
   });
 
   test("adds a summary to operations that lack one", () => {

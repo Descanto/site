@@ -4,9 +4,9 @@ import { motion, useReducedMotion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { Reveal, Stagger, StaggerItem } from "@/components/motion";
 
-const PAGE_TITLE = "Canto — instant-wake cloud desktops for agents";
+const PAGE_TITLE = "Descanto — instant-wake cloud desktops for agents";
 const PAGE_DESCRIPTION =
-  "Canto gives computer-use agents a persistent Linux desktop that hibernates when idle and wakes in under a second. Honest, awake-time-only billing from $6/mo.";
+  "Descanto gives computer-use agents a persistent Linux desktop that hibernates when idle and wakes in under a second. Honest, awake-time-only billing from $6/mo.";
 
 function usePageMeta(title: string, description: string) {
   useEffect(() => {
@@ -80,9 +80,9 @@ const steps = [
   ["03", "Hibernate", "Hibernate when idle — memory-snapshot preserved, wake in under a second, pay nothing while asleep."],
 ];
 
-const sdkSnippet = `import { Canto } from "@descanto/vm-sdk";
+const sdkSnippet = `import { Descanto } from "@descanto/vm-sdk";
 
-const canto = new Canto({ apiKey }); // or CANTO_API_KEY env var
+const canto = new Descanto({ apiKey }); // or CANTO_API_KEY env var
 
 const d = await canto.desktops.create({ tier: "default", billingMode: "monthly" });
 
@@ -142,7 +142,7 @@ export function HomePage() {
         />
         <StaggerItem>
           <p className="max-w-155 text-[17px] leading-relaxed text-graphite">
-            Canto gives computer-use agents a persistent Linux desktop that hibernates the instant it's idle and resumes
+            Descanto gives computer-use agents a persistent Linux desktop that hibernates the instant it's idle and resumes
             exactly where it left off — tabs, processes, and logins intact. Always there. Pay only when it thinks.
           </p>
         </StaggerItem>
@@ -255,7 +255,7 @@ $ canto fork release-bot --count 20
           </div>
           <div className="grid grid-cols-3 overflow-hidden rounded-2xl border border-hairline max-md:grid-cols-1">
             {[
-              ["honest-metering", "Our slowness never bills you", "Canto meters only while your desktop responds. Cold starts, snapshots, and uploads are on us — and overage is opt-in, never a surprise."],
+              ["honest-metering", "Our slowness never bills you", "Descanto meters only while your desktop responds. Cold starts, snapshots, and uploads are on us — and overage is opt-in, never a surprise."],
               ["snapshot-native", "State is the product", "Every hibernate captures a full memory snapshot. Restore any generation, fork a running machine, and never lose where an agent left off."],
               ["hard-isolation", "MicroVM boundaries", "Every desktop is its own Firecracker microVM — hardware-virtualized isolation, not a shared container pretending to be a computer."],
             ].map(([tag, title, body], i) => (

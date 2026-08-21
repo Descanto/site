@@ -9,10 +9,10 @@ const inter = Inter({
 
 export const metadata = {
   title: {
-    template: "%s | Canto Docs",
-    default: "Canto Docs",
+    template: "%s | Descanto Docs",
+    default: "Descanto Docs",
   },
-  description: "Documentation for Canto: instant-wake, persistent Linux desktops for computer-use agents.",
+  description: "Documentation for Descanto: instant-wake, persistent Linux desktops for computer-use agents.",
   icons: {
     icon: "/favicon.svg",
   },

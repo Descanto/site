@@ -1,16 +1,16 @@
 ---
-title: What is Canto
+title: What is Descanto
 description: Instant-wake, persistent Linux desktops for computer-use agents.
 ---
 
-Canto is a cloud desktop platform built for computer-use agents. Every
+Descanto is a cloud desktop platform built for computer-use agents. Every
 desktop is a real, persistent Linux machine that an agent (or a human) can
 wake in seconds, drive over `exec`/files/stream, and hibernate when it's
 done -- state preserved, compute stopped.
 
 ## The hibernation model
 
-A Canto desktop always exists once created -- its disk, its generation
+A Descanto desktop always exists once created -- its disk, its generation
 history, its identity -- but it isn't always *running*. It moves through a
 small set of lifecycle states (`provisioning`, `waking`, `awake`,
 `hibernating`, `hibernated`, `destroyed`; see
@@ -55,7 +55,7 @@ idle time in between.
   pipeline, with a `--json` contract for scripting.
 - An [MCP server](/mcp) exposes the same operations (including computer
   use and port ingress) as tools, so Claude Code, Claude Desktop, Cursor,
-  and any other MCP client can drive a Canto desktop directly.
+  and any other MCP client can drive a Descanto desktop directly.
 
 ## Where to go next
 
@@ -93,12 +93,12 @@ idle time in between.
   <Card
     title="MCP server"
     href="/mcp"
-    description="Drive Canto desktops from Claude Code, Claude Desktop, or Cursor."
+    description="Drive Descanto desktops from Claude Code, Claude Desktop, or Cursor."
   />
 </Cards>
 
 <Callout title="Early access">
-  Canto is early access. Desktops are manually provisioned -- see
+  Descanto is early access. Desktops are manually provisioned -- see
   [Quickstart: get access](/quickstart#1-get-access) for how to log in
   and create an API key.
 </Callout>

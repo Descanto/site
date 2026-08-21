@@ -13,7 +13,7 @@ export function ContactPage() {
       <section className="mx-auto flex max-w-[1440px] flex-col gap-5 px-20 pt-22 pb-12 max-lg:px-8">
         <span className="text-xs font-semibold tracking-widest text-faint">CONTACT</span>
         <h1 className="max-w-250 font-display text-[clamp(34px,3.6vw,52px)] font-bold leading-[1.2] tracking-[-0.025em]">
-          Talk to the team behind Canto
+          Talk to the team behind Descanto
         </h1>
         <p className="max-w-180 text-[17px] leading-[1.65] text-graphite">
           Descanto is a small team and every message lands with someone who can actually act on it. Whether you're

@@ -44,7 +44,7 @@ const targets: RenderTarget[] = [
   })),
   ...posts.map((post: { slug: string; title: string; description: string; date: string }) => ({
     path: `/news/${post.slug}`,
-    title: `${post.title} — Canto News`,
+    title: `${post.title} — Descanto News`,
     description: post.description,
     ogType: "article" as const,
     lastmod: post.date,
@@ -70,7 +70,7 @@ function buildPage(target: RenderTarget, appHtml: string): string {
     `<meta property="og:url" content="${canonical}" />`,
     `<meta property="og:type" content="${target.ogType}" />`,
     `<meta property="og:image" content="${OG_IMAGE}" />`,
-    `<meta property="og:site_name" content="Canto" />`,
+    `<meta property="og:site_name" content="Descanto" />`,
     `<meta name="twitter:card" content="summary_large_image" />`,
     target.jsonLd ? `<script type="application/ld+json">${JSON.stringify(target.jsonLd)}</script>` : "",
   ]
@@ -110,7 +110,7 @@ async function main() {
     buildPage(
       {
         path: "/404",
-        title: "Page not found — Canto",
+        title: "Page not found — Descanto",
         description: "This page doesn't exist. See the sitemap, llms.txt, or docs for everything that does.",
         ogType: "website",
         lastmod: buildDate,

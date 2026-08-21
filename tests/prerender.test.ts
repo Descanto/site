@@ -50,7 +50,7 @@ describe.if(built)("prerendered output", () => {
     for (const page of ["pricing", "about", "contact", "privacy", "terms", "news", "early-access"]) {
       const html = readFileSync(join(DIST, `${page}.html`), "utf8");
       expect(html).toContain(`<link rel="canonical" href="https://descanto.com/${page}"`);
-      expect(html).not.toContain("<title>Canto — instant-wake cloud desktops for agents</title>");
+      expect(html).not.toContain("<title>Descanto — instant-wake cloud desktops for agents</title>");
     }
   });
 
@@ -90,7 +90,7 @@ describe.if(built)("prerendered output", () => {
 
   test("llms.txt ships with when-to-use guidance", () => {
     const llms = readFileSync(join(DIST, "llms.txt"), "utf8");
-    expect(llms).toContain("## When to use Canto");
+    expect(llms).toContain("## When to use Descanto");
     expect(llms).toContain("openapi.json");
     expect(llms).toContain("Accept: text/markdown");
   });

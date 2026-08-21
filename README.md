@@ -1,6 +1,6 @@
 # Descanto/site
 
-descanto.com — marketing site for Canto, instant-wake cloud desktops for agents. Vite + React 19 + Tailwind v4, light mode per the brand kit, deployed to Cloudflare Pages.
+descanto.com — marketing site for Descanto, instant-wake cloud desktops for agents. Vite + React 19 + Tailwind v4, light mode per the brand kit, deployed to Cloudflare Pages.
 
 ## Develop
 
@@ -17,7 +17,7 @@ Drop a markdown file in `src/content/news/`:
 ---
 title: My post title
 description: One-line summary shown on cards and at the top of the post.
-category: Canto | Company | Engineering
+category: Descanto | Company | Engineering
 date: 2026-09-01
 featured: false
 ---

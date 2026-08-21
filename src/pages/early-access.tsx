@@ -46,7 +46,7 @@ export function EarlyAccessPage() {
       <div className="flex flex-col gap-4">
         <span className="text-xs font-semibold tracking-widest text-faint">EARLY ACCESS</span>
         <h1 className="font-display text-[clamp(34px,4vw,52px)] font-bold leading-[1.12] tracking-[-0.025em]">
-          Request access to Canto
+          Request access to Descanto
         </h1>
         <p className="text-[16px] leading-relaxed text-graphite">
           Desktops are manually provisioned this milestone, so we onboard in small batches. Tell us what you're building

@@ -10,7 +10,7 @@ export const onRequest = async ({ request }: { request: Request }): Promise<Resp
       error: {
         code: "not_found",
         message: `No API route exists at ${pathname} on descanto.com.`,
-        hint: "The Canto product API lives at https://api.descanto.com/v1 — see the spec at https://descanto.com/openapi.json and docs at https://docs.descanto.com/api/overview. This host only serves POST /api/contact and POST /api/waitlist.",
+        hint: "The Descanto product API lives at https://api.descanto.com/v1 — see the spec at https://descanto.com/openapi.json and docs at https://docs.descanto.com/api/overview. This host only serves POST /api/contact and POST /api/waitlist.",
       },
     }),
     { status: 404, headers: { "Content-Type": "application/json" } },

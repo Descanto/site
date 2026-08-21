@@ -1,4 +1,4 @@
-// GET /openapi.json — publish the Canto API's OpenAPI spec at the marketing
+// GET /openapi.json — publish the Descanto API's OpenAPI spec at the marketing
 // apex, where agents look for it. Fetches the live spec from
 // api.descanto.com, pins the production server URL, and overlays
 // per-operation summaries (see _openapi-overlay.ts) so every operation is
@@ -15,7 +15,7 @@ type Spec = {
 };
 
 export function overlaySpec(spec: Spec): Spec {
-  spec.servers = [{ url: "https://api.descanto.com", description: "Canto production API" }];
+  spec.servers = [{ url: "https://api.descanto.com", description: "Descanto production API" }];
   for (const methods of Object.values(spec.paths ?? {})) {
     for (const [method, op] of Object.entries(methods)) {
       if (!HTTP_METHODS.has(method) || typeof op !== "object" || op === null) continue;

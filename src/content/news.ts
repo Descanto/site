@@ -4,7 +4,7 @@ export interface NewsPost {
   slug: string;
   title: string;
   description: string;
-  category: "Canto" | "Company" | "Engineering";
+  category: "Descanto" | "Company" | "Engineering";
   date: string; // ISO yyyy-mm-dd
   readMinutes: number;
   featured: boolean;

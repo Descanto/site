@@ -1,12 +1,12 @@
-# Canto (by Descanto)
+# Descanto
 
-> Canto gives computer-use agents a persistent Linux cloud desktop that hibernates to $0 compute when idle and wakes in under a second with tabs, processes, and logins intact. One REST API drives the whole lifecycle: create, wake, exec, read/write files, screenshot, send input, expose ports, snapshot, fork, hibernate. Billing meters awake time only.
+> Descanto gives computer-use agents a persistent Linux cloud desktop that hibernates to $0 compute when idle and wakes in under a second with tabs, processes, and logins intact. One REST API drives the whole lifecycle: create, wake, exec, read/write files, screenshot, send input, expose ports, snapshot, fork, hibernate. Billing meters awake time only.
 
-Canto is built by Descanto (descanto.com). The product is in early access; desktops are manually provisioned — request access at https://descanto.com/early-access.
+Descanto is built by DV CENTRAL HOLDINGS LTD (descanto.com). The product is in early access; desktops are manually provisioned — request access at https://descanto.com/early-access.
 
-## When to use Canto
+## When to use Descanto
 
-Reach for Canto when an agent needs a real computer, not just a code sandbox:
+Reach for Descanto when an agent needs a real computer, not just a code sandbox:
 
 - **Computer-use / GUI automation**: your agent needs a full Linux desktop with a browser — screenshots, mouse and keyboard input via `POST /v1/desktops/{id}/input`, live display geometry.
 - **Long-lived, bursty agents**: an agent that works in bursts (minutes of tool use, hours of waiting) keeps its exact state across sessions; hibernated desktops cost $0 compute and wake in ~0.5s.
@@ -17,7 +17,7 @@ Reach for Canto when an agent needs a real computer, not just a code sandbox:
 
 Not a fit: stateless one-shot code execution (a plain sandbox is cheaper), Windows/macOS desktops (Linux only), or GPU workloads (not offered in early access).
 
-## How an agent should call Canto
+## How an agent should call Descanto
 
 - REST API: base `https://api.descanto.com/v1`, auth `Authorization: Bearer canto_sk_...`. Machine-readable spec: https://descanto.com/openapi.json
 - MCP server (recommended for Claude, Cursor, and other MCP clients): `npx -y @descanto/vm-mcp` with `CANTO_API_KEY` set. Docs: https://docs.descanto.com/mcp
@@ -29,7 +29,7 @@ Not a fit: stateless one-shot code execution (a plain sandbox is cheaper), Windo
 
 ## Docs
 
-- [What is Canto](https://docs.descanto.com): the hibernation model and architecture
+- [What is Descanto](https://docs.descanto.com): the hibernation model and architecture
 - [Quickstart](https://docs.descanto.com/quickstart): first desktop in five minutes
 - [API overview](https://docs.descanto.com/api/overview): auth, versioning, errors, pagination
 - [Desktops & lifecycle](https://docs.descanto.com/concepts/desktops-and-lifecycle): states and transitions

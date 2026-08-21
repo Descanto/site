@@ -18,57 +18,57 @@ export interface PageMeta {
 export const staticPages: PageMeta[] = [
   {
     path: "/",
-    title: "Canto — instant-wake cloud desktops for agents",
+    title: "Descanto — instant-wake cloud desktops for agents",
     description:
-      "Canto gives computer-use agents a persistent Linux desktop that hibernates when idle and wakes in under a second. Honest, awake-time-only billing from $6/mo.",
+      "Descanto gives computer-use agents a persistent Linux desktop that hibernates when idle and wakes in under a second. Honest, awake-time-only billing from $6/mo.",
     ogType: "website",
   },
   {
     path: "/pricing",
-    title: "Pricing — Canto",
+    title: "Pricing — Descanto",
     description:
-      "Locked launch pricing for Canto cloud desktops: Small $6/mo, Default $12/mo, Large $24/mo — or hourly billing that meters awake time only. Hibernated desktops cost $0 compute.",
+      "Locked launch pricing for Descanto cloud desktops: Small $6/mo, Default $12/mo, Large $24/mo — or hourly billing that meters awake time only. Hibernated desktops cost $0 compute.",
     ogType: "website",
   },
   {
     path: "/news",
-    title: "News — Canto",
-    description: "Launches, releases, and engineering notes from the team building Canto.",
+    title: "News — Descanto",
+    description: "Launches, releases, and engineering notes from the team building Descanto.",
     ogType: "website",
   },
   {
     path: "/about",
-    title: "About — Canto",
+    title: "About — Descanto",
     description:
-      "Canto builds the computer agents work on: persistent cloud desktops in hardware-isolated microVMs that wake in half a second and never forget where they were.",
+      "Descanto builds the computer agents work on: persistent cloud desktops in hardware-isolated microVMs that wake in half a second and never forget where they were.",
     ogType: "website",
   },
   {
     path: "/contact",
-    title: "Contact — Canto",
+    title: "Contact — Descanto",
     description:
-      "Talk to the team behind Canto — early access, fleet sizing, security reports, or anything else. hello@descanto.com, GitHub, or the contact form.",
+      "Talk to the team behind Descanto — early access, fleet sizing, security reports, or anything else. hello@descanto.com, GitHub, or the contact form.",
     ogType: "website",
   },
   {
     path: "/privacy",
-    title: "Privacy policy — Canto",
+    title: "Privacy policy — Descanto",
     description:
-      "What Descanto collects to run Canto, why, and what we never do with it. No tracking cookies, no selling data, your desktop contents are yours.",
+      "What Descanto collects to run the platform, why, and what we never do with it. No tracking cookies, no selling data, your desktop contents are yours.",
     ogType: "article",
   },
   {
     path: "/terms",
-    title: "Terms of service — Canto",
+    title: "Terms of service — Descanto",
     description:
-      "The terms governing Canto cloud desktops during early access: the service, your responsibilities, billing, your data, and liability.",
+      "The terms governing Descanto cloud desktops during early access: the service, your responsibilities, billing, your data, and liability.",
     ogType: "article",
   },
   {
     path: "/early-access",
-    title: "Request early access — Canto",
+    title: "Request early access — Descanto",
     description:
-      "Canto desktops are manually provisioned during early access. Tell us what you're building and we'll get you an API key as capacity opens up.",
+      "Descanto desktops are manually provisioned during early access. Tell us what you're building and we'll get you an API key as capacity opens up.",
     ogType: "website",
   },
 ];
@@ -80,7 +80,7 @@ export const homeJsonLd = {
     {
       "@type": "SoftwareApplication",
       "@id": `${SITE_URL}/#software`,
-      name: "Canto",
+      name: "Descanto",
       description:
         "Instant-wake, persistent Linux cloud desktops for computer-use agents. Desktops hibernate to $0 compute when idle and wake in under a second with tabs, processes, and logins intact. Driven by a REST API, TypeScript and Python SDKs, a CLI, and an MCP server.",
       url: SITE_URL,
@@ -108,7 +108,7 @@ export const homeJsonLd = {
         addressCountry: "GB",
       },
       logo: `${SITE_URL}/og.png`,
-      description: "Descanto builds Canto, the cloud desktop platform for computer-use agents.",
+      description: "Descanto is the cloud desktop platform for computer-use agents, built by DV CENTRAL HOLDINGS LTD.",
       email: "hello@descanto.com",
       contactPoint: {
         "@type": "ContactPoint",
