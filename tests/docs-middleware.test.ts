@@ -65,10 +65,35 @@ describe.if(built)("docs markdown renditions and metadata", () => {
     expect(home).toContain('<html lang="en"');
   });
 
-  test("_redirects exposes /developers and apex trust anchors", () => {
+  test("_redirects aliases /developer and keeps apex trust anchors", () => {
     const redirects = readFileSync(join(OUT, "_redirects"), "utf8");
-    expect(redirects).toContain("/developers / 301");
+    expect(redirects).toContain("/developer /developers 301");
+    expect(redirects).not.toContain("/developers / 301"); // real page now, not a redirect
     expect(redirects).toContain("/privacy https://descanto.com/privacy 301");
     expect(redirects).toContain("/openapi.json https://descanto.com/openapi.json 301");
+  });
+
+  test("developer portal page exists with keys, docs, and sandbox sections", () => {
+    const portal = readFileSync(join(OUT, "developers.html"), "utf8");
+    for (const needle of ["Developer portal", "Get API keys", "Sandbox", "Quickstart", "OpenAPI"]) {
+      expect(portal).toContain(needle);
+    }
+    expect(existsSync(join(OUT, "md", "developers")), "md rendition").toBe(true);
+  });
+
+  test("homepage has a deep heading structure with the product name", () => {
+    const home = readFileSync(join(OUT, "index.html"), "utf8");
+    expect(home.match(/<h1[ >]/g)?.length).toBe(1);
+    expect((home.match(/<h2[ >]/g)?.length ?? 0)).toBeGreaterThanOrEqual(3);
+    expect((home.match(/<h3[ >]/g)?.length ?? 0)).toBeGreaterThanOrEqual(3);
+    expect(home).toContain("How Descanto is built");
+    expect(home).toContain("The Descanto REST API");
+    // Content efficiency: visible text at least 5% of the HTML.
+    const text = home
+      .replace(/<script[\s\S]*?<\/script>/g, "")
+      .replace(/<style[\s\S]*?<\/style>/g, "")
+      .replace(/<[^>]+>/g, " ")
+      .replace(/\s+/g, " ");
+    expect(text.length / home.length).toBeGreaterThan(0.05);
   });
 });

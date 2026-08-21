@@ -3,6 +3,7 @@
   "pages": [
     "index",
     "quickstart",
+    "developers",
     "concepts",
     "api",
     "sdk",

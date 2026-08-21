@@ -4,6 +4,7 @@
 
 ## Key pages
 
+- [Developer portal](https://docs.descanto.com/developers): API keys, all docs and tools, sandbox options
 - [What is Descanto](https://docs.descanto.com/): the hibernation model and architecture
 - [Quickstart](https://docs.descanto.com/quickstart): first desktop in five minutes
 - [API overview](https://docs.descanto.com/api/overview): auth, versioning, errors, pagination

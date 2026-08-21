@@ -24,40 +24,55 @@ that works in bursts -- a few minutes of tool use, then long stretches of
 waiting on a human or another system -- doesn't pay cloud-VM prices for the
 idle time in between.
 
-## How it's built
+## How Descanto is built
 
-- A small, versioned [REST API](/api/overview) (`/v1/**`) is the one
-  source of truth: create/list/get/update desktops, wake/hibernate/destroy/
-  [fork](/concepts/forking) them, run commands (blocking or
-  [detached](/concepts/operations#background-processes-detached-exec)),
-  read/write/list files (including
-  [large-file chunked transfer](/api/exec-and-files#write-a-file)), get a
-  stream ticket, and query usage.
-- [Computer use](/concepts/computer-use) drives an awake desktop's GUI
-  directly -- screenshot, mouse/keyboard input as a single-round-trip
-  batch, and live display geometry.
-- [Port ingress](/concepts/ingress) publishes any guest TCP port at a
-  stable `https://{port}-{desktopId}.canto.host` URL, token-gated or
-  public, plus an in-browser noVNC viewer on the dashboard.
-- [Snapshots](/concepts/snapshots) let you list a desktop's Generation
-  history and restore an earlier one, with branch semantics (nothing is
-  ever destroyed by a restore) and read-time retention buckets.
-- [Webhooks](/api/webhooks) notify your own server about desktop lifecycle
-  events (`desktop.created`, `.woken`, `.hibernated`, `.destroyed`),
-  HMAC-signed and with a full delivery log.
-- Every mutation (`wake`/`hibernate`/`destroy`/`fork`/`restore`) returns an
-  [operation handle](/concepts/operations) you can poll or long-poll,
-  rather than blocking your connection open.
-- A [TypeScript SDK](/sdk/typescript) and a [Python SDK](/sdk/python) wrap
-  the API with friendlier, promise-/async-based clients and sensible
-  retry/wait defaults.
-- A [CLI](/cli) (`descanto`) drives every route from a shell or a CI
-  pipeline, with a `--json` contract for scripting.
-- An [MCP server](/mcp) exposes the same operations (including computer
-  use and port ingress) as tools, so Claude Code, Claude Desktop, Cursor,
-  and any other MCP client can drive a Descanto desktop directly.
+Everything below is driven by one versioned surface -- the same routes
+whether you call them from curl, an SDK, the CLI, or an MCP client.
 
-## Where to go next
+### The Descanto REST API
+
+A small, versioned [REST API](/api/overview) (`/v1/**`) is the one
+source of truth: create/list/get/update desktops, wake/hibernate/destroy/
+[fork](/concepts/forking) them, run commands (blocking or
+[detached](/concepts/operations#background-processes-detached-exec)),
+read/write/list files (including
+[large-file chunked transfer](/api/exec-and-files#write-a-file)), get a
+stream ticket, and query usage. Every mutation
+(`wake`/`hibernate`/`destroy`/`fork`/`restore`) returns an
+[operation handle](/concepts/operations) you can poll or long-poll,
+rather than blocking your connection open, and
+[webhooks](/api/webhooks) notify your own server about desktop
+lifecycle events (`desktop.created`, `.woken`, `.hibernated`,
+`.destroyed`), HMAC-signed and with a full delivery log. The
+machine-readable contract is published at
+[descanto.com/openapi.json](https://descanto.com/openapi.json).
+
+### Computer use, ingress, and snapshots
+
+[Computer use](/concepts/computer-use) drives an awake desktop's GUI
+directly -- screenshot, mouse/keyboard input as a single-round-trip
+batch, and live display geometry.
+[Port ingress](/concepts/ingress) publishes any guest TCP port at a
+stable `https://{port}-{desktopId}.canto.host` URL, token-gated or
+public, plus an in-browser noVNC viewer on the dashboard.
+[Snapshots](/concepts/snapshots) let you list a desktop's Generation
+history and restore an earlier one, with branch semantics (nothing is
+ever destroyed by a restore) and read-time retention buckets.
+
+### Descanto SDKs, CLI, and MCP server
+
+A [TypeScript SDK](/sdk/typescript) (`@descanto/sdk`) and a
+[Python SDK](/sdk/python) (`descanto-vm`) wrap the API with friendlier,
+promise-/async-based clients and sensible retry/wait defaults. A
+[CLI](/cli) (`descanto`, from `@descanto/cli`) drives every route from a
+shell or a CI pipeline, with a `--json` contract for scripting. An
+[MCP server](/mcp) (`@descanto/mcp`) exposes the same operations
+(including computer use and port ingress) as tools, so Claude Code,
+Claude Desktop, Cursor, and any other MCP client can drive a Descanto
+desktop directly. The [developer portal](/developers) collects all of
+these plus how to get API keys.
+
+## Where to go next in the Descanto docs
 
 <Cards>
   <Card

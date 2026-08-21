@@ -1,0 +1,67 @@
+---
+title: Developer portal
+description: Everything you need to build on Descanto — API keys, quickstart, API reference, SDKs, CLI, MCP server, and a self-hosted sandbox.
+---
+
+This page is the front door for building on Descanto: where to get
+credentials, where every developer resource lives, and how to try the
+platform before you wire it into anything real.
+
+## Get API keys
+
+Descanto is in early access, so keys are provisioned per organization:
+
+1. [Request access](https://descanto.com/early-access) — tell us your use
+   case and preferred tier.
+2. Once onboarded, sign in and create a key with
+   [`descanto login`](/cli#auth) or `POST /v1/keys`
+   ([API keys reference](/api/me)).
+3. Keys look like `canto_sk_...` and are org-scoped: a key only ever sees
+   its own organization's desktops. See
+   [Orgs and auth](/concepts/orgs-and-auth).
+
+## Descanto documentation
+
+- **[Quickstart](/quickstart)** — first desktop in five minutes: create,
+  wake, exec, hibernate, shown with curl, the SDK, and MCP.
+- **[Concepts](/concepts/desktops-and-lifecycle)** — the hibernation
+  model, lifecycle states, [snapshots](/concepts/snapshots),
+  [forking](/concepts/forking), [port ingress](/concepts/ingress), and
+  [billing](/concepts/billing).
+- **[API reference](/api/overview)** — every route and status code, plus
+  the [versioning and deprecation policy](/api/overview#versioning-and-deprecation)
+  and [rate-limit conventions](/api/overview#rate-limiting).
+- **[Webhooks](/api/webhooks)** — HMAC-signed lifecycle events with a
+  full delivery log.
+
+## Descanto tools and clients
+
+- **OpenAPI spec** — machine-readable contract at
+  [descanto.com/openapi.json](https://descanto.com/openapi.json)
+  (also served live at `GET /v1/openapi.json`).
+- **[TypeScript SDK](/sdk/typescript)** — `npm install @descanto/sdk`.
+- **[Python SDK](/sdk/python)** — `pip install descanto-vm`, sync and async.
+- **[CLI](/cli)** — `npm install -g @descanto/cli`, then `descanto --help`.
+- **[MCP server](/mcp)** — `npx -y @descanto/mcp`: drive desktops from
+  Claude Code, Claude Desktop, Cursor, or any MCP client.
+- **llms.txt** — the agent-facing guide at
+  [descanto.com/llms.txt](https://descanto.com/llms.txt), including
+  when-to-use guidance and markdown content negotiation.
+
+## Sandbox
+
+Two ways to experiment without touching production quota:
+
+- **[Self-hosting](/self-hosting)** — run the whole stack (`controld` +
+  `hostd`) locally or on your own hardware; the API surface is identical,
+  so anything you build against a self-hosted instance works unchanged
+  against the hosted platform.
+- **Fork-and-discard** — [fork](/concepts/forking) a desktop, experiment
+  destructively on the copy, and destroy it; the parent is never touched.
+
+## Support
+
+Questions, bug reports, or a fleet to size:
+[hello@descanto.com](mailto:hello@descanto.com), the
+[contact form](https://descanto.com/contact), or
+[GitHub](https://github.com/descanto).
