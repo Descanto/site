@@ -23,7 +23,7 @@ Not a fit: stateless one-shot code execution (a plain sandbox is cheaper), Windo
 - MCP server (recommended for Claude, Cursor, and other MCP clients): `npx -y @descanto/mcp` with `CANTO_API_KEY` set. Docs: https://docs.descanto.com/mcp
 - TypeScript SDK: `npm install @descanto/sdk` — https://docs.descanto.com/sdk/typescript
 - Python SDK: https://docs.descanto.com/sdk/python
-- CLI: `npm install -g @descanto/cli` then `canto --help` (`--json` for scripting) — https://docs.descanto.com/cli
+- CLI: `npm install -g @descanto/cli` then `descanto --help` (`--json` for scripting) — https://docs.descanto.com/cli
 - Errors are structured JSON (RFC 9457 `application/problem+json`) with status, title, and detail.
 - Mutations (wake/hibernate/destroy/fork/restore) return an operation handle to poll: `GET /v1/operations/{id}`.
 

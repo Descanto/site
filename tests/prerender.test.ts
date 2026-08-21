@@ -99,11 +99,11 @@ describe.if(built)("prerendered output", () => {
 describe("htmlToMarkdown", () => {
   test("converts headings, links, and code blocks", () => {
     const md = htmlToMarkdown(
-      '<h1>Title<br/>two</h1><p>Body with <a href="/pricing">pricing</a>.</p><pre><code>$ canto wake</code></pre>',
+      '<h1>Title<br/>two</h1><p>Body with <a href="/pricing">pricing</a>.</p><pre><code>$ descanto wake</code></pre>',
     );
     expect(md).toContain("# Title two");
     expect(md).toContain("[pricing](https://descanto.com/pricing)");
-    expect(md).toContain("```\n$ canto wake\n```");
+    expect(md).toContain("```\n$ descanto wake\n```");
   });
 
   test("strips svg and scripts, unescapes entities", () => {

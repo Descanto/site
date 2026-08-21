@@ -90,11 +90,11 @@ const { stdout } = await d.exec("whoami");
 
 await d.hibernate(); // pay nothing while asleep`;
 
-const mcpClaudeCode = `claude mcp add canto --env CANTO_API_KEY=canto_sk_... -- npx -y @descanto/mcp`;
+const mcpClaudeCode = `claude mcp add descanto --env CANTO_API_KEY=canto_sk_... -- npx -y @descanto/mcp`;
 
 const mcpConfig = `{
   "mcpServers": {
-    "canto": {
+    "descanto": {
       "command": "npx",
       "args": ["-y", "@descanto/mcp"],
       "env": {
@@ -159,10 +159,10 @@ export function HomePage() {
         <section className="mx-auto max-w-200 px-10 pb-18 max-lg:px-6">
           <CodeBlock
             title="desktop: release-bot · awake"
-            code={`$ canto wake release-bot
+            code={`$ descanto wake release-bot
 woke in 0.5s — 14 tabs, 3 processes, logins intact
 
-$ canto fork release-bot --count 20
+$ descanto fork release-bot --count 20
 20 forks in 4.5s · ~1.4 MB marginal RAM each`}
           />
         </section>

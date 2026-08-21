@@ -26,7 +26,7 @@ desktops, driven entirely through the [tools](#tools) below.
 ### Claude Code
 
 ```bash
-claude mcp add canto --env CANTO_API_KEY=canto_sk_... -- npx -y @descanto/mcp
+claude mcp add descanto --env CANTO_API_KEY=canto_sk_... -- npx -y @descanto/mcp
 ```
 
 ### Claude Desktop
@@ -36,7 +36,7 @@ Add to `claude_desktop_config.json` (Settings → Developer → Edit Config):
 ```json
 {
   "mcpServers": {
-    "canto": {
+    "descanto": {
       "command": "npx",
       "args": ["-y", "@descanto/mcp"],
       "env": {
@@ -54,7 +54,7 @@ Add to `.cursor/mcp.json` (project) or `~/.cursor/mcp.json` (global):
 ```json
 {
   "mcpServers": {
-    "canto": {
+    "descanto": {
       "command": "npx",
       "args": ["-y", "@descanto/mcp"],
       "env": {
@@ -70,7 +70,7 @@ Add to `.cursor/mcp.json` (project) or `~/.cursor/mcp.json` (global):
 Use the CLI:
 
 ```bash
-codex mcp add canto --env CANTO_API_KEY=canto_sk_... -- npx -y @descanto/mcp
+codex mcp add descanto --env CANTO_API_KEY=canto_sk_... -- npx -y @descanto/mcp
 ```
 
 or add the server to `~/.codex/config.toml` by hand:
@@ -90,7 +90,7 @@ Add to `.vscode/mcp.json`. Copilot uses the top-level `servers` key and requires
 ```json
 {
   "servers": {
-    "canto": {
+    "descanto": {
       "type": "stdio",
       "command": "npx",
       "args": ["-y", "@descanto/mcp"],
@@ -110,7 +110,7 @@ config** (writes `~/.gemini/config/mcp_config.json`):
 ```json
 {
   "mcpServers": {
-    "canto": {
+    "descanto": {
       "command": "npx",
       "args": ["-y", "@descanto/mcp"],
       "env": {
@@ -131,7 +131,7 @@ OpenCode nests servers under `mcp`, takes `command` as an array, and uses
 {
   "$schema": "https://opencode.ai/config.json",
   "mcp": {
-    "canto": {
+    "descanto": {
       "type": "local",
       "command": ["npx", "-y", "@descanto/mcp"],
       "enabled": true,
